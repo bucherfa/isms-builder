@@ -277,6 +277,8 @@ Contributions are very welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for:
 | ✅ Done | Policy Acknowledgement — staff confirm policies digitally with audit trail (V 1.35.0) |
 | ✅ Done | Guidance CRUD — create, edit and upload own documentation (V 1.35.0) |
 | ✅ Done | Guidance Search — cross-category full-text search with excerpt (V 1.35.0) |
+| ✅ Done | Asset protection goals — CIA + authenticity (1–4), dependencies and BSI maximum-principle inheritance (V 1.36.0) |
+| ✅ Done | NIS2 Art. 21 governance checklist (30 items) and Art. 23 reporting deadlines with automatic alerts (V 1.37.0) |
 | 🔜 Next | AI Policy Assistant — Ollama drafts policy content from title + framework |
 | 🔜 Next | Scheduled Reports — weekly/monthly compliance report delivered by email |
 | 🔜 Next | PostgreSQL backend |
