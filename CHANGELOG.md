@@ -13,11 +13,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Fixed
 - **Navigation blieb im NIS2-Modul hängen**: Nach dem Aufruf von NIS2 blieb dessen Panel beim Wechsel auf ein anderes Modul rechts stehen. Ursache: `removeAllDynamicPanels()` in `ui/app.js` räumt die dynamischen Panels über eine hartcodierte ID-Liste ab, in der `nis2Container` fehlte — jede `render*`-Funktion entfernt nur ihren eigenen Container.
 - **Admin → „Vorhandene Templates" blieb dauerhaft auf „lädt…"**: Im Template-Callback von `renderAdminTemplatesTab()` hieß der Parameter `t` und überschattete damit die globale i18n-Funktion `t()`. Das `t('delete')` für den Tooltip des Löschen-Buttons warf `TypeError: t is not a function`, der `innerHTML`-Aufbau brach ab und die Ladeanzeige blieb stehen. Parameter in `tpl` umbenannt; zusätzlich fängt die Funktion Fehler jetzt ab und zeigt eine Fehlermeldung statt endlos „lädt…".
+- **Menüreihenfolge zeigte NIS2 und Richtlinien-Bestätigungen nicht**: Unter Administration → Organisation → Menüreihenfolge fehlten beide Module. `_NAV_ORDER_DEFAULT` (UI) und `navOrder` (beide Org-Settings-Stores) waren nicht mitgezogen worden. Da eine einmal gespeicherte Reihenfolge die neuen IDs ohnehin nicht kennt, ergänzt die Sortierliste jetzt fehlende Sections aus `SECTION_META` am Ende — so wie es die Navigation selbst schon tat. Neue Module tauchen damit künftig automatisch auf und lassen sich einsortieren.
 
 ### Added
-- `tests/uiPanels.test.js`: statische Guards gegen zwei Fehlerklassen in `ui/app.js` (4 Tests, 326 gesamt) —
-  jeder dynamisch erzeugte Panel-Container muss in `removeAllDynamicPanels()` gelistet sein, und kein mehrzeiliger
-  Template-Callback darf die i18n-Funktion `t()` überschatten. Beide Fehler fielen bisher erst bei der Nutzung auf.
+- `tests/uiPanels.test.js`: statische Guards gegen drei Fehlerklassen in `ui/app.js` (8 Tests, 330 gesamt) —
+  jeder dynamisch erzeugte Panel-Container muss in `removeAllDynamicPanels()` gelistet sein, kein mehrzeiliger
+  Template-Callback darf die i18n-Funktion `t()` überschatten, und die Nav-Default-Reihenfolge muss in UI und
+  beiden Stores identisch sein und jede Section aus `SECTION_META` enthalten. Alle drei Fehler fielen bisher erst
+  bei der Nutzung der jeweiligen Maske auf.
 
 ---
 

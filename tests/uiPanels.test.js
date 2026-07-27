@@ -76,3 +76,54 @@ describe('i18n-Funktion t() wird nicht überschattet', () => {
     expect(shadowedTCallbacks()).toEqual([])
   })
 })
+
+/**
+ * Navigations-Reihenfolge: die Default-Liste steht an drei Stellen (UI + beide Stores)
+ * und muss jede Section aus SECTION_META enthalten. Fehlt eine ID, taucht das Modul unter
+ * Administration → Organisation → Menüreihenfolge nicht auf und lässt sich nicht
+ * einsortieren (so passiert mit 'nis2' und 'policy-acks', V 1.37.1).
+ *
+ * Die Store-Dateien werden bewusst als Text gelesen und nicht require't — ein require
+ * würde beim Laden das echte data/-Verzeichnis anfassen.
+ */
+function idList(source, regex) {
+  const m = source.match(regex)
+  expect(m).not.toBeNull()
+  return m[1].split(',').map(s => s.trim().replace(/'/g, '')).filter(Boolean)
+}
+
+function sectionMetaIds() {
+  const block = APP_JS.match(/const SECTION_META = \[([\s\S]*?)\n\]/)
+  expect(block).not.toBeNull()
+  return [...block[1].matchAll(/id:\s*'([a-z0-9-]+)'/g)].map(m => m[1])
+}
+
+function storeNavOrder(relPath) {
+  const src = fs.readFileSync(path.join(__dirname, '..', relPath), 'utf8')
+  return idList(src, /navOrder:\s*\[([^\]]+)\]/)
+}
+
+describe('Navigations-Reihenfolge', () => {
+  test('_NAV_ORDER_DEFAULT enthält jede Section aus SECTION_META', () => {
+    const nav = idList(APP_JS, /const _NAV_ORDER_DEFAULT = \[([^\]]+)\]/)
+    const missing = sectionMetaIds().filter(id => !nav.includes(id))
+    expect(missing).toEqual([])
+  })
+
+  test('_NAV_ORDER_DEFAULT enthält keine unbekannten IDs', () => {
+    const nav = idList(APP_JS, /const _NAV_ORDER_DEFAULT = \[([^\]]+)\]/)
+    const meta = sectionMetaIds()
+    expect(nav.filter(id => !meta.includes(id))).toEqual([])
+  })
+
+  test('JSON-Store und Knex-Store haben dieselbe Default-Reihenfolge wie die UI', () => {
+    const nav = idList(APP_JS, /const _NAV_ORDER_DEFAULT = \[([^\]]+)\]/)
+    expect(storeNavOrder('server/db/orgSettingsStore.js')).toEqual(nav)
+    expect(storeNavOrder('server/db/stores/orgSettingsStore.js')).toEqual(nav)
+  })
+
+  test('gespeicherte Reihenfolgen werden um fehlende Sections ergänzt', () => {
+    expect(APP_JS).toMatch(/function _navOrderWithMissing/)
+    expect(APP_JS).toMatch(/const list = _navOrderWithMissing\(order\)/)
+  })
+})

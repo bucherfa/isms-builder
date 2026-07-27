@@ -4045,10 +4045,20 @@ async function saveSplashSettings() {
 
 // ── Nav-Reihenfolge Hilfsfunktion ─────────────────────────────────────────────
 
-const _NAV_ORDER_DEFAULT = ['dashboard','soa','guidance','goals','risk','legal','incident','gdpr','training','assets','governance','bcm','suppliers','reports','calendar','settings','admin']
+const _NAV_ORDER_DEFAULT = ['dashboard','soa','guidance','goals','risk','legal','incident','gdpr','training','assets','governance','nis2','bcm','suppliers','policy-acks','reports','calendar','settings','admin']
+
+// Eine gespeicherte Reihenfolge kennt neue Module noch nicht. Die Navigation selbst
+// hängt Unbekanntes ans Ende (s. buildNav) — die Sortierliste im Admin muss dasselbe
+// tun, sonst lässt sich ein neues Modul nie einsortieren.
+function _navOrderWithMissing(order) {
+  const list = (order && order.length) ? order.slice() : _NAV_ORDER_DEFAULT.slice()
+  const known = new Set(list)
+  SECTION_META.forEach(m => { if (!known.has(m.id)) list.push(m.id) })
+  return list.filter(sid => SECTION_META.some(m => m.id === sid))
+}
 
 function _renderNavOrderItems(order) {
-  const list = (order && order.length) ? order : _NAV_ORDER_DEFAULT.slice()
+  const list = _navOrderWithMissing(order)
   return list.map(sid => {
     const meta  = SECTION_META.find(m => m.id === sid)
     const label = meta ? (meta.labelKey ? t(meta.labelKey) : meta.label) : sid
