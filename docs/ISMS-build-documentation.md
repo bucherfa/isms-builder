@@ -297,7 +297,7 @@ tests/
 
 **Datenisolation:** Jede Testdatei bekommt ein eigenes `mkdtemp`-Verzeichnis mit frischen Seed-Daten. `DATA_DIR`-Umgebungsvariable wird vor dem Server-Require gesetzt — alle Stores lesen diesen Pfad beim Laden. Temp-Dirs werden in `afterAll` gelöscht.
 
-**Aktueller Stand:** 322/322 Tests bestehen. Vor einem Push `npm run preflight` ausführen — das spiegelt exakt die harten CI-Schritte (Tests, pdf-parse-Pinning, `npm audit --audit-level=high`). Optionaler `pre-push`-Hook: `git config core.hooksPath .githooks`
+**Aktueller Stand:** 325/325 Tests bestehen. Vor einem Push `npm run preflight` ausführen — das spiegelt exakt die harten CI-Schritte (Tests, pdf-parse-Pinning, `npm audit --audit-level=high`). Optionaler `pre-push`-Hook: `git config core.hooksPath .githooks`
 
 ---
 

@@ -5,7 +5,7 @@
 **Self-hosted Information Security Management System — open source, no cloud required**
 
 [![CI](https://github.com/coolstartnow/isms-builder/actions/workflows/ci.yml/badge.svg)](https://github.com/coolstartnow/isms-builder/actions/workflows/ci.yml)
-[![Tests](https://img.shields.io/badge/tests-322%20passing-brightgreen)](https://github.com/coolstartnow/isms-builder/actions)
+[![Tests](https://img.shields.io/badge/tests-325%20passing-brightgreen)](https://github.com/coolstartnow/isms-builder/actions)
 [![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](LICENSE)
 [![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js&logoColor=white)](https://nodejs.org)
 [![Version](docs/badges/version.svg)](CHANGELOG.md)
@@ -241,7 +241,7 @@ See [`docs/architecture/`](docs/architecture/) for C4 diagrams, full data model,
 > relation to any production or demo data.
 
 ```bash
-npm test                  # runs all 322 tests
+npm test                  # runs all 325 tests
 npm run preflight         # exactly what CI gates on (tests + pinning + audit)
 npm test -- --verbose     # with test names
 ```

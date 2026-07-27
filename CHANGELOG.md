@@ -8,6 +8,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [1.37.1] — 2026-07-27
+
+### Fixed
+- **Navigation blieb im NIS2-Modul hängen**: Nach dem Aufruf von NIS2 blieb dessen Panel beim Wechsel auf ein anderes Modul rechts stehen. Ursache: `removeAllDynamicPanels()` in `ui/app.js` räumt die dynamischen Panels über eine hartcodierte ID-Liste ab, in der `nis2Container` fehlte — jede `render*`-Funktion entfernt nur ihren eigenen Container.
+
+### Added
+- `tests/uiPanels.test.js`: statischer Guard, der prüft, dass jeder dynamisch erzeugte Panel-Container auch in `removeAllDynamicPanels()` gelistet ist (3 Tests, 325 gesamt). Verhindert diese Fehlerklasse bei jedem künftigen Modul.
+
+---
+
 ## [1.37.0] — 2026-07-27
 
 ### Added
