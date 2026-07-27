@@ -12,9 +12,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 - **Navigation blieb im NIS2-Modul hängen**: Nach dem Aufruf von NIS2 blieb dessen Panel beim Wechsel auf ein anderes Modul rechts stehen. Ursache: `removeAllDynamicPanels()` in `ui/app.js` räumt die dynamischen Panels über eine hartcodierte ID-Liste ab, in der `nis2Container` fehlte — jede `render*`-Funktion entfernt nur ihren eigenen Container.
+- **Admin → „Vorhandene Templates" blieb dauerhaft auf „lädt…"**: Im Template-Callback von `renderAdminTemplatesTab()` hieß der Parameter `t` und überschattete damit die globale i18n-Funktion `t()`. Das `t('delete')` für den Tooltip des Löschen-Buttons warf `TypeError: t is not a function`, der `innerHTML`-Aufbau brach ab und die Ladeanzeige blieb stehen. Parameter in `tpl` umbenannt; zusätzlich fängt die Funktion Fehler jetzt ab und zeigt eine Fehlermeldung statt endlos „lädt…".
 
 ### Added
-- `tests/uiPanels.test.js`: statischer Guard, der prüft, dass jeder dynamisch erzeugte Panel-Container auch in `removeAllDynamicPanels()` gelistet ist (3 Tests, 325 gesamt). Verhindert diese Fehlerklasse bei jedem künftigen Modul.
+- `tests/uiPanels.test.js`: statische Guards gegen zwei Fehlerklassen in `ui/app.js` (4 Tests, 326 gesamt) —
+  jeder dynamisch erzeugte Panel-Container muss in `removeAllDynamicPanels()` gelistet sein, und kein mehrzeiliger
+  Template-Callback darf die i18n-Funktion `t()` überschatten. Beide Fehler fielen bisher erst bei der Nutzung auf.
 
 ---
 

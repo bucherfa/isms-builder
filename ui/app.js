@@ -3456,9 +3456,17 @@ async function renderAdminTemplatesTab() {
   const container = document.getElementById('adminTabPanelTemplates')
   if (!container) return
   container.innerHTML = `<p class="report-loading">${t('loading')}</p>`
-  const res = await fetch('/templates', { headers: apiHeaders('reader') })
-  if (!res.ok) { container.innerHTML = `<p class="report-error">${t('err_load')}</p>`; return }
-  const templates = await res.json()
+  let res, templates
+  try {
+    res = await fetch('/templates', { headers: apiHeaders('reader') })
+    if (!res.ok) { container.innerHTML = `<p class="report-error">${t('err_load')}</p>`; return }
+    templates = await res.json()
+  } catch (e) {
+    // Ohne diesen Zweig bliebe bei einem Fehler dauerhaft „lädt…" stehen
+    console.error('renderAdminTemplatesTab:', e)
+    container.innerHTML = `<p class="report-error">${t('err_load')}</p>`
+    return
+  }
   if (templates.length === 0) {
     container.innerHTML = `<p style="color:var(--text-subtle);padding:12px;">${t('admin_noTemplates')}</p>`
     return
@@ -3478,17 +3486,17 @@ async function renderAdminTemplatesTab() {
         </tr>
       </thead>
       <tbody>
-        ${templates.map(t => `
+        ${templates.map(tpl => `
           <tr>
-            <td>${escHtml(t.title || '—')}</td>
-            <td><span class="badge">${escHtml(t.type || '—')}</span></td>
-            <td><span class="badge status-badge ${STATUS_CLS[t.status] || ''}">${t.status || 'draft'}</span></td>
-            <td>${escHtml(t.language || '—')}</td>
-            <td>${t.version || 1}</td>
-            <td style="color:var(--text-subtle);font-size:12px;">${t.updatedAt ? new Date(t.updatedAt).toLocaleDateString('en-GB') : '—'}</td>
+            <td>${escHtml(tpl.title || '—')}</td>
+            <td><span class="badge">${escHtml(tpl.type || '—')}</span></td>
+            <td><span class="badge status-badge ${STATUS_CLS[tpl.status] || ''}">${tpl.status || 'draft'}</span></td>
+            <td>${escHtml(tpl.language || '—')}</td>
+            <td>${tpl.version || 1}</td>
+            <td style="color:var(--text-subtle);font-size:12px;">${tpl.updatedAt ? new Date(tpl.updatedAt).toLocaleDateString('en-GB') : '—'}</td>
             <td>
               <button class="btn btn-sm" style="color:var(--danger-text);" title="${t('delete')}"
-                onclick="adminDeleteTemplate('${escHtml(t.type)}','${escHtml(t.id)}','${escHtml(t.title || '')}')">
+                onclick="adminDeleteTemplate('${escHtml(tpl.type)}','${escHtml(tpl.id)}','${escHtml(tpl.title || '')}')">
                 <i class="ph ph-trash"></i>
               </button>
             </td>
