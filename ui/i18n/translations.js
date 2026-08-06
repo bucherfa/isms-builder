@@ -22,6 +22,8 @@
     loginFooter:        { de: 'ISMS Builder · ISO 27001 · BSI · NIS2 · EUCS · EU AI Act', en: 'ISMS Builder · ISO 27001 · BSI · NIS2 · EUCS · EU AI Act', fr: 'ISMS Builder · ISO 27001 · BSI · NIS2 · EUCS · EU AI Act', nl: 'ISMS Builder · ISO 27001 · BSI · NIS2 · EUCS · EU AI Act' },
     licenseNotice:      { de: '© Claude Hecker · Open Source (AGPL-3.0)', en: '© Claude Hecker · Open source (AGPL-3.0)', fr: '© Claude Hecker · Open source (AGPL-3.0)', nl: '© Claude Hecker · Open source (AGPL-3.0)' },
     licenseSourceLink:  { de: 'Quellcode auf GitHub', en: 'Source code on GitHub', fr: 'Code source sur GitHub', nl: 'Broncode op GitHub' },
+    intendedUseNotice:  { de: 'Für kleine ISMS-Teams · selbst gehostet, Betrieb liegt beim Betreiber · kein kommerzieller Support', en: 'Built for small ISMS teams · self-hosted, you operate it · no commercial support', fr: 'Conçu pour de petites équipes SMSI · auto-hébergé, exploitation à votre charge · pas de support commercial', nl: 'Voor kleine ISMS-teams · zelf gehost, u beheert het · geen commerciële ondersteuning' },
+    intendedUseLink:    { de: 'Einsatzzweck und Grenzen', en: 'Intended use and scope', fr: 'Usage prévu et limites', nl: 'Beoogd gebruik en reikwijdte' },
     loginLang:          { de: 'Sprache',                                           en: 'Language',                                        fr: 'Langue',                                              nl: 'Taal' },
 
     // Demo reset banner

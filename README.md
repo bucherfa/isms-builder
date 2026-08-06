@@ -50,6 +50,37 @@ It covers the full compliance lifecycle — from policy authoring to audit evide
 
 ---
 
+## Intended Use and Scope
+
+This project began as a working tool for a single ISMS practitioner and grew from there. It is
+open source because the work may be useful to others — not because it is a commercial product in
+disguise. Being explicit about that helps you decide whether it fits your situation.
+
+**What it is built for.** A small ISMS team — often one person, sometimes a handful — that
+authors and maintains the documentation of a management system: policies, risks, assets,
+controls, evidence. The number of people who *need an account* is expected to stay small.
+Reaching a large audience works without accounts: policy acknowledgements are sent as
+token-based links, so recipients read and confirm a document without ever logging in, and
+without appearing in any user list.
+
+**What it expects of you.** ISMS Builder is self-hosted, and everything that follows from that
+is yours: deployment, TLS, hardening, backups, updates, access control, and the data protection
+obligations for whatever you store in it. The project ships a reasonable default configuration,
+not a managed service.
+
+**What it is not.** There is no hosted SaaS offering, no commercial support contract, and no
+service-level agreement. It is not a multi-tenant hosting product. It does not certify you
+against any standard, and it is not legal advice — it helps you organise and evidence the work,
+but the assessment remains yours and your auditor's.
+
+**Who maintains it.** One person, alongside a full-time job. Issues and discussions are read and
+answered, usually within days; security reports are prioritised. Feature requests are welcome and
+genuinely shape the roadmap, but they compete for limited evenings. If your organisation depends
+on a fixed timeline or guaranteed response, a commercial vendor is the honest recommendation —
+and that is not a reason to avoid the project, only a reason to plan realistically.
+
+---
+
 ## Screenshots
 
 | Login | Dashboard |
