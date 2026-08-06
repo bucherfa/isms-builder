@@ -115,7 +115,10 @@ docs/               – Architecture, API spec, data model
 Use the GitHub Issue Templates:
 - **Bug Report** — unexpected behaviour with steps to reproduce
 - **Feature Request** — new module or enhancement with ISMS/ISO 27001 justification
-- **Security Vulnerability** — use the Security template (not a public issue)
+
+**Security vulnerabilities do not belong in an issue.** Use
+[private vulnerability reporting](https://github.com/coolstartnow/isms-builder/security/advisories/new)
+instead — see [SECURITY.md](SECURITY.md) for scope, safe harbour and what to expect.
 
 ## Code Style
 

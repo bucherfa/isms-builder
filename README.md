@@ -288,7 +288,10 @@ Contributions are very welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for:
 - Development setup (5 minutes to first test run)
 - Code style and conventions
 - How to open a good issue or PR
-- Security vulnerability reporting
+
+**Found a security issue?** Please do not open a public issue — use
+[private vulnerability reporting](https://github.com/coolstartnow/isms-builder/security/advisories/new).
+[SECURITY.md](SECURITY.md) describes the scope, the safe harbour, and what to realistically expect.
 
 **Good first issues** are labelled [`good first issue`](https://github.com/coolstartnow/isms-builder/issues?q=label%3A%22good+first+issue%22) in the issue tracker.
 
