@@ -36,13 +36,51 @@ Typische Asset-Kategorien:
 
 Felder:
 - **Name** — eindeutige Bezeichnung (z.B. „Produktions-Datenbankserver")
-- **Typ** — Kategorie (Hardware, Software, Daten, Personen, Prozess, Einrichtung)
+- **Typ** — z.B. Server, SaaS-Anwendung, Datenbank. Die Auswahl ist nach Kategorie gruppiert (Hardware, Software, Daten, Dienste, Einrichtungen) und lässt sich anpassen — siehe unten.
 - **Eigentümer** — wer ist verantwortlich?
 - **Abteilung / Organisationseinheit**
 - **Klassifizierung** — Vertraulichkeit: `public` / `internal` / `confidential` / `secret`
 - **Kritikalität** — `low` / `medium` / `high` / `critical`
 - **Beschreibung** — was ist das Asset, wo befindet es sich?
 - **Verknüpfte Risiken** — welche Risiken betreffen dieses Asset?
+
+---
+
+## Asset-Typen anpassen
+
+**Administration → Listen → Asset-Typen** (nur Administration)
+
+Die mitgelieferten Typen sind eine Vorgabe, keine feste Liste. Sie lassen sich umbenennen,
+ergänzen und entfernen; jeder Typ gehört zu einer der fünf Kategorien.
+
+Zwei Sicherungen greifen dabei:
+
+- **Ein Typ, der noch an Assets hängt, lässt sich nicht entfernen.** Das System nennt Typ und
+  Anzahl der betroffenen Assets. Erst umhängen, dann löschen.
+- **Beim Speichern eines Assets wird der Typ geprüft.** Ein unbekannter Typ wird abgewiesen,
+  damit Tippfehler nicht als eigener Typ in den Daten landen.
+
+Bestehende Assets behalten ihren Typ auch dann, wenn er später aus der Liste verschwindet; im
+Formular erscheint er als „Unbekannter Typ", damit er beim Bearbeiten nicht verlorengeht.
+
+Über **Zurücksetzen** kehrt die Liste zur Vorgabe zurück.
+
+### Sprachen: was übersetzt wird und was nicht
+
+Dies ist eine bewusste Festlegung, keine Lücke:
+
+- **Die 24 mitgelieferten Typen sind in alle Oberflächensprachen übersetzt** (DE/EN/FR/NL) und
+  erscheinen automatisch in der Sprache, die der jeweilige Benutzer eingestellt hat.
+- **Ein selbst angelegter Typ wird nicht übersetzt.** Er erscheint für alle Benutzer genau so,
+  wie er eingegeben wurde. Das Programm kann für einen Begriff, den es nicht kennt, keine
+  Übersetzung erfinden.
+- **Wird ein mitgelieferter Typ umbenannt, entfällt seine Übersetzung ebenfalls.** Ab diesem
+  Moment gilt der eingegebene Text — sonst würde die Umbenennung in anderen Sprachen
+  stillschweigend überschrieben.
+
+Wer eine mehrsprachige Belegschaft hat und eigene Typen anlegt, sollte deshalb eine Sprache
+festlegen, in der Typbezeichnungen gepflegt werden — üblicherweise die Konzernsprache. Ein
+Zurücksetzen auf die Vorgabe stellt auch die Übersetzungen wieder her.
 
 ---
 

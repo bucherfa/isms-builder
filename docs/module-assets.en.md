@@ -36,13 +36,48 @@ Typical asset categories:
 
 Fields:
 - **Name** — unique identifier (e.g. "Production Database Server")
-- **Type** — category (Hardware, Software, Data, People, Process, Facility)
+- **Type** — e.g. Server, SaaS Application, Database. The list is grouped by category (Hardware, Software, Data, Services, Facilities) and can be customised — see below.
 - **Owner** — who is responsible?
 - **Department / Organisational unit**
 - **Classification** — confidentiality: `public` / `internal` / `confidential` / `secret`
 - **Criticality** — `low` / `medium` / `high` / `critical`
 - **Description** — what is the asset, where is it located?
 - **Linked risks** — which risks affect this asset?
+
+---
+
+## Customising asset types
+
+**Administration → Lists → Asset Types** (administrators only)
+
+The types that ship with the application are a starting point, not a fixed list. They can be
+renamed, extended and removed; every type belongs to one of the five categories.
+
+Two safeguards apply:
+
+- **A type still in use cannot be removed.** The system names the type and how many assets are
+  affected. Reassign them first, then delete.
+- **The type is validated when an asset is saved.** An unknown type is rejected, so that a typo
+  does not end up in the data as a type of its own.
+
+Existing assets keep their type even if it later disappears from the list; in the form it appears
+under "Unknown type" so that it is not silently lost while editing.
+
+**Reset** restores the shipped defaults.
+
+### Languages: what is translated and what is not
+
+This is a deliberate design decision, not a gap:
+
+- **The 24 shipped types are translated into all interface languages** (DE/EN/FR/NL) and appear
+  in whichever language each user has selected.
+- **A type you create yourself is not translated.** It appears to every user exactly as it was
+  entered. The application cannot invent a translation for a term it does not know.
+- **Renaming a shipped type also drops its translation.** From that point the text you entered
+  applies — otherwise your rename would be silently overwritten in other languages.
+
+If you have a multilingual workforce and add your own types, agree on one language for type
+names — usually the corporate language. Resetting to the defaults restores the translations.
 
 ---
 

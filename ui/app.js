@@ -459,6 +459,12 @@ async function init() {
         lists.incidentTypes.forEach(t => { rebuilt[t.id] = t.label })
         INC_TYPE_LABELS = rebuilt
       }
+      // Asset-Typen (#64): Das UI hält keine eigene Liste mehr, sondern
+      // übernimmt die des Servers — sonst kennt es selbst angelegte Typen nicht.
+      if (Array.isArray(lists.assetTypes) && lists.assetTypes.length) {
+        ASSET_TYPES = lists.assetTypes
+        ASSET_TYPES_MAP = Object.fromEntries(ASSET_TYPES.map(t => [t.id, t.label]))
+      }
     }
   } catch {}
 
@@ -2133,8 +2139,8 @@ let INC_TYPE_LABELS = {
   social_engineering: 'CEO Fraud / Identity Abuse',
   other:              'Other',
 }
-const INC_CLEANED_LABELS = { yes: 'Yes, resolved', no: 'No – pending follow-up', partial: 'Partial' }
-const INC_STATUS_LABELS  = { new: 'New', in_review: 'Under Review', assigned: 'Assigned', closed: 'Closed' }
+const INC_CLEANED_LABELS = { get yes() { return t('incl_clYes') }, get no() { return t('incl_clNo') }, get partial() { return t('incl_clPartial') } }
+const INC_STATUS_LABELS  = { get new() { return t('incl_stNew') }, get in_review() { return t('incl_stReview') }, get assigned() { return t('incl_stAssigned') }, get closed() { return t('incl_stClosed') } }
 const INC_STATUS_CLS     = { new: 'risk-badge risk-l-high', in_review: 'risk-badge risk-l-medium', assigned: 'risk-badge risk-l-low', closed: 'risk-badge' }
 
 let _incidentDetail = null
@@ -2354,11 +2360,13 @@ const THEME_COLORS = {
   Physical:       '#fb923c',
   Technological:  '#34d399'
 }
+// SoA-Status. Stand vorher fest auf Deutsch — in der englischen Oberfläche
+// erschien damit „Nicht begonnen".
 const STATUS_LABELS = {
-  not_started: 'Nicht begonnen',
-  partial:     'Teilweise',
-  implemented: 'Umgesetzt',
-  optimized:   'Optimiert'
+  get not_started() { return t('soal_notStarted') },
+  get partial()     { return t('soal_partial') },
+  get implemented() { return t('soal_implemented') },
+  get optimized()   { return t('soal_optimized') }
 }
 
 let soaData = []
@@ -3524,6 +3532,12 @@ const LIST_META = [
   { id: 'gdprDataCategories',get label() { return t('list_gdprDataCats') },  type: 'string' },
   { id: 'gdprSubjectTypes',  get label() { return t('list_gdprSubjects') },  type: 'object' },
   { id: 'incidentTypes',     get label() { return t('list_incidentTypes') }, type: 'object' },
+  // Asset-Typen (#64) tragen zusätzlich eine Kategorie. `extraSelect` rüstet
+  // dem generischen Objekt-Editor ein drittes Feld an, statt einen zweiten
+  // Editor danebenzustellen.
+  { id: 'assetTypes',        get label() { return t('admin_assetTypes') },   type: 'object',
+    extraSelect: { key: 'category',
+      get options() { return Object.fromEntries(Object.keys(ASSET_CAT_LABELS).map(c => [c, assetCatLabel(c)])) } } },
 ]
 
 let _adminListsData   = null  // cached from server
@@ -3604,6 +3618,11 @@ function _renderListPanel() {
         <input class="input" id="adminListNewId"    placeholder="ID (e.g. my_cat)"  style="width:160px">
         <input class="input" id="adminListNewLabel" placeholder="${t('admin_labelPlaceholder')}"             style="flex:1"
                onkeydown="if(event.key==='Enter')_adminListAddObject()">
+        ${meta.extraSelect ? `
+        <select class="input" id="adminListNewExtra" style="width:170px">
+          ${Object.entries(meta.extraSelect.options).map(([v, l]) =>
+            `<option value="${escHtml(v)}">${escHtml(l)}</option>`).join('')}
+        </select>` : ''}
         <button class="btn btn-primary btn-sm" onclick="_adminListAddObject()">
           <i class="ph ph-plus"></i> ${t('add')}
         </button>
@@ -3617,6 +3636,12 @@ function _renderListPanel() {
             <input class="input admin-lists-item-input" value="${escHtml(item.label || '')}"
                    placeholder="${t('col_label')}" style="flex:1"
                    onchange="_adminListUpdateObjectField(${idx},'label',this.value)">
+            ${meta.extraSelect ? `
+            <select class="input" style="width:170px"
+                    onchange="_adminListUpdateObjectField(${idx},'${meta.extraSelect.key}',this.value)">
+              ${Object.entries(meta.extraSelect.options).map(([v, l]) =>
+                `<option value="${escHtml(v)}"${item[meta.extraSelect.key] === v ? ' selected' : ''}>${escHtml(l)}</option>`).join('')}
+            </select>` : ''}
             <button class="btn btn-sm" style="color:var(--danger-text)" onclick="_adminListRemoveItem(${idx})"
                     title="${t('remove')}"><i class="ph ph-trash"></i></button>
           </div>`).join('')}
@@ -3640,10 +3665,15 @@ function _adminListUpdateString(idx, val) {
 }
 
 function _adminListAddObject() {
+  const meta  = LIST_META.find(m => m.id === _adminActiveList)
   const id    = document.getElementById('adminListNewId')?.value?.trim().replace(/\s+/g, '_')
   const label = document.getElementById('adminListNewLabel')?.value?.trim()
   if (!id || !label) { alert(t('admin_idLabelRequired')); return }
-  _adminListsData[_adminActiveList] = [...(_adminListsData[_adminActiveList] || []), { id, label }]
+  const entry = { id, label }
+  if (meta?.extraSelect) {
+    entry[meta.extraSelect.key] = document.getElementById('adminListNewExtra')?.value || ''
+  }
+  _adminListsData[_adminActiveList] = [...(_adminListsData[_adminActiveList] || []), entry]
   _adminListSave()
   document.getElementById('adminListNewId').value    = ''
   document.getElementById('adminListNewLabel').value = ''
@@ -3669,7 +3699,41 @@ async function _adminListSave() {
     headers: { ...apiHeaders('admin'), 'Content-Type': 'application/json' },
     body: JSON.stringify(items),
   })
-  if (!res.ok) { const e = await res.json().catch(() => ({})); alert(e.error || t('err_saveFailed')) }
+  if (res.ok) {
+    // Gespeicherte Typen sofort in die laufende Sitzung übernehmen — sonst
+    // kennt das Asset-Formular einen neu angelegten Typ erst nach einem Reload.
+    if (listId === 'assetTypes') _applyAssetTypes(items)
+    return
+  }
+
+  const e = await res.json().catch(() => ({}))
+  if (res.status === 409 && Array.isArray(e.inUse)) {
+    // Typ noch in Verwendung: sagen, welcher und wie oft — sonst rät der Admin.
+    alert(`${t('admin_typeInUse')}\n\n` +
+      e.inUse.map(u => `• ${u.label || u.type}: ${u.count}`).join('\n'))
+  } else if (Array.isArray(e.details) && e.details.length) {
+    alert(`${e.error || t('err_saveFailed')}\n\n${e.details.join('\n')}`)
+  } else {
+    alert(e.error || t('err_saveFailed'))
+  }
+
+  // Abgelehnt heißt: nicht gespeichert. Ohne diesen Rücksprung zeigte der
+  // Editor weiter einen Stand, den der Server nie übernommen hat.
+  try {
+    const fresh = await fetch('/admin/lists', { headers: apiHeaders() })
+    if (fresh.ok) {
+      _adminListsData = await fresh.json()
+      if (listId === 'assetTypes') _applyAssetTypes(_adminListsData.assetTypes)
+      _renderListPanel()
+    }
+  } catch {}
+}
+
+/** Übernimmt eine gespeicherte Typenliste in die laufende Sitzung. */
+function _applyAssetTypes(items) {
+  if (!Array.isArray(items) || !items.length) return
+  ASSET_TYPES = items
+  ASSET_TYPES_MAP = Object.fromEntries(items.map(t => [t.id, t.label]))
 }
 
 async function _adminListReset(listId) {
@@ -3679,6 +3743,7 @@ async function _adminListReset(listId) {
   })
   if (!res.ok) { alert(t('admin_resetError')); return }
   _adminListsData[listId] = await res.json()
+  if (listId === 'assetTypes') _applyAssetTypes(_adminListsData[listId])
   _renderListPanel()
 }
 
@@ -8032,10 +8097,10 @@ const RISK_STATUSES = [
   { id:'closed',       label:'Closed' },
 ]
 const RISK_LEVEL_CFG = {
-  low:      { label:'Low',      cls:'risk-low' },
-  medium:   { label:'Medium',   cls:'risk-medium' },
-  high:     { label:'High',     cls:'risk-high' },
-  critical: { label:'Critical', cls:'risk-critical' },
+  low:      { get label() { return t('riskl_low') },      cls:'risk-low' },
+  medium:   { get label() { return t('riskl_medium') },   cls:'risk-medium' },
+  high:     { get label() { return t('riskl_high') },     cls:'risk-high' },
+  critical: { get label() { return t('riskl_critical') }, cls:'risk-critical' },
 }
 
 /* CVSS v3.1 Severity Bands — FIRST.org (freely usable, attribution recommended)
@@ -10362,18 +10427,18 @@ function showModal(id, innerHtml) {
 // ── Training & Schulungen ─────────────────────────────────────────
 
 const TRAINING_CAT_LABELS = {
-  security_awareness: 'Security Awareness',
-  iso27001:           'ISO 27001',
-  gdpr:               'GDPR',
-  technical:          'Technical',
-  management:         'Management',
-  other:              'Other'
+  get security_awareness() { return t('trnl_catAwareness') },
+  get iso27001()           { return t('trnl_catIso') },
+  get gdpr()               { return t('trnl_catGdpr') },
+  get technical()          { return t('trnl_catTechnical') },
+  get management()         { return t('trnl_catManagement') },
+  get other()              { return t('trnl_catOther') }
 }
 const TRAINING_STATUS_LABELS = {
-  planned:     'Planned',
-  in_progress: 'In Progress',
-  completed:   'Completed',
-  cancelled:   'Cancelled'
+  get planned()     { return t('trnl_statPlanned') },
+  get in_progress() { return t('trnl_statProgress') },
+  get completed()   { return t('trnl_statCompleted') },
+  get cancelled()   { return t('trnl_statCancelled') }
 }
 const TRAINING_STATUS_CLS = {
   planned:     'badge-draft',
@@ -10694,12 +10759,12 @@ async function deleteTraining(id) {
 
 let _legalTab = 'contracts'
 
-const LEGAL_CONTRACT_STATUS_LABELS = { draft:'Draft', review:'Review', active:'Active', expired:'Expired', terminated:'Terminated' }
-const LEGAL_NDA_STATUS_LABELS      = { draft:'Draft', signed:'Signed', expired:'Expired', terminated:'Terminated' }
-const LEGAL_POLICY_STATUS_LABELS   = { draft:'Draft', review:'Review', published:'Published', archived:'Archived' }
-const LEGAL_CONTRACT_TYPE_LABELS   = { service:'Service', supply:'Supply', nda:'NDA', framework:'Framework Agreement', other:'Other' }
-const LEGAL_NDA_TYPE_LABELS        = { bilateral:'Bilateral', unilateral_recv:'Unilateral (Receiving)', unilateral_give:'Unilateral (Giving)' }
-const LEGAL_POLICY_TYPE_LABELS     = { privacy_notice:'Privacy Notice', cookie:'Cookie Policy', consent_form:'Consent Form', employee:'Employee', internal:'Internal', other:'Other' }
+const LEGAL_CONTRACT_STATUS_LABELS = { get draft() { return t('legl_stDraft') }, get review() { return t('legl_stReview') }, get active() { return t('legl_stActive') }, get expired() { return t('legl_stExpired') }, get terminated() { return t('legl_stTerminated') } }
+const LEGAL_NDA_STATUS_LABELS      = { get draft() { return t('legl_stDraft') }, get signed() { return t('legl_stSigned') }, get expired() { return t('legl_stExpired') }, get terminated() { return t('legl_stTerminated') } }
+const LEGAL_POLICY_STATUS_LABELS   = { get draft() { return t('legl_stDraft') }, get review() { return t('legl_stReview') }, get published() { return t('legl_stPublished') }, get archived() { return t('legl_stArchived') } }
+const LEGAL_CONTRACT_TYPE_LABELS   = { get service() { return t('legl_ctService') }, get supply() { return t('legl_ctSupply') }, get nda() { return t('legl_ctNda') }, get framework() { return t('legl_ctFramework') }, get other() { return t('legl_ctOther') } }
+const LEGAL_NDA_TYPE_LABELS        = { get bilateral() { return t('legl_ndBilateral') }, get unilateral_recv() { return t('legl_ndRecv') }, get unilateral_give() { return t('legl_ndGive') } }
+const LEGAL_POLICY_TYPE_LABELS     = { get privacy_notice() { return t('legl_pyPrivacy') }, get cookie() { return t('legl_pyCookie') }, get consent_form() { return t('legl_pyConsent') }, get employee() { return t('legl_pyEmployee') }, get internal() { return t('legl_pyInternal') }, get other() { return t('legl_pyOther') } }
 
 async function renderLegal(startTab) {
   if (startTab) _legalTab = startTab
@@ -11202,41 +11267,65 @@ async function deleteLegalItem(resource, id) {
 
 let _assetsTab = 'list'
 
-const ASSET_TYPES_MAP = {
-  hardware_server: 'Server', hardware_workstation: 'Workstation / PC', hardware_laptop: 'Laptop / Notebook',
-  hardware_mobile: 'Mobile Device', hardware_network: 'Network Equipment', hardware_ics_ot: 'ICS/OT System',
-  hardware_building: 'Building Technology (BAS)', hardware_other: 'Hardware (Other)',
-  software_app: 'Application Software', software_os: 'Operating System', software_cloud: 'Cloud Service (IaaS/PaaS)',
-  software_saas: 'SaaS Application', software_other: 'Software (Other)',
-  data_database: 'Database', data_document: 'Document Collection', data_backup: 'Backup / Archive', data_other: 'Data (Other)',
-  service_internal: 'Internal Service', service_cloud: 'Cloud Service (External)', service_external: 'External Service Provider',
-  facility_office: 'Office Building', facility_datacenter: 'Data Centre / Server Room',
-  facility_production: 'Production Site / Plant', facility_other: 'Facility (Other)',
+// Asset-Typen (#64): seit die Typen im Admin editierbar sind, ist der Server
+// die Quelle. Beide Werte werden beim Start aus /admin/lists gefüllt; die
+// Vorgabe hier ist nur der Notnagel, falls der Abruf fehlschlägt.
+let ASSET_TYPES = []
+let ASSET_TYPES_MAP = {}
+
+/**
+ * Anzeigename eines Asset-Typs.
+ *
+ * Übersetzt wird nur, was unverändert ausgeliefert wurde: Stimmt das
+ * gespeicherte Label exakt mit dem englischen Vorgabewert des zugehörigen
+ * i18n-Schlüssels überein, gilt der Typ als unangetastet und wird übersetzt.
+ * Sobald ein Administrator ihn umbenennt — oder einen eigenen Typ anlegt —
+ * gewinnt sein Text, in der Sprache, in der er ihn eingegeben hat. Anders geht
+ * es nicht: Für selbst angelegte Einträge existiert keine Übersetzung, und
+ * eine Umbenennung stillschweigend zu überschreiben wäre schlimmer als eine
+ * englische Bezeichnung. Die Regel ist in docs/module-assets.md festgehalten.
+ */
+function assetTypeLabel(idOrType) {
+  const type = typeof idOrType === 'string'
+    ? ASSET_TYPES.find(t => t.id === idOrType)
+    : idOrType
+  if (!type) return typeof idOrType === 'string' ? idOrType : ''
+  const entry = (window.TRANSLATIONS || {})[`assetType_${type.id}`]
+  if (entry && entry.en === type.label) return t(`assetType_${type.id}`)
+  return type.label
 }
 
+/** Anzeigename einer Asset-Kategorie. Kategorien sind fest, daher immer übersetzt. */
+function assetCatLabel(catId) {
+  const entry = (window.TRANSLATIONS || {})[`assetCat_${catId}`]
+  return entry ? t(`assetCat_${catId}`) : (ASSET_CAT_LABELS[catId] || catId)
+}
+
+// Kategorien: Die Schlüssel bestimmen Reihenfolge und Gültigkeit, die Anzeige
+// läuft über assetCatLabel(). Die Werte hier sind nur noch Rückfallebene.
 const ASSET_CAT_LABELS = {
-  hardware: 'Hardware',
-  software: 'Software',
-  data:     'Data / Information',
-  service:  'Services',
-  facility: 'Facilities',
+  get hardware() { return t('assetCat_hardware') },
+  get software() { return t('assetCat_software') },
+  get data()     { return t('assetCat_data') },
+  get service()  { return t('assetCat_service') },
+  get facility() { return t('assetCat_facility') },
 }
 
 const ASSET_CLASS = {
-  public:               { label: 'Public',               color: '#4ade80' },
-  internal:             { label: 'Internal',             color: '#60a5fa' },
-  confidential:         { label: 'Confidential',         color: '#f0b429' },
-  strictly_confidential:{ label: 'Strictly Confidential', color: '#f87171' },
+  public:               { get label() { return t('assl_clPublic') },       color: '#4ade80' },
+  internal:             { get label() { return t('assl_clInternal') },     color: '#60a5fa' },
+  confidential:         { get label() { return t('assl_clConfidential') }, color: '#f0b429' },
+  strictly_confidential:{ get label() { return t('assl_clStrict') }, color: '#f87171' },
 }
 
 const ASSET_CRIT = {
-  low:      { label: 'Low',      color: '#4ade80' },
-  medium:   { label: 'Medium',   color: '#60a5fa' },
-  high:     { label: 'High',     color: '#f0b429' },
-  critical: { label: 'Critical', color: '#f87171' },
+  low:      { get label() { return t('assl_crLow') },    color: '#4ade80' },
+  medium:   { get label() { return t('assl_crMedium') }, color: '#60a5fa' },
+  high:     { get label() { return t('assl_crHigh') },   color: '#f0b429' },
+  critical: { get label() { return t('assl_crCritical') }, color: '#f87171' },
 }
 
-const ASSET_STATUS_LABELS = { active: 'Active', planned: 'Planned', decommissioned: 'Decommissioned' }
+const ASSET_STATUS_LABELS = { get active() { return t('assl_stActive') }, get planned() { return t('assl_stPlanned') }, get decommissioned() { return t('assl_stDecommissioned') } }
 
 function assetClassBadge(cls) {
   const c = ASSET_CLASS[cls] || { label: cls || '—', color: '#8C9BAB' }
@@ -11362,7 +11451,7 @@ async function renderAssetsList(el) {
       ${canEdit ? `<button class="btn btn-primary btn-sm" onclick="openAssetForm()"><i class="ph ph-plus"></i> ${t('assets_new')}</button>` : ''}
       <select id="assetFilterCat" onchange="_filterAssets()" title="Category">
         <option value="">${t('filter_allCats')}</option>
-        ${Object.entries(ASSET_CAT_LABELS).map(([v,l])=>`<option value="${v}">${l}</option>`).join('')}
+        ${Object.keys(ASSET_CAT_LABELS).map(v=>`<option value="${v}">${escHtml(assetCatLabel(v))}</option>`).join('')}
       </select>
       <select id="assetFilterClass" onchange="_filterAssets()" title="Classification">
         <option value="">${t('assets_allClass')}</option>
@@ -11413,8 +11502,8 @@ function _renderAssetsTable(list, canEdit, isAdmin, entMap) {
           const eolDays = a.endOfLifeDate ? Math.ceil((new Date(a.endOfLifeDate) - now) / 86400000) : null
           const eolStr  = a.endOfLifeDate ? (eolDays < 0 ? `<span style="color:#f87171">Expired</span>` : eolDays <= 90 ? `<span style="color:#f0b429">${a.endOfLifeDate}</span>` : a.endOfLifeDate) : '—'
           return `<tr>
-            <td><strong>${escHtml(a.name)}</strong><br><span style="font-size:.75rem;color:var(--text-subtle)">${escHtml(ASSET_CAT_LABELS[a.category]||a.category)}</span></td>
-            <td style="font-size:.78rem;color:var(--text-subtle)">${escHtml(ASSET_TYPES_MAP[a.type]||a.type||'—')}</td>
+            <td><strong>${escHtml(a.name)}</strong><br><span style="font-size:.75rem;color:var(--text-subtle)">${escHtml(assetCatLabel(a.category))}</span></td>
+            <td style="font-size:.78rem;color:var(--text-subtle)">${escHtml(a.type ? assetTypeLabel(a.type) : '—')}</td>
             <td>${assetProtChips(a, _assetNames)}</td>
             <td>${assetClassBadge(a.classification)}</td>
             <td>${assetCritBadge(a.criticality)}</td>
@@ -11476,7 +11565,8 @@ async function renderAssetsByCategory(el) {
   const list = Array.isArray(raw) ? raw : []
 
   const grouped = {}
-  for (const [catKey, catLabel] of Object.entries(ASSET_CAT_LABELS)) {
+  for (const catKey of Object.keys(ASSET_CAT_LABELS)) {
+    const catLabel = assetCatLabel(catKey)
     grouped[catKey] = { label: catLabel, items: list.filter(a => a.category === catKey) }
   }
 
@@ -11494,7 +11584,7 @@ async function renderAssetsByCategory(el) {
             <tbody>
               ${g.items.map(a => `<tr>
                 <td><strong>${escHtml(a.name)}</strong></td>
-                <td style="font-size:.78rem;color:var(--text-subtle)">${escHtml(ASSET_TYPES_MAP[a.type]||a.type||'—')}</td>
+                <td style="font-size:.78rem;color:var(--text-subtle)">${escHtml(a.type ? assetTypeLabel(a.type) : '—')}</td>
                 <td>${assetClassBadge(a.classification)}</td>
                 <td>${assetCritBadge(a.criticality)}</td>
                 <td style="font-size:.78rem">${escHtml(ASSET_STATUS_LABELS[a.status]||a.status)}</td>
@@ -11552,7 +11642,7 @@ async function renderAssetsByClass(el) {
             <tbody>
               ${g.items.map(a => `<tr>
                 <td><strong>${escHtml(a.name)}</strong></td>
-                <td style="font-size:.78rem;color:var(--text-subtle)">${escHtml(ASSET_CAT_LABELS[a.category]||a.category)}</td>
+                <td style="font-size:.78rem;color:var(--text-subtle)">${escHtml(assetCatLabel(a.category))}</td>
                 <td>${assetCritBadge(a.criticality)}</td>
                 <td style="font-size:.78rem">${escHtml(a.owner||'—')}</td>
                 <td style="font-size:.78rem">${escHtml(ASSET_STATUS_LABELS[a.status]||a.status)}</td>
@@ -11629,7 +11719,7 @@ function _assetDepPicker(list) {
     .map(a => `<label class="asset-dep-item" data-name="${escHtml((a.name || '').toLowerCase())}">
         <input type="checkbox" value="${a.id}"${_assetFormDeps.has(a.id) ? ' checked' : ''} onchange="_toggleAssetDep('${a.id}')">
         <span>${escHtml(a.name || a.id)}</span>
-        <span class="adi-meta">${escHtml(ASSET_CAT_LABELS[a.category] || a.category || '')}</span>
+        <span class="adi-meta">${escHtml(a.category ? assetCatLabel(a.category) : '')}</span>
       </label>`).join('')
 
   return `<div class="asset-dep-picker">
@@ -11699,13 +11789,26 @@ async function openAssetForm(id) {
 
   document.querySelectorAll('.training-tab').forEach(b => b.classList.remove('active'))
 
-  const catOptions = Object.entries(ASSET_CAT_LABELS).map(([v,l]) =>
+  const catOptions = Object.keys(ASSET_CAT_LABELS).map(v => [v, assetCatLabel(v)]).map(([v,l]) =>
     `<option value="${v}"${item?.category===v?' selected':''}>${l}</option>`
   ).join('')
 
-  const typeOptions = Object.entries(ASSET_TYPES_MAP).map(([v,l]) =>
-    `<option value="${v}"${item?.type===v?' selected':''}>${l}</option>`
-  ).join('')
+  // Nach Kategorie gruppiert — die Zuordnung liefert der Server mit dem Typ.
+  // Ein Typ, den es nicht mehr gibt (Bestandsdaten), bekommt eine eigene
+  // Gruppe, damit er beim Bearbeiten nicht stillschweigend verschwindet.
+  const typeOptions = (() => {
+    const groups = Object.keys(ASSET_CAT_LABELS).map(catId => [catId, assetCatLabel(catId)]).map(([catId, catLabel]) => {
+      const opts = ASSET_TYPES.filter(t => t.category === catId)
+        .map(at => `<option value="${escHtml(at.id)}"${item?.type === at.id ? ' selected' : ''}>${escHtml(assetTypeLabel(at))}</option>`)
+        .join('')
+      return opts ? `<optgroup label="${escHtml(catLabel)}">${opts}</optgroup>` : ''
+    }).join('')
+    const known = new Set(ASSET_TYPES.map(t => t.id))
+    const orphan = item?.type && !known.has(item.type)
+      ? `<optgroup label="${escHtml(t('assets_unknownType'))}"><option value="${escHtml(item.type)}" selected>${escHtml(item.type)}</option></optgroup>`
+      : ''
+    return groups + orphan
+  })()
 
   const classOptions = Object.entries(ASSET_CLASS).map(([v,c]) =>
     `<option value="${v}"${item?.classification===v?' selected':''}>${c.label}</option>`
@@ -12823,15 +12926,15 @@ async function switchGovTab(tab) {
   }
 }
 
-const GOV_REVIEW_TYPE_LABELS = { annual: 'Annual', interim: 'Interim Review', extraordinary: 'Extraordinary' }
-const GOV_REVIEW_STATUS_LABELS = { planned: 'Planned', completed: 'Completed', approved: 'Approved' }
+const GOV_REVIEW_TYPE_LABELS = { get annual() { return t('govl_typeAnnual') }, get interim() { return t('govl_typeInterim') }, get extraordinary() { return t('govl_typeExtra') } }
+const GOV_REVIEW_STATUS_LABELS = { get planned() { return t('govl_statPlanned') }, get completed() { return t('govl_statCompleted') }, get approved() { return t('govl_statApproved') } }
 const GOV_REVIEW_STATUS_COLORS = { planned: '#888', completed: '#60a5fa', approved: '#4ade80' }
-const GOV_PRIORITY_LABELS = { low: 'Low', medium: 'Medium', high: 'High', critical: 'Critical' }
+const GOV_PRIORITY_LABELS = { get low() { return t('govl_prioLow') }, get medium() { return t('govl_prioMedium') }, get high() { return t('govl_prioHigh') }, get critical() { return t('govl_prioCritical') } }
 const GOV_PRIORITY_COLORS = { low: '#4ade80', medium: '#f0b429', high: '#fb923c', critical: '#f87171' }
-const GOV_ACTION_STATUS_LABELS = { open: 'Open', in_progress: 'In Progress', completed: 'Completed', cancelled: 'Cancelled' }
+const GOV_ACTION_STATUS_LABELS = { get open() { return t('govl_actOpen') }, get in_progress() { return t('govl_actProgress') }, get completed() { return t('govl_actCompleted') }, get cancelled() { return t('govl_actCancelled') } }
 const GOV_ACTION_STATUS_COLORS = { open: '#888', in_progress: '#60a5fa', completed: '#4ade80', cancelled: '#555' }
-const GOV_SOURCE_LABELS = { management_review: 'Management Review', internal_audit: 'Internal Audit', external_audit: 'External Audit', incident: 'Incident', other: 'Other' }
-const GOV_COMMITTEE_LABELS = { isms_committee: 'ISMS Committee', ciso_meeting: 'CISO Meeting', risk_committee: 'Risk Committee', management: 'Management', other: 'Other' }
+const GOV_SOURCE_LABELS = { get management_review() { return t('govl_srcMgmtReview') }, get internal_audit() { return t('govl_srcInternal') }, get external_audit() { return t('govl_srcExternal') }, get incident() { return t('govl_srcIncident') }, get other() { return t('govl_srcOther') } }
+const GOV_COMMITTEE_LABELS = { get isms_committee() { return t('govl_cmtIsms') }, get ciso_meeting() { return t('govl_cmtCiso') }, get risk_committee() { return t('govl_cmtRisk') }, get management() { return t('govl_cmtMgmt') }, get other() { return t('govl_cmtOther') } }
 
 function govBadge(label, color) {
   return `<span class="gov-badge" style="color:${color};border-color:${color}">${escHtml(label)}</span>`
@@ -13381,11 +13484,11 @@ async function deleteGovMeeting(id) {
 
 let _bcmTab = 'bia'
 
-const BCM_CRIT_LABELS = { critical:'Critical', high:'High', medium:'Medium', low:'Low' }
-const BCM_STATUS_LABELS = { draft:'Draft', reviewed:'Reviewed', approved:'Approved', tested:'Tested', review:'Under Review' }
-const BCM_PLAN_TYPE_LABELS = { bcp:'BCP', drp:'DRP', itp:'ITP', crisis_communication:'Crisis Communication' }
-const BCM_RESULT_LABELS = { pass:'Pass', fail:'Fail', partial:'Partial', planned:'Planned', not_tested:'Not Tested' }
-const BCM_EXERCISE_TYPE_LABELS = { tabletop:'Tabletop', simulation:'Simulation', full_drill:'Full Drill', walkthrough:'Walkthrough' }
+const BCM_CRIT_LABELS = { get critical() { return t('bcml_critCritical') }, get high() { return t('bcml_critHigh') }, get medium() { return t('bcml_critMedium') }, get low() { return t('bcml_critLow') } }
+const BCM_STATUS_LABELS = { get draft() { return t('bcml_statDraft') }, get reviewed() { return t('bcml_statReviewed') }, get approved() { return t('bcml_statApproved') }, get tested() { return t('bcml_statTested') }, get review() { return t('bcml_statInReview') } }
+const BCM_PLAN_TYPE_LABELS = { get bcp() { return t('bcml_planBcp') }, get drp() { return t('bcml_planDrp') }, get itp() { return t('bcml_planItp') }, get crisis_communication() { return t('bcml_planCrisis') } }
+const BCM_RESULT_LABELS = { get pass() { return t('bcml_resPass') }, get fail() { return t('bcml_resFail') }, get partial() { return t('bcml_resPartial') }, get planned() { return t('bcml_resPlanned') }, get not_tested() { return t('bcml_resNotTested') } }
+const BCM_EXERCISE_TYPE_LABELS = { get tabletop() { return t('bcml_exTabletop') }, get simulation() { return t('bcml_exSimulation') }, get full_drill() { return t('bcml_exFullDrill') }, get walkthrough() { return t('bcml_exWalkthrough') } }
 
 function bcmCritBadge(v) {
   return `<span class="bcm-badge ${v}">${BCM_CRIT_LABELS[v] || v}</span>`
@@ -14091,25 +14194,25 @@ async function deleteExercise(id) {
 let _suppliersTab = 'list'
 
 const SUP_TYPE_LABELS = {
-  software:    'Software',
-  hardware:    'Hardware',
-  service:     'Service',
-  cloud:       'Cloud',
-  consulting:  'Consulting',
-  other:       'Other',
+  get software()   { return t('supl_typeSoftware') },
+  get hardware()   { return t('supl_typeHardware') },
+  get service()    { return t('supl_typeService') },
+  get cloud()      { return t('supl_typeCloud') },
+  get consulting() { return t('supl_typeConsulting') },
+  get other()      { return t('supl_typeOther') },
 }
-const SUP_CRIT_LABELS = { critical: 'Critical', high: 'High', medium: 'Medium', low: 'Low' }
+const SUP_CRIT_LABELS = { get critical() { return t('supl_critCritical') }, get high() { return t('supl_critHigh') }, get medium() { return t('supl_critMedium') }, get low() { return t('supl_critLow') } }
 const SUP_STATUS_LABELS = {
-  active:       'Active',
-  under_review: 'Under Review',
-  inactive:     'Inactive',
-  terminated:   'Terminated',
+  get active()       { return t('supl_statActive') },
+  get under_review() { return t('bcml_statInReview') },
+  get inactive()     { return t('supl_statInactive') },
+  get terminated()   { return t('supl_statTerminated') },
 }
 const SUP_AUDIT_LABELS = {
-  passed:        'Passed',
-  failed:        'Failed',
-  pending:       'Pending',
-  not_scheduled: 'Not Scheduled',
+  get passed()        { return t('supl_audPassed') },
+  get failed()        { return t('supl_audFailed') },
+  get pending()       { return t('supl_audPending') },
+  get not_scheduled() { return t('supl_audNotSched') },
 }
 
 function _supplierCritColor(c) {

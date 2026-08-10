@@ -8,6 +8,7 @@ const { requireAuth, authorize } = require('../auth')
 const orgSettingsStore = require('../db/orgSettingsStore')
 const auditStore       = require('../db/auditStore')
 const customListsStore = require('../db/customListsStore')
+const assetStore       = require('../db/assetStore')
 const storage          = require('../storage')
 const mailer           = require('../mailer')
 
@@ -162,10 +163,50 @@ router.put('/admin/list/:listId', requireAuth, authorize('admin'), async (req, r
   const { listId } = req.params
   const items = req.body
   if (!Array.isArray(items)) return res.status(400).json({ error: 'Body must be an array' })
+
+  // Asset-Typen (#64) — Reihenfolge ist wichtig: erst prüfen, ob die Liste
+  // überhaupt wohlgeformt ist, dann ob sie etwas Benutztes entfernt. Andersherum
+  // meldete eine kaputte Liste "Typ in Verwendung" statt des echten Fehlers.
+  if (listId === 'assetTypes') {
+    const invalid = customListsStore.validateList(listId, items)
+    if (invalid.length) return res.status(400).json({ error: 'Invalid list', details: invalid })
+
+    // Ein Typ, der noch an Assets hängt, darf nicht verschwinden — sonst
+    // zeigen bestehende Assets auf einen Typ, den es nicht mehr gibt.
+    const inUse = await assetsUsingRemovedTypes(items)
+    if (inUse.length) {
+      return res.status(409).json({
+        error: 'asset types still in use',
+        inUse,   // [{ type, label, count }]
+      })
+    }
+  }
+
   const result = await customListsStore.setList(listId, items)
   if (result === null) return res.status(404).json({ error: 'Unknown list id' })
+  if (result && result.errors) return res.status(400).json({ error: 'Invalid list', details: result.errors })
   res.json(result)
 })
+
+/**
+ * Ermittelt, welche der bisherigen Asset-Typen in der neuen Liste fehlen und
+ * noch von Assets verwendet werden. Leeres Array = Speichern ist unbedenklich.
+ */
+async function assetsUsingRemovedTypes(newItems) {
+  const keptIds = new Set((newItems || []).map(i => i && i.id).filter(Boolean))
+  const current = await customListsStore.getList('assetTypes') || []
+  const removed = current.filter(t => !keptIds.has(t.id))
+  if (!removed.length) return []
+
+  const assets = await assetStore.getAll({}) || []
+  return removed
+    .map(t => ({
+      type:  t.id,
+      label: t.label,
+      count: assets.filter(a => a.type === t.id).length,
+    }))
+    .filter(r => r.count > 0)
+}
 router.post('/admin/list/:listId/reset', requireAuth, authorize('admin'), async (req, res) => {
   const result = await customListsStore.resetList(req.params.listId)
   if (result === null) return res.status(404).json({ error: 'Unknown list id' })

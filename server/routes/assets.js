@@ -4,7 +4,28 @@ const express = require('express')
 const router = express.Router()
 const { requireAuth, authorize } = require('../auth')
 const assetStore = require('../db/assetStore')
+const customListsStore = require('../db/customListsStore')
 const embeddingStore = require('../ai/embeddingStore')
+
+/**
+ * Prüft den Asset-Typ gegen die aktuell konfigurierte Typenliste (#64).
+ * Vorher wurde jeder Wert angenommen — mit editierbaren Typen wäre das eine
+ * offene Tür für Tippfehler, die erst im UI als leere Zelle auffallen.
+ * Ein leerer Typ bleibt erlaubt: Bestandsdaten haben ihn, und das Formular
+ * erzwingt ihn nicht.
+ */
+async function checkType(req, res) {
+  const type = req.body.type
+  if (type === undefined || type === '') return true
+  const types = await customListsStore.getList('assetTypes') || []
+  if (types.some(t => t.id === type)) return true
+  res.status(400).json({
+    error: 'Unknown asset type',
+    type,
+    allowed: types.map(t => t.id),
+  })
+  return false
+}
 
 // Abhängigkeiten prüfen (unbekannte Ziele / Zyklen). Muss vor dem Schreiben
 // passieren — Express 4 fängt Fehler aus async-Handlern nicht selbst ab.
@@ -40,6 +61,7 @@ router.get('/assets/:id', requireAuth, authorize('reader'), async (req, res) => 
 })
 
 router.post('/assets', requireAuth, authorize('editor'), async (req, res) => {
+  if (!await checkType(req, res)) return
   if (!await checkDependencies(req, res, null)) return
   const asset = await assetStore.create(req.body, { createdBy: req.user })
   await require('../db/auditStore').append({ user: req.user, action: 'create', resource: 'asset', detail: asset.name })
@@ -48,6 +70,7 @@ router.post('/assets', requireAuth, authorize('editor'), async (req, res) => {
 })
 
 router.put('/assets/:id', requireAuth, authorize('editor'), async (req, res) => {
+  if (!await checkType(req, res)) return
   if (!await checkDependencies(req, res, req.params.id)) return
   const updated = await assetStore.update(req.params.id, req.body, { changedBy: req.user })
   if (!updated) return res.status(404).json({ error: 'Not found' })

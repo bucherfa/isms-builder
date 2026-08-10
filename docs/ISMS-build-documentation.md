@@ -297,7 +297,7 @@ tests/
 
 **Datenisolation:** Jede Testdatei bekommt ein eigenes `mkdtemp`-Verzeichnis mit frischen Seed-Daten. `DATA_DIR`-Umgebungsvariable wird vor dem Server-Require gesetzt — alle Stores lesen diesen Pfad beim Laden. Temp-Dirs werden in `afterAll` gelöscht.
 
-**Aktueller Stand:** 330/330 Tests bestehen. Vor einem Push `npm run preflight` ausführen — das spiegelt exakt die harten CI-Schritte (Tests, pdf-parse-Pinning, `npm audit --audit-level=high`). Optionaler `pre-push`-Hook: `git config core.hooksPath .githooks`
+**Aktueller Stand:** 423/423 Tests bestehen. Vor einem Push `npm run preflight` ausführen — das spiegelt exakt die harten CI-Schritte (Tests, pdf-parse-Pinning, `npm audit --audit-level=high`). Optionaler `pre-push`-Hook: `git config core.hooksPath .githooks`
 
 ---
 
@@ -1162,7 +1162,9 @@ Vererbte Werte werden **berechnet, nicht gespeichert** — eine Änderung an der
 | `protectionOrigins` | je Schutzziel die ID des Assets, dessen Eigenwert den effektiven Wert bestimmt (= eigene ID, wenn nicht geerbt) |
 | `requiredBy` | IDs der Assets, die direkt von diesem Asset abhängen |
 
-Die Logik liegt backend-neutral in `server/db/assetProtection.js` und wird von JSON- und Knex-Store gemeinsam genutzt. Im SQL-Backend liegen `protection` und `dependsOn` im vorhandenen `data`-JSON-Feld — **kein Schema-Change erforderlich**.
+Die Logik liegt backend-neutral in `server/db/assetProtection.js` und wird von JSON- und Knex-Store gemeinsam genutzt. Nach demselben Muster hält `server/db/assetTypes.js` die Asset-Typen und Kategorien — die einzige Deklaration im Projekt. Sie war zuvor dreifach vorhanden (beide Stores plus `ASSET_TYPES_MAP` im Frontend) und bereits auseinandergelaufen. Editierbar sind die Typen über `customListsStore` (Administration → Listen); das Frontend bezieht sie über `/admin/lists` und hält keine eigene Kopie mehr.
+
+Zur Mehrsprachigkeit gilt eine bewusste Festlegung: Die 24 Vorgabetypen tragen i18n-Schlüssel (`assetType_<id>`, dazu `assetCat_<id>`) und werden übersetzt. `assetTypeLabel()` in `ui/app.js` übersetzt aber nur, solange das gespeicherte Label exakt dem `en`-Wert des Schlüssels entspricht — daran erkennt es einen unveränderten Vorgabetyp. Selbst angelegte und umbenannte Typen werden nicht übersetzt, weil für sie keine Übersetzung existieren kann und eine Umbenennung sonst stillschweigend überschrieben würde. **Wer ein Vorgabe-Label in `server/db/assetTypes.js` ändert, muss den `en`-Wert in `ui/i18n/translations.js` mitziehen**; `tests/assetTypes.test.js` prüft diese Invariante. Ein mehrsprachiges Labelfeld je Typ ist ausdrücklich nicht vorgesehen. Im SQL-Backend liegen `protection` und `dependsOn` im vorhandenen `data`-JSON-Feld — **kein Schema-Change erforderlich**.
 
 **UI — 4 Tabs:**
 - **Alle Assets:** Filtertabelle (Kategorie, Klassifizierung, Kritikalität, Status, Schutzziel + Mindeststufe, Suchfeld) + inline Formular. Schutzziele erscheinen als Chips (`C3 I4↑ A4↑`); geerbte Werte sind gestrichelt umrandet und mit Pfeil markiert, der Tooltip nennt Eigenwert und Vererbungsquelle.

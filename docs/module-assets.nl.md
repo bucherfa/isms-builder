@@ -36,13 +36,52 @@ Typische asset-categorieën:
 
 Velden:
 - **Naam** — unieke benaming (bijv. « Productiedatabaseserver »)
-- **Type** — categorie (Hardware, Software, Gegevens, Personen, Proces, Faciliteit)
+- **Type** — bijv. Server, SaaS-toepassing, Database. De lijst is gegroepeerd per categorie (Hardware, Software, Gegevens, Diensten, Faciliteiten) en is aanpasbaar.
 - **Eigenaar** — wie is verantwoordelijk?
 - **Afdeling / Organisatorische eenheid**
 - **Classificatie** — vertrouwelijkheid: `public` / `internal` / `confidential` / `secret`
 - **Kritikaliteit** — `low` / `medium` / `high` / `critical`
 - **Beschrijving** — wat is dit asset, waar bevindt het zich?
 - **Gekoppelde risico's** — welke risico's betreffen dit asset?
+
+---
+
+## Bedrijfsmiddeltypen aanpassen
+
+**Administratie → Lijsten → Bedrijfsmiddeltypen** (alleen beheer)
+
+De meegeleverde typen zijn een uitgangspunt, geen vaste lijst. Ze kunnen worden hernoemd,
+aangevuld en verwijderd; elk type hoort bij een van de vijf categorieën.
+
+Er gelden twee waarborgen:
+
+- **Een type dat nog in gebruik is, kan niet worden verwijderd.** Het systeem noemt het type en
+  het aantal betrokken bedrijfsmiddelen. Wijs ze eerst opnieuw toe, verwijder daarna.
+- **Bij het opslaan van een bedrijfsmiddel wordt het type gecontroleerd.** Een onbekend type
+  wordt geweigerd, zodat een typefout niet als eigen type in de gegevens belandt.
+
+Bestaande bedrijfsmiddelen behouden hun type, ook als dat later uit de lijst verdwijnt; in het
+formulier verschijnt het als "Onbekend type", zodat het bij bewerken niet stilzwijgend verloren
+gaat.
+
+Met **Herstellen** keert de lijst terug naar de standaardwaarden.
+
+### Talen: wat wordt vertaald en wat niet
+
+Dit is een bewuste keuze, geen tekortkoming:
+
+- **De 24 meegeleverde typen zijn vertaald in alle interfacetalen** (DE/EN/FR/NL) en verschijnen
+  in de taal die elke gebruiker heeft ingesteld.
+- **Een zelf aangemaakt type wordt niet vertaald.** Het verschijnt bij iedere gebruiker precies
+  zoals het is ingevoerd. De toepassing kan geen vertaling verzinnen voor een term die zij niet
+  kent.
+- **Het hernoemen van een meegeleverd type laat ook de vertaling vervallen.** Vanaf dat moment
+  geldt de ingevoerde tekst — anders zou uw wijziging in andere talen stilzwijgend worden
+  overschreven.
+
+Heeft u een meertalig personeelsbestand en maakt u eigen typen aan, spreek dan één taal af
+waarin typebenamingen worden onderhouden — meestal de bedrijfstaal. Herstellen naar de
+standaardwaarden zet ook de vertalingen terug.
 
 ---
 

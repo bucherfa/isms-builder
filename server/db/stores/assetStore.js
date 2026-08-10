@@ -2,26 +2,13 @@
 
 const { getDb, init: initDb } = require('../knexDatabase')
 const protection = require('../assetProtection')
-
-const ASSET_TYPES = {
-  hardware_server: 'Server', hardware_workstation: 'Workstation / PC',
-  hardware_laptop: 'Laptop / Notebook', hardware_mobile: 'Mobilgerät',
-  hardware_network: 'Netzwerk-Equipment', hardware_ics_ot: 'ICS/OT-Anlage',
-  hardware_building: 'Gebäudetechnik (BAS/GLT)', hardware_other: 'Hardware (Sonstige)',
-  software_app: 'Anwendungssoftware', software_os: 'Betriebssystem',
-  software_cloud: 'Cloud-Dienst (IaaS/PaaS)', software_saas: 'SaaS-Anwendung',
-  software_other: 'Software (Sonstige)', data_database: 'Datenbank',
-  data_document: 'Dokumentensammlung', data_backup: 'Backup / Archiv',
-  data_other: 'Daten (Sonstige)', service_internal: 'Interner Dienst',
-  service_cloud: 'Cloud-Service (extern)', service_external: 'Externer Dienstleister',
-  facility_office: 'Bürogebäude', facility_datacenter: 'Rechenzentrum / Serverraum',
-  facility_production: 'Produktionsstätte / Werk', facility_other: 'Einrichtung (Sonstige)',
+const assetTypes = require('../assetTypes')
+function currentAssetTypes() {
+  try { return require('../customListsStore').getList('assetTypes') || assetTypes.defaults() }
+  catch { return assetTypes.defaults() }
 }
 
-const CATEGORIES = {
-  hardware: 'Hardware', software: 'Software',
-  data: 'Daten / Informationen', service: 'Dienste', facility: 'Einrichtungen',
-}
+
 
 function nowISO() { return new Date().toISOString() }
 function makeId() { return `asset_${require('crypto').randomBytes(4).toString('hex')}` }
@@ -69,7 +56,7 @@ function packData(a) {
 /** Alle nicht gelöschten Assets inkl. berechneter Vererbung. */
 async function activeAnnotated() {
   const rows = await getDb()('assets').whereNull('deleted_at')
-  return protection.annotate(rows.map(rowToAsset))
+  return protection.annotate(rows.map(rowToAsset), currentAssetTypes())
 }
 
 /** Hält `classification` (Altfeld) und `protection.c` konsistent. */
@@ -215,7 +202,7 @@ module.exports = {
   getSummary: async () => {
     const rows = await getDb()('assets').whereNull('deleted_at')
     const raw  = rows.map(rowToAsset)
-    const list = protection.annotate(raw)
+    const list = protection.annotate(raw, currentAssetTypes())
     const now = new Date()
 
     const byProtection = {
@@ -278,7 +265,7 @@ module.exports = {
     }
   },
 
-  ASSET_TYPES, CATEGORIES,
+  CATEGORIES: assetTypes.CATEGORIES,
   PROTECTION_LEVELS: protection.PROTECTION_LEVELS,
   PROTECTION_GOALS:  protection.PROTECTION_GOALS,
 }

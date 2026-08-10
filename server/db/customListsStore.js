@@ -7,11 +7,15 @@ const STORAGE_BACKEND = (process.env.STORAGE_BACKEND || 'json').toLowerCase()
 
 const fs   = require('fs')
 const path = require('path')
+const assetTypes = require('./assetTypes')
 
 const _BASE = process.env.DATA_DIR || path.join(__dirname, '../../data')
 const DB_FILE = path.join(_BASE, 'custom-lists.json')
 
 const DEFAULTS = {
+  // Asset-Typen (#64): Die Vorgabe steht in assetTypes.js — der einzigen
+  // Deklaration im Projekt. Hier nur referenziert, nicht wiederholt.
+  assetTypes: assetTypes.defaults(),
   templateTypes: ['Policy', 'Procedure', 'Risk Policy', 'SoA', 'Incident', 'Release'],
   riskCategories: [
     { id: 'technical',      label: 'Technical',      icon: 'ph-cpu' },
@@ -76,8 +80,20 @@ function getList(listId) {
   return stored[listId] !== undefined ? stored[listId] : DEFAULTS[listId]
 }
 
+/**
+ * Prüft listenspezifisch. Gibt ein Array von Fehlermeldungen zurück
+ * (leer = in Ordnung). Nur assetTypes wird bislang geprüft — eine kaputte
+ * Typenliste würde das Asset-Modul unbenutzbar machen.
+ */
+function validateList(listId, items) {
+  if (listId !== 'assetTypes') return []
+  return assetTypes.validateTypes(items).errors
+}
+
 function setList(listId, items) {
   if (!ALLOWED_LIST_IDS.includes(listId)) return null
+  const errors = validateList(listId, items)
+  if (errors.length) return { errors }
   const stored = load()
   stored[listId] = items
   save(stored)
@@ -92,7 +108,7 @@ function resetList(listId) {
   return DEFAULTS[listId]
 }
 
-const _jsonExports = { getAll, getList, setList, resetList, ALLOWED_LIST_IDS, DEFAULTS }
+const _jsonExports = { getAll, getList, setList, resetList, validateList, ALLOWED_LIST_IDS, DEFAULTS }
 
 if (STORAGE_BACKEND !== 'json') {
   const _knex = require('./stores/customListsStore')

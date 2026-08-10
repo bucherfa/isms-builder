@@ -1,11 +1,11 @@
-<!-- © 2026 Claude Hecker — ISMS Builder V 1.32.0 — AGPL-3.0 -->
+<!-- © 2026 Claude Hecker — ISMS Builder V 1.37.2.0 — AGPL-3.0 -->
 ![ISMS Builder Banner](isms-builder-banner.png)
 # ISMS Builder
 
 **Self-hosted Information Security Management System — open source, no cloud required**
 
 [![CI](https://github.com/coolstartnow/isms-builder/actions/workflows/ci.yml/badge.svg)](https://github.com/coolstartnow/isms-builder/actions/workflows/ci.yml)
-[![Tests](https://img.shields.io/badge/tests-330%20passing-brightgreen)](https://github.com/coolstartnow/isms-builder/actions)
+[![Tests](https://img.shields.io/badge/tests-423%20passing-brightgreen)](https://github.com/coolstartnow/isms-builder/actions)
 [![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-blue.svg)](LICENSE)
 [![Node.js](https://img.shields.io/badge/Node.js-18%2B-339933?logo=node.js&logoColor=white)](https://nodejs.org)
 [![Version](docs/badges/version.svg)](CHANGELOG.md)
@@ -112,7 +112,7 @@ and that is not a reason to avoid the project, only a reason to plan realistical
 | **Risk Management** | Risk register, treatment plans, auditor role | ISO 27001 §6.1 |
 | **Security Goals** | KPI tracking with progress bars, calendar integration | ISO 27001 §6.2 |
 | **GDPR & Privacy** | VVT, AV-contracts, DSFA, TOMs, DSAR queue, 72h-timer, deletion log with email alerts | DSGVO Art. 13–35 |
-| **Asset Management** | Asset register, classification levels, EoL tracking | ISO 27001 A.5.9–5.12 |
+| **Asset Management** | Asset register, editable asset types, protection goals (CIA + authenticity) with dependency inheritance, classification levels, EoL tracking | ISO 27001 A.5.9–5.12 |
 | **BCM / BCP** | Business Impact Analysis, continuity plans, exercises | ISO 27001 A.5.29–5.30 / NIS2 |
 | **Training Records** | Training catalogue, completion tracking, certificate upload | ISO 27001 A.6.3 |
 | **Supplier Management** | Vendor register, audit scheduling, risk assessment | ISO 27001 A.5.19–5.22 |
@@ -272,7 +272,7 @@ See [`docs/architecture/`](docs/architecture/) for C4 diagrams, full data model,
 > relation to any production or demo data.
 
 ```bash
-npm test                  # runs all 330 tests
+npm test                  # runs all 423 tests
 npm run preflight         # exactly what CI gates on (tests + pinning + audit)
 npm test -- --verbose     # with test names
 ```
@@ -305,15 +305,15 @@ Contributions are very welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for:
 | ✅ Done | SQLite backend, Docker, CI/CD |
 | ✅ Done | GDPR deletion log email alerts |
 | ✅ Done | Multilingual demo bundles (DE / EN / FR / NL) |
-| ✅ Done | Audit Findings module with action plans (V 1.32.0) |
-| ✅ Done | FR/NL Guidance translations + admin language configuration (V 1.32.0) |
-| ✅ Done | MariaDB/MySQL backend (`STORAGE_BACKEND=mariadb`, V 1.34.1) |
-| ✅ Done | Scanner → Risk draft (Greenbone/OpenVAS XML + PDF import, V 1.33.0) |
-| ✅ Done | Policy Acknowledgement — staff confirm policies digitally with audit trail (V 1.35.0) |
-| ✅ Done | Guidance CRUD — create, edit and upload own documentation (V 1.35.0) |
-| ✅ Done | Guidance Search — cross-category full-text search with excerpt (V 1.35.0) |
-| ✅ Done | Asset protection goals — CIA + authenticity (1–4), dependencies and BSI maximum-principle inheritance (V 1.36.0) |
-| ✅ Done | NIS2 Art. 21 governance checklist (30 items) and Art. 23 reporting deadlines with automatic alerts (V 1.37.0) |
+| ✅ Done | Audit Findings module with action plans (V 1.37.2.0) |
+| ✅ Done | FR/NL Guidance translations + admin language configuration (V 1.37.2.0) |
+| ✅ Done | MariaDB/MySQL backend (`STORAGE_BACKEND=mariadb`, V 1.37.2.1) |
+| ✅ Done | Scanner → Risk draft (Greenbone/OpenVAS XML + PDF import, V 1.37.2.0) |
+| ✅ Done | Policy Acknowledgement — staff confirm policies digitally with audit trail (V 1.37.2.0) |
+| ✅ Done | Guidance CRUD — create, edit and upload own documentation (V 1.37.2.0) |
+| ✅ Done | Guidance Search — cross-category full-text search with excerpt (V 1.37.2.0) |
+| ✅ Done | Asset protection goals — CIA + authenticity (1–4), dependencies and BSI maximum-principle inheritance (V 1.37.2.0) |
+| ✅ Done | NIS2 Art. 21 governance checklist (30 items) and Art. 23 reporting deadlines with automatic alerts (V 1.37.2.0) |
 | 🔜 Next | AI Policy Assistant — Ollama drafts policy content from title + framework |
 | 🔜 Next | Scheduled Reports — weekly/monthly compliance report delivered by email |
 | 🔜 Next | PostgreSQL backend |

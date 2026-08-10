@@ -61,6 +61,62 @@ function normalizeProtection(input, classification) {
   }
 }
 
+/**
+ * Eigenwert eines Assets vor der Abhängigkeitsvererbung (#64, Teil 2).
+ *
+ * Zwei Quellen wirken auf dieselben vier Werte:
+ *   1. der Asset-Typ (Vorgabe für alle Assets dieses Typs),
+ *   2. der am Asset gespeicherte Wert.
+ *
+ * Der Typwert gilt **dauerhaft**, nicht nur beim Anlegen: Wird er am Typ
+ * korrigiert, wirkt das sofort auf alle Assets, die ihn nicht überschrieben
+ * haben. Wer abweichen will, setzt `protectionOverride` — sonst ließe sich eine
+ * bewusste Abweichung nicht von einem zufällig gleichen Wert unterscheiden.
+ *
+ * Der Typ wirkt je Schutzziel: Setzt er nur `c`, kommen `i`, `a` und `auth`
+ * weiterhin vom Asset. Das erlaubt Typen wie „Datenbank: Vertraulichkeit hoch",
+ * ohne die übrigen Ziele vorwegzunehmen.
+ *
+ * Gibt Werte und je Ziel die Herkunft zurück: 'own' oder `type:<typId>`.
+ */
+function resolveOwnProtection(asset, typeProtectionById) {
+  const own = normalizeProtection(asset.protection, asset.classification)
+  const origin = Object.fromEntries(PROTECTION_GOALS.map(g => [g, 'own']))
+
+  if (asset.protectionOverride) return { values: own, origin }
+
+  const fromType = (typeProtectionById || {})[asset.type]
+  if (!fromType) return { values: own, origin }
+
+  const values = { ...own }
+  for (const goal of PROTECTION_GOALS) {
+    const lvl = normalizeLevel(fromType[goal])
+    if (lvl === null) continue          // Ziel am Typ nicht gesetzt → Asset behält seinen Wert
+    values[goal] = lvl
+    origin[goal] = `type:${asset.type}`
+  }
+  return { values, origin }
+}
+
+/**
+ * Baut aus einer Typenliste die Nachschlagetabelle für resolveOwnProtection.
+ * Typen ohne Schutzziele tauchen nicht auf und wirken damit nicht.
+ */
+function typeProtectionMap(assetTypes) {
+  const map = {}
+  for (const t of (Array.isArray(assetTypes) ? assetTypes : [])) {
+    if (!t || !t.id || !t.protection) continue
+    const p = {}
+    let any = false
+    for (const goal of PROTECTION_GOALS) {
+      const lvl = normalizeLevel(t.protection[goal])
+      if (lvl !== null) { p[goal] = lvl; any = true }
+    }
+    if (any) map[t.id] = p
+  }
+  return map
+}
+
 /** Dedupliziert, entfernt Leerwerte und Selbstbezug. */
 function normalizeDependsOn(input, selfId) {
   if (!Array.isArray(input)) return []
@@ -109,9 +165,10 @@ function findUnknownDependencies(list, dependsOn) {
  *
  * Die Eingabeliste wird nicht verändert; es werden flache Kopien erzeugt.
  */
-function annotate(list) {
-  const assets = Array.isArray(list) ? list : []
-  const byId   = new Map(assets.map(a => [a.id, a]))
+function annotate(list, assetTypes) {
+  const assets  = Array.isArray(list) ? list : []
+  const byId    = new Map(assets.map(a => [a.id, a]))
+  const typeMap = typeProtectionMap(assetTypes)
 
   // Umgekehrte Kanten: wer hängt von wem ab
   const dependents = new Map()
@@ -132,17 +189,23 @@ function annotate(list) {
     const asset = byId.get(id)
     if (!asset) return null
 
-    const own = normalizeProtection(asset.protection, asset.classification)
+    // Eigenwert = Typvorgabe, sofern nicht überschrieben (#64)
+    const ownRes = resolveOwnProtection(asset, typeMap)
+    const own    = ownRes.values
+    // Herkunft in der Vererbungskette ist IMMER eine Asset-ID: Nur so bleibt
+    // erkennbar, über welches Asset ein Wert nach oben gereicht wurde. Ob der
+    // Eigenwert vom Typ stammt, steht getrennt in protectionSources.
+    const ownOrigins = Object.fromEntries(PROTECTION_GOALS.map(g => [g, id]))
 
     // Zyklenschutz: bei bereits importierten Altdaten kann trotz Schreibprüfung
     // ein Zyklus vorliegen — dann zählt nur der Eigenwert.
     if (visiting.has(id)) {
-      return { values: own, origins: Object.fromEntries(PROTECTION_GOALS.map(g => [g, id])) }
+      return { values: own, origins: { ...ownOrigins } }
     }
     visiting.add(id)
 
     const values  = { ...own }
-    const origins = Object.fromEntries(PROTECTION_GOALS.map(g => [g, id]))
+    const origins = { ...ownOrigins }
 
     for (const dependentId of dependents.get(id) || []) {
       const up = resolve(dependentId)
@@ -165,11 +228,20 @@ function annotate(list) {
 
   return assets.map(asset => {
     const resolved = resolve(asset.id)
+    const ownRes   = resolveOwnProtection(asset, typeMap)
     return {
       ...asset,
-      protection:          normalizeProtection(asset.protection, asset.classification),
+      protection:          ownRes.values,
+      protectionOwn:       normalizeProtection(asset.protection, asset.classification),
+      // Je Schutzziel: 'own' oder 'type' — woher der EIGENWERT kommt.
+      // protectionOrigins sagt daneben, welches ASSET den effektiven Wert setzt.
+      protectionSources:   Object.fromEntries(
+                             PROTECTION_GOALS.map(g => [g, ownRes.origin[g] === 'own' ? 'own' : 'type'])),
+      protectionTypeId:    Object.values(ownRes.origin).find(o => o !== 'own')?.slice(5) || null,
+      protectionFromType:  Object.values(ownRes.origin).some(o => o !== 'own'),
+      protectionOverride:  !!asset.protectionOverride,
       dependsOn:           Array.isArray(asset.dependsOn) ? asset.dependsOn : [],
-      effectiveProtection: resolved ? resolved.values  : normalizeProtection(asset.protection, asset.classification),
+      effectiveProtection: resolved ? resolved.values  : ownRes.values,
       protectionOrigins:   resolved ? resolved.origins : {},
       requiredBy:          dependents.get(asset.id) || [],
     }
@@ -177,8 +249,8 @@ function annotate(list) {
 }
 
 /** Wie annotate(), aber nur für ein Asset (Graph wird trotzdem vollständig ausgewertet). */
-function annotateOne(list, id) {
-  return annotate(list).find(a => a.id === id) || null
+function annotateOne(list, id, assetTypes) {
+  return annotate(list, assetTypes).find(a => a.id === id) || null
 }
 
 /**
@@ -221,6 +293,8 @@ module.exports = {
   LEVEL_TO_CLASSIFICATION,
   normalizeLevel,
   normalizeProtection,
+  resolveOwnProtection,
+  typeProtectionMap,
   normalizeDependsOn,
   wouldCreateCycle,
   findUnknownDependencies,

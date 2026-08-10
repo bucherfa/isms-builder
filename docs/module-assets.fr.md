@@ -36,13 +36,53 @@ Catégories d'assets typiques :
 
 Champs :
 - **Nom** — désignation unique (p. ex. « Serveur de base de données de production »)
-- **Type** — catégorie (Matériel, Logiciel, Données, Personnes, Processus, Installation)
+- **Type** — p. ex. Serveur, Application SaaS, Base de données. La liste est groupée par catégorie (Matériel, Logiciel, Données, Services, Installations) et peut être personnalisée.
 - **Propriétaire** — qui est responsable ?
 - **Département / Unité organisationnelle**
 - **Classification** — confidentialité : `public` / `internal` / `confidential` / `secret`
 - **Criticité** — `low` / `medium` / `high` / `critical`
 - **Description** — qu'est-ce que cet asset, où se trouve-t-il ?
 - **Risques liés** — quels risques concernent cet asset ?
+
+---
+
+## Personnaliser les types d'actifs
+
+**Administration → Listes → Types d'actifs** (administration uniquement)
+
+Les types livrés avec l'application constituent un point de départ, non une liste figée. Ils
+peuvent être renommés, complétés et supprimés ; chaque type appartient à l'une des cinq
+catégories.
+
+Deux garde-fous s'appliquent :
+
+- **Un type encore utilisé ne peut pas être supprimé.** Le système indique le type et le nombre
+  d'actifs concernés. Réaffectez-les d'abord, puis supprimez.
+- **Le type est vérifié lors de l'enregistrement d'un actif.** Un type inconnu est refusé, afin
+  qu'une faute de frappe ne devienne pas un type à part entière dans les données.
+
+Les actifs existants conservent leur type même s'il disparaît ensuite de la liste ; dans le
+formulaire, il apparaît sous « Type inconnu » afin de ne pas être perdu silencieusement lors
+d'une modification.
+
+**Réinitialiser** rétablit les valeurs par défaut.
+
+### Langues : ce qui est traduit et ce qui ne l'est pas
+
+Il s'agit d'un choix délibéré, non d'une lacune :
+
+- **Les 24 types livrés sont traduits dans toutes les langues de l'interface** (DE/EN/FR/NL) et
+  s'affichent dans la langue choisie par chaque utilisateur.
+- **Un type que vous créez n'est pas traduit.** Il apparaît à tous les utilisateurs exactement
+  tel qu'il a été saisi : l'application ne peut inventer une traduction pour un terme qu'elle ne
+  connaît pas.
+- **Renommer un type livré supprime également sa traduction.** À partir de ce moment, c'est le
+  texte saisi qui s'applique, faute de quoi votre modification serait silencieusement écrasée
+  dans les autres langues.
+
+Si votre personnel est multilingue et que vous créez vos propres types, convenez d'une langue
+unique pour leur libellé — généralement la langue de l'entreprise. La réinitialisation rétablit
+également les traductions.
 
 ---
 

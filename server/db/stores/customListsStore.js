@@ -1,8 +1,11 @@
 'use strict'
 
 const { getDb, init: initDb } = require('../knexDatabase')
+const assetTypes = require('../assetTypes')
 
 const DEFAULTS = {
+  // Asset-Typen (#64) — Vorgabe kommt aus assetTypes.js, siehe dort.
+  assetTypes: assetTypes.defaults(),
   templateTypes: ['Policy', 'Procedure', 'Risk Policy', 'SoA', 'Incident', 'Release'],
   riskCategories: [
     { id: 'technical',      label: 'Technical',      icon: 'ph-cpu' },
@@ -77,6 +80,8 @@ module.exports = {
 
   setList: async (listId, items) => {
     if (!ALLOWED_LIST_IDS.includes(listId)) return null
+    const errors = module.exports.validateList(listId, items)
+    if (errors.length) return { errors }
     const db = getDb()
     const row = await db('custom_lists').where('list_id', listId).first()
     if (row) {
@@ -93,6 +98,11 @@ module.exports = {
       items: JSON.stringify(DEFAULTS[listId]),
     })
     return DEFAULTS[listId]
+  },
+
+  validateList: (listId, items) => {
+    if (listId !== 'assetTypes') return []
+    return assetTypes.validateTypes(items).errors
   },
 
   ALLOWED_LIST_IDS,

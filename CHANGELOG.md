@@ -8,6 +8,31 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [1.37.2] — 2026-08-10
+
+### Added
+- **Asset-Typen sind editierbar** — Teil 1 von [#64](https://github.com/coolstartnow/isms-builder/issues/64). Unter Administration → Listen lassen sich Asset-Typen anlegen, umbenennen, umsortieren und entfernen; jeder Typ trägt seine Kategorie mit. Der Objekt-Editor für Listen hat dafür ein optionales drittes Feld (Auswahlliste) bekommen, statt einen zweiten Editor danebenzustellen.
+- Das Typ-Auswahlfeld im Asset-Formular ist nach Kategorie gruppiert. Ein Typ, den es nicht mehr gibt, erscheint als „Unbekannter Typ" — damit er beim Bearbeiten eines Bestandsassets nicht stillschweigend verschwindet.
+- **Asset-Typen und -Kategorien sind übersetzt** (DE/EN/FR/NL). Bewusste Festlegung dabei: Übersetzt wird nur, was unverändert ausgeliefert wurde. Ein selbst angelegter Typ und ein umbenannter Vorgabetyp erscheinen in der Sprache, in der sie eingegeben wurden — für sie kann keine Übersetzung existieren, und eine Umbenennung stillschweigend zu überschreiben wäre schlechter als eine englische Bezeichnung. Ein mehrsprachiges Labelfeld je Typ ist ausdrücklich nicht vorgesehen; die Regel steht in `docs/module-assets.md` (alle vier Sprachen) und in der Architekturdokumentation.
+- **Schutzziele je Asset-Typ mit dauerhafter Vererbung** — Teil 2 von [#64](https://github.com/coolstartnow/isms-builder/issues/64), Backend. Ein Typ kann C/I/A/Authentizitaet vorgeben; Assets dieses Typs uebernehmen die Werte, solange sie nicht `protectionOverride` setzen. Die Vorgabe wirkt **je Schutzziel einzeln** (ein Typ „Datenbank: C=4" laesst I und A beim Asset) und ist ein **dauerhafter Bezug**: Eine Korrektur am Typ wirkt sofort auf alle Assets, die nicht uebersteuern. Die Abhaengigkeitsvererbung aus #29 laeuft unveraendert darueber — das Maximum gewinnt, auch gegen einen bewusst gesenkten Wert.
+- Zwei getrennte Herkunftsangaben je Asset, damit in der Oberflaeche erklaerbar bleibt, warum ein Wert so hoch ist: `protectionOrigins` nennt weiterhin das **Asset**, das den effektiven Wert bestimmt, das neue `protectionSources` je Ziel `own` oder `type`. Waeren beide in einem Feld, ginge verloren, ueber welches Asset ein Wert nach oben gereicht wurde.
+- `tests/assetTypeProtection.test.js` (15 Tests) auf beide Vererbungsquellen und ihr Zusammenspiel.
+- `tests/i18nKeys.test.js` (32 Tests): prueft, dass jeder in `ui/app.js` statisch verwendete Uebersetzungsschluessel existiert und in allen vier Sprachen gefuellt ist, und wacht darueber, dass die umgestellten Label-Maps nicht wieder auf feste Texte zurueckfallen. Ein fehlender Schluessel fiel bisher nicht auf: `t()` gibt den Schluesselnamen zurueck, die Oberflaeche zeigt dann `govl_prioLow` — ohne Fehler und ohne Absturz.
+- `tests/assetTypes.test.js` (46 Tests, 423 gesamt), darunter ein Guard gegen den Rückfall in die Mehrfach-Deklaration und einer auf die Invariante, dass der `en`-Wert jedes `assetType_*`-Schlüssels exakt dem Vorgabe-Label entspricht — sonst fiele die Übersetzung still aus.
+
+### Changed
+- **Rund 30 Label-Maps liefen an der Uebersetzung vorbei** und tragen ihre Anzeigetexte jetzt ueber `t()`: Governance (6), BCM (5), Lieferanten (4), Legal (6), Training (2), Incident Inbox (2), dazu SoA-Status, Risikostufen sowie Klassifizierung, Kritikalitaet, Status und Kategorien im Asset-Modul — zusammen 122 neue Schluessel in DE/EN/FR/NL. Fuer einen franzoesischen oder niederlaendischen Nutzer waren diese Module bis dahin durchgehend englisch. Umgesetzt als Getter (`get x() { return t(key) }`) nach dem Muster von `CAL_EVENT_CFG`, damit keine einzige Verwendungsstelle geaendert werden musste.
+- Der SoA-Status war als einziger **deutsch** fest verdrahtet und erschien so auch in der englischen Oberflaeche.
+- **Die Asset-Typenliste steht nur noch an einer Stelle**: neu in `server/db/assetTypes.js`, backend-neutral wie `assetProtection.js`. Vorher stand sie dreimal — in `server/db/assetStore.js`, in `server/db/stores/assetStore.js` und als `ASSET_TYPES_MAP` in `ui/app.js` — und war bereits auseinandergelaufen: Die Backend-Kopien führten deutsche Labels („Mobilgerät"), das Frontend englische („Mobile Device"). Konsumiert wurde keine der beiden Backend-Kopien. Das UI holt die Liste jetzt über `/admin/lists`, was ohnehin nötig ist, sobald Typen editierbar sind.
+
+### Fixed
+- **Asset-Typen wurden beim Speichern nicht geprüft**: `type` übernahm jeden Wert, auch einen Tippfehler. `POST`/`PUT /assets` weisen einen unbekannten Typ jetzt mit HTTP 400 ab; ein leerer Typ bleibt zulässig, weil Bestandsdaten ihn haben.
+- Ein Asset-Typ, der noch an Assets hängt, lässt sich nicht mehr entfernen (HTTP 409 mit Typ und Anzahl). Sonst zeigten bestehende Assets auf einen Typ, den es nicht mehr gibt.
+- Lehnte der Server eine Listenänderung ab, zeigte der Admin-Editor weiter den nicht gespeicherten Stand. Er lädt jetzt zurück.
+- Ein im Admin neu angelegter Asset-Typ stand im Asset-Formular erst nach einem Neuladen der Seite zur Verfügung.
+
+---
+
 ## [1.37.1] — 2026-07-27
 
 ### Fixed

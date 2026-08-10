@@ -8,43 +8,16 @@ const path = require('path')
 
 const protection = require('./assetProtection')
 
+const assetTypes = require('./assetTypes')
+// Typen liegen im Listen-Store (editierbar, #64). Lazy geholt, damit eine
+// Änderung an der Typenliste sofort wirkt, ohne Neustart.
+function currentAssetTypes() {
+  try { return require('./customListsStore').getList('assetTypes') || assetTypes.defaults() }
+  catch { return assetTypes.defaults() }
+}
+
 const _BASE = process.env.DATA_DIR || path.join(__dirname, '../../data')
 const FILE  = path.join(_BASE, 'assets.json')
-
-const ASSET_TYPES = {
-  hardware_server:      'Server',
-  hardware_workstation: 'Workstation / PC',
-  hardware_laptop:      'Laptop / Notebook',
-  hardware_mobile:      'Mobilgerät',
-  hardware_network:     'Netzwerk-Equipment',
-  hardware_ics_ot:      'ICS/OT-Anlage',
-  hardware_building:    'Gebäudetechnik (BAS/GLT)',
-  hardware_other:       'Hardware (Sonstige)',
-  software_app:         'Anwendungssoftware',
-  software_os:          'Betriebssystem',
-  software_cloud:       'Cloud-Dienst (IaaS/PaaS)',
-  software_saas:        'SaaS-Anwendung',
-  software_other:       'Software (Sonstige)',
-  data_database:        'Datenbank',
-  data_document:        'Dokumentensammlung',
-  data_backup:          'Backup / Archiv',
-  data_other:           'Daten (Sonstige)',
-  service_internal:     'Interner Dienst',
-  service_cloud:        'Cloud-Service (extern)',
-  service_external:     'Externer Dienstleister',
-  facility_office:      'Bürogebäude',
-  facility_datacenter:  'Rechenzentrum / Serverraum',
-  facility_production:  'Produktionsstätte / Werk',
-  facility_other:       'Einrichtung (Sonstige)',
-}
-
-const CATEGORIES = {
-  hardware: 'Hardware',
-  software: 'Software',
-  data:     'Daten / Informationen',
-  service:  'Dienste',
-  facility: 'Einrichtungen',
-}
 
 function load() {
   try { return JSON.parse(fs.readFileSync(FILE, 'utf8')) } catch { return [] }
@@ -60,7 +33,7 @@ function makeId()  {
 
 /** Alle nicht gelöschten Assets inkl. berechneter Vererbung. */
 function _activeAnnotated() {
-  return protection.annotate(load().filter(i => !i.deletedAt))
+  return protection.annotate(load().filter(i => !i.deletedAt), currentAssetTypes())
 }
 
 function getAll({ category, type, classification, criticality, status, entityId,
@@ -85,7 +58,7 @@ function getAll({ category, type, classification, criticality, status, entityId,
 }
 
 function getById(id) {
-  return protection.annotateOne(load().filter(i => !i.deletedAt), id)
+  return protection.annotateOne(load().filter(i => !i.deletedAt), id, currentAssetTypes())
 }
 
 /** Knoten + Kanten für die Abhängigkeitsvisualisierung. */
@@ -151,6 +124,7 @@ function create(data, { createdBy } = {}) {
     linkedControls: Array.isArray(data.linkedControls) ? data.linkedControls : [],
     linkedPolicies: Array.isArray(data.linkedPolicies) ? data.linkedPolicies : [],
     protection:     protection.normalizeProtection(data.protection, data.classification || 'internal'),
+    protectionOverride: !!data.protectionOverride,
     dependsOn:      protection.normalizeDependsOn(data.dependsOn, null),
     createdAt:      nowISO(),
     updatedAt:      nowISO(),
@@ -159,7 +133,7 @@ function create(data, { createdBy } = {}) {
   _syncClassification(asset, data.protection)
   list.push(asset)
   save(list)
-  return protection.annotateOne(list.filter(i => !i.deletedAt), asset.id)
+  return protection.annotateOne(list.filter(i => !i.deletedAt), asset.id, currentAssetTypes())
 }
 
 function update(id, patch, { changedBy } = {}) {
@@ -171,6 +145,7 @@ function update(id, patch, { changedBy } = {}) {
     'name','category','type','description','owner','ownerEmail','custodian','entityId',
     'location','classification','criticality','status','vendor','version','serialNumber',
     'purchaseDate','endOfLifeDate','tags','notes','linkedControls','linkedPolicies',
+    'protectionOverride',
   ]
   for (const k of allowed) {
     if (patch[k] !== undefined) item[k] = patch[k]
@@ -196,7 +171,7 @@ function update(id, patch, { changedBy } = {}) {
   item.updatedAt = nowISO()
   if (changedBy) item.updatedBy = changedBy
   save(list)
-  return protection.annotateOne(list.filter(i => !i.deletedAt), id)
+  return protection.annotateOne(list.filter(i => !i.deletedAt), id, currentAssetTypes())
 }
 
 function remove(id) {
@@ -210,7 +185,7 @@ function remove(id) {
 
 function getSummary() {
   const raw   = load().filter(i => !i.deletedAt)
-  const list  = protection.annotate(raw)
+  const list  = protection.annotate(raw, currentAssetTypes())
   const now   = new Date()
   const in90  = new Date(now.getTime() + 90 * 86400000)
 
@@ -296,7 +271,7 @@ function getSummary() {
 const _jsonExports = {
   getAll, getById, create, update, remove, getSummary,
   getGraph, validateDependencies,
-  ASSET_TYPES, CATEGORIES,
+  CATEGORIES: assetTypes.CATEGORIES,
   PROTECTION_LEVELS: protection.PROTECTION_LEVELS,
   PROTECTION_GOALS:  protection.PROTECTION_GOALS,
 }
