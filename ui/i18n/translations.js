@@ -1817,5 +1817,35 @@
     reports_colRef:          { de: 'Ref.', en: 'Ref', fr: 'Réf.', nl: 'Ref.' },
     reports_scanBadge:       { de: 'Scan', en: 'Scan', fr: 'Scan', nl: 'Scan' },
     reports_generatedOn:     { de: 'Erstellt am', en: 'Generated', fr: 'Généré le', nl: 'Gegenereerd op' },
+
+    // ── Training ──
+    trn_total:               { de: 'Gesamt', en: 'Total', fr: 'Total', nl: 'Totaal' },
+    trn_overdue:              { de: 'Überfällig', en: 'Overdue', fr: 'En retard', nl: 'Achterstallig' },
+    trn_dueLabel:             { de: 'Fällig', en: 'Due', fr: 'Échéance', nl: 'Verval' },
+    trn_newTraining:          { de: 'Neue Schulung', en: 'New Training', fr: 'Nouvelle formation', nl: 'Nieuwe opleiding' },
+    trn_noRecords:            { de: 'Keine Schulungsdatensätze gefunden.', en: 'No training records found.', fr: 'Aucun enregistrement de formation trouvé.', nl: 'Geen opleidingsgegevens gevonden.' },
+    trn_colMandatory:         { de: 'Pflicht', en: 'Mandatory', fr: 'Obligatoire', nl: 'Verplicht' },
+    trn_colAssignedTo:        { de: 'Zugewiesen an', en: 'Assigned To', fr: 'Assigné à', nl: 'Toegewezen aan' },
+    trn_noEvidenceText:       { de: 'Kein Nachweis hinterlegt.', en: 'No evidence provided.', fr: 'Aucune preuve fournie.', nl: 'Geen bewijs verstrekt.' },
+    trn_backToOverview:       { de: 'Zurück zur Übersicht', en: 'Back to Overview', fr: 'Retour à l’aperçu', nl: 'Terug naar overzicht' },
+    trn_editTraining:         { de: 'Schulung bearbeiten', en: 'Edit Training', fr: 'Modifier la formation', nl: 'Opleiding bewerken' },
+    trn_titlePh:              { de: 'Titel der Schulung', en: 'Training title', fr: 'Titre de la formation', nl: 'Titel van de opleiding' },
+    trn_descPh:               { de: 'Ziele und Inhalt der Schulung', en: 'Goals and content of the training', fr: 'Objectifs et contenu de la formation', nl: 'Doelen en inhoud van de opleiding' },
+    trn_planning:             { de: 'Planung', en: 'Planning', fr: 'Planification', nl: 'Planning' },
+    trn_completedOn:          { de: 'Abgeschlossen am', en: 'Completed On', fr: 'Terminé le', nl: 'Afgerond op' },
+    trn_instructorProvider:   { de: 'Trainer / Anbieter', en: 'Instructor / Provider', fr: 'Formateur / Prestataire', nl: 'Trainer / Aanbieder' },
+    trn_instructorPh:         { de: 'z. B. IT-Security-Team, externer Anbieter', en: 'e.g. IT Security Team, external provider', fr: 'p. ex. équipe sécurité informatique, prestataire externe', nl: 'bijv. IT-securityteam, externe aanbieder' },
+    trn_assigneesPh:          { de: 'z. B. Alle Mitarbeitenden, HR-Abteilung', en: 'e.g. All staff, HR department', fr: 'p. ex. tout le personnel, service RH', nl: 'bijv. alle medewerkers, HR-afdeling' },
+    trn_mandatoryTraining:    { de: 'Pflichtschulung', en: 'Mandatory Training', fr: 'Formation obligatoire', nl: 'Verplichte opleiding' },
+    trn_evidenceNotes:        { de: 'Nachweis / Notizen', en: 'Evidence / Notes', fr: 'Preuve / Notes', nl: 'Bewijs / notities' },
+    trn_evidencePh:           { de: 'Teilnehmerliste, Zertifikate, Links zu Dokumenten…', en: 'Attendance list, certificates, links to documents…', fr: 'Liste de présence, certificats, liens vers des documents…', nl: 'Presentielijst, certificaten, links naar documenten…' },
+
+    // ── Links-Picker (modulübergreifend, in fast jedem Formular) ──
+    link_title:               { de: 'Verknüpfungen', en: 'Links', fr: 'Liens', nl: 'Koppelingen' },
+    link_soaControls:         { de: 'SoA-Maßnahmen', en: 'SoA Controls', fr: 'Mesures SoA', nl: 'SoA-maatregelen' },
+    link_searchControlId:     { de: 'Control-ID suchen…', en: 'Search Control ID…', fr: 'Rechercher un ID de mesure…', nl: 'Zoek control-ID…' },
+    link_policiesTemplates:   { de: 'Richtlinien / Vorlagen', en: 'Policies / Templates', fr: 'Politiques / Modèles', nl: 'Beleid / Sjablonen' },
+    link_search:               { de: 'Suchen…', en: 'Search…', fr: 'Rechercher…', nl: 'Zoeken…' },
+    link_dblClickAdd:          { de: 'Doppelklick zum Hinzufügen', en: 'Double-click to add', fr: 'Double-cliquez pour ajouter', nl: 'Dubbelklik om toe te voegen' },
   };
 })();

@@ -288,37 +288,37 @@ function renderLinksBlock(formId, existingControls = [], existingPolicies = [], 
 
   const policiesPicker = showPolicies ? `
     <div class="link-picker-group" style="margin-top:10px">
-      <label class="form-label" style="margin-bottom:4px">Policies / Templates</label>
+      <label class="form-label" style="margin-bottom:4px">${t('link_policiesTemplates')}</label>
       <div style="display:flex;gap:6px;align-items:flex-start;flex-wrap:wrap">
         <div>
-          <input id="${formId}_polSearch" class="form-input" style="width:160px;padding:4px 8px;font-size:.8rem" placeholder="Suche…"
+          <input id="${formId}_polSearch" class="form-input" style="width:160px;padding:4px 8px;font-size:.8rem" placeholder="${t('link_search')}"
             oninput="filterLinkSelect('${formId}_polSelect', this.value)">
           <select id="${formId}_polSelect" class="select" multiple size="5" style="margin-top:4px;width:340px;font-size:.8rem"
             ondblclick="addLinkChip('${formId}_pol', this)"></select>
         </div>
         <div>
           <div id="${formId}_pol_chips" class="link-chip-area">${polChips}</div>
-          <small style="color:var(--text-subtle);font-size:.72rem">Double-click to add</small>
+          <small style="color:var(--text-subtle);font-size:.72rem">${t('link_dblClickAdd')}</small>
         </div>
       </div>
     </div>` : ''
 
   return `
   <details class="link-picker-details">
-    <summary><i class="ph ph-link"></i> Links</summary>
+    <summary><i class="ph ph-link"></i> ${t('link_title')}</summary>
     <div style="padding:10px 0">
       <div class="link-picker-group">
-        <label class="form-label" style="margin-bottom:4px">SoA-Controls</label>
+        <label class="form-label" style="margin-bottom:4px">${t('link_soaControls')}</label>
         <div style="display:flex;gap:6px;align-items:flex-start;flex-wrap:wrap">
           <div>
-            <input id="${formId}_ctrlSearch" class="form-input" style="width:160px;padding:4px 8px;font-size:.8rem" placeholder="Suche Control-ID…"
+            <input id="${formId}_ctrlSearch" class="form-input" style="width:160px;padding:4px 8px;font-size:.8rem" placeholder="${t('link_searchControlId')}"
               oninput="filterLinkSelect('${formId}_ctrlSelect', this.value)">
             <select id="${formId}_ctrlSelect" class="select" multiple size="5" style="margin-top:4px;width:340px;font-size:.8rem"
               ondblclick="addLinkChip('${formId}_ctrl', this)"></select>
           </div>
           <div>
             <div id="${formId}_ctrl_chips" class="link-chip-area">${ctrlChips}</div>
-            <small style="color:var(--text-subtle);font-size:.72rem">Double-click to add</small>
+            <small style="color:var(--text-subtle);font-size:.72rem">${t('link_dblClickAdd')}</small>
           </div>
         </div>
       </div>
@@ -10685,7 +10685,7 @@ async function renderTraining() {
   ]
   container.innerHTML = `
     <div class="training-header">
-      <h2 class="training-title"><i class="ph ph-graduation-cap"></i> Training</h2>
+      <h2 class="training-title"><i class="ph ph-graduation-cap"></i> ${t('nav_training')}</h2>
       <div class="training-tab-bar">
         ${tabs.map(t => `<button class="training-tab${t.id===_trainingTab?' active':''}" data-tab="${t.id}">
           <i class="ph ${t.icon}"></i> ${t.label}
@@ -10732,11 +10732,11 @@ async function renderTrainingOverview(el) {
 
   el.innerHTML = `
     <div class="training-kpi-row">
-      <div class="training-kpi"><span class="training-kpi-val">${summary.total}</span><span class="training-kpi-label">Total</span></div>
-      <div class="training-kpi planned"><span class="training-kpi-val">${summary.planned}</span><span class="training-kpi-label">Planned</span></div>
-      <div class="training-kpi inprogress"><span class="training-kpi-val">${summary.inProgress}</span><span class="training-kpi-label">In Progress</span></div>
-      <div class="training-kpi completed"><span class="training-kpi-val">${summary.completed}</span><span class="training-kpi-label">Completed</span></div>
-      <div class="training-kpi overdue"><span class="training-kpi-val">${summary.overdue}</span><span class="training-kpi-label">Overdue</span></div>
+      <div class="training-kpi"><span class="training-kpi-val">${summary.total}</span><span class="training-kpi-label">${t('trn_total')}</span></div>
+      <div class="training-kpi planned"><span class="training-kpi-val">${summary.planned}</span><span class="training-kpi-label">${t('trnl_statPlanned')}</span></div>
+      <div class="training-kpi inprogress"><span class="training-kpi-val">${summary.inProgress}</span><span class="training-kpi-label">${t('trnl_statProgress')}</span></div>
+      <div class="training-kpi completed"><span class="training-kpi-val">${summary.completed}</span><span class="training-kpi-label">${t('trnl_statCompleted')}</span></div>
+      <div class="training-kpi overdue"><span class="training-kpi-val">${summary.overdue}</span><span class="training-kpi-label">${t('trn_overdue')}</span></div>
       <div class="training-kpi rate"><span class="training-kpi-val">${summary.completionRate}%</span><span class="training-kpi-label">${t('training_completionRate')}</span></div>
     </div>
     <h3 style="margin:20px 0 10px;font-size:.95rem;color:var(--text-subtle)">${t('training_overdueUpcoming')}</h3>
@@ -10750,7 +10750,7 @@ async function renderTrainingOverview(el) {
             <span class="badge ${TRAINING_STATUS_CLS[i.status]||''}">${TRAINING_STATUS_LABELS[i.status]||i.status}</span>
             <strong>${escHtml(i.title)}</strong>
             <span style="color:var(--text-subtle);font-size:.78rem">${TRAINING_CAT_LABELS[i.category]||i.category}</span>
-            <span class="training-due ${urgency}">${i.dueDate ? (i.overdue ? `${t('training_overdueSince')} ${i.dueDate}` : `Due: ${i.dueDate}`) : '—'}</span>
+            <span class="training-due ${urgency}">${i.dueDate ? (i.overdue ? `${t('training_overdueSince')} ${i.dueDate}` : `${t('trn_dueLabel')}: ${i.dueDate}`) : '—'}</span>
             <span style="color:var(--text-subtle);font-size:.78rem">${escHtml(i.assignees||'—')}</span>
           </div>`
         }).join('') || `<p style="color:var(--text-subtle)">${t('training_noUrgent')}</p>`}
@@ -10770,7 +10770,7 @@ async function renderTrainingPlan(el) {
 
   el.innerHTML = `
     <div class="training-plan-toolbar">
-      ${canEdit ? `<button class="btn btn-primary btn-sm" onclick="openTrainingForm()"><i class="ph ph-plus"></i> New Training</button>` : ''}
+      ${canEdit ? `<button class="btn btn-primary btn-sm" onclick="openTrainingForm()"><i class="ph ph-plus"></i> ${t('trn_newTraining')}</button>` : ''}
       <select id="trainingFilterStatus" class="select select-sm" onchange="filterTrainingPlan()">
         <option value="">${t('filter_allStatuses')}</option>
         ${Object.entries(TRAINING_STATUS_LABELS).map(([v,l])=>`<option value="${v}">${l}</option>`).join('')}
@@ -10788,11 +10788,11 @@ async function renderTrainingPlan(el) {
 function renderTrainingTable(list, isAdmin, canEdit) {
   const el = dom('trainingPlanTable')
   if (!el) return
-  if (!list.length) { el.innerHTML = '<p style="color:var(--text-subtle);padding:16px">No training records found.</p>'; return }
+  if (!list.length) { el.innerHTML = `<p style="color:var(--text-subtle);padding:16px">${t('trn_noRecords')}</p>`; return }
   el.innerHTML = `
     <table class="training-table">
       <thead><tr>
-        <th>Title</th><th>Category</th><th>Status</th><th>Due</th><th>Mandatory</th><th>Assigned To</th>${canEdit?'<th></th>':''}
+        <th>${t('col_title')}</th><th>${t('col_category')}</th><th>${t('col_status')}</th><th>${t('col_dueDate')}</th><th>${t('trn_colMandatory')}</th><th>${t('trn_colAssignedTo')}</th>${canEdit?'<th></th>':''}
       </tr></thead>
       <tbody>
         ${list.map(i => `
@@ -10844,7 +10844,7 @@ async function renderTrainingEvidence(el) {
             <span><i class="ph ph-user"></i> ${escHtml(i.instructor||'—')}</span>
             <span><i class="ph ph-users"></i> ${escHtml(i.assignees||'—')}</span>
           </div>
-          ${i.evidence ? `<div class="training-evidence-text"><i class="ph ph-note-pencil"></i> ${escHtml(i.evidence)}</div>` : '<div class="training-evidence-text" style="color:var(--text-subtle);font-style:italic">Kein Nachweis hinterlegt.</div>'}
+          ${i.evidence ? `<div class="training-evidence-text"><i class="ph ph-note-pencil"></i> ${escHtml(i.evidence)}</div>` : `<div class="training-evidence-text" style="color:var(--text-subtle);font-style:italic">${t('trn_noEvidenceText')}</div>`}
         </div>`).join('')}
   `
 }
@@ -10866,78 +10866,78 @@ async function openTrainingForm(id) {
     <div class="training-form-page">
       <div class="training-form-header">
         <button class="btn btn-secondary btn-sm" onclick="switchTrainingTab('plan')">
-          <i class="ph ph-arrow-left"></i> Back to Overview
+          <i class="ph ph-arrow-left"></i> ${t('trn_backToOverview')}
         </button>
         <h3 class="training-form-title">
           <i class="ph ph-graduation-cap"></i>
-          ${isEdit ? 'Edit Training' : 'New Training'}
+          ${isEdit ? t('trn_editTraining') : t('trn_newTraining')}
         </h3>
       </div>
       <div class="training-form-body">
         <div class="training-form-section">
           <div class="form-group">
-            <label class="form-label">Title <span class="form-required">*</span></label>
-            <input id="tmTitel" class="form-input" value="${escHtml(item?.title||'')}" placeholder="Training title">
+            <label class="form-label">${t('col_title')} <span class="form-required">*</span></label>
+            <input id="tmTitel" class="form-input" value="${escHtml(item?.title||'')}" placeholder="${t('trn_titlePh')}">
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Category</label>
+              <label class="form-label">${t('col_category')}</label>
               <select id="tmCat" class="select">
                 ${Object.entries(TRAINING_CAT_LABELS).map(([v,l])=>`<option value="${v}"${item?.category===v?' selected':''}>${l}</option>`).join('')}
               </select>
             </div>
             <div class="form-group">
-              <label class="form-label">Status</label>
+              <label class="form-label">${t('col_status')}</label>
               <select id="tmStatus" class="select">
                 ${Object.entries(TRAINING_STATUS_LABELS).map(([v,l])=>`<option value="${v}"${item?.status===v?' selected':''}>${l}</option>`).join('')}
               </select>
             </div>
           </div>
           <div class="form-group">
-            <label class="form-label">Description</label>
-            <textarea id="tmDesc" class="form-input" rows="3" placeholder="Goals and content of the training">${escHtml(item?.description||'')}</textarea>
+            <label class="form-label">${t('ui_description')}</label>
+            <textarea id="tmDesc" class="form-input" rows="3" placeholder="${t('trn_descPh')}">${escHtml(item?.description||'')}</textarea>
           </div>
         </div>
         <div class="training-form-section">
-          <h4 class="training-form-section-title"><i class="ph ph-calendar"></i> Planning</h4>
+          <h4 class="training-form-section-title"><i class="ph ph-calendar"></i> ${t('trn_planning')}</h4>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Due Date</label>
+              <label class="form-label">${t('col_dueDate')}</label>
               <input id="tmDue" type="date" class="form-input" value="${item?.dueDate||''}" style="color-scheme:dark">
             </div>
             <div class="form-group">
-              <label class="form-label">Completed On</label>
+              <label class="form-label">${t('trn_completedOn')}</label>
               <input id="tmDone" type="date" class="form-input" value="${item?.completedDate||''}" style="color-scheme:dark">
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Instructor / Provider</label>
-              <input id="tmInstructor" class="form-input" value="${escHtml(item?.instructor||'')}" placeholder="e.g. IT Security Team, external provider">
+              <label class="form-label">${t('trn_instructorProvider')}</label>
+              <input id="tmInstructor" class="form-input" value="${escHtml(item?.instructor||'')}" placeholder="${t('trn_instructorPh')}">
             </div>
             <div class="form-group">
-              <label class="form-label">Assigned To</label>
-              <input id="tmAssignees" class="form-input" value="${escHtml(item?.assignees||'')}" placeholder="e.g. All staff, HR department">
+              <label class="form-label">${t('trn_colAssignedTo')}</label>
+              <input id="tmAssignees" class="form-input" value="${escHtml(item?.assignees||'')}" placeholder="${t('trn_assigneesPh')}">
             </div>
           </div>
           <div class="form-group" style="display:flex;align-items:center;gap:10px;margin-top:4px">
             <input id="tmMandatory" type="checkbox" ${item?.mandatory?'checked':''} style="width:16px;height:16px">
-            <label for="tmMandatory" class="form-label" style="margin:0;cursor:pointer">Mandatory Training</label>
+            <label for="tmMandatory" class="form-label" style="margin:0;cursor:pointer">${t('trn_mandatoryTraining')}</label>
           </div>
         </div>
         <div class="training-form-section">
-          <h4 class="training-form-section-title"><i class="ph ph-certificate"></i> Evidence</h4>
+          <h4 class="training-form-section-title"><i class="ph ph-certificate"></i> ${t('training_tabEvidence')}</h4>
           <div class="form-group">
-            <label class="form-label">Evidence / Notes</label>
-            <textarea id="tmEvidence" class="form-input" rows="4" placeholder="Attendance list, certificates, links to documents…">${escHtml(item?.evidence||'')}</textarea>
+            <label class="form-label">${t('trn_evidenceNotes')}</label>
+            <textarea id="tmEvidence" class="form-input" rows="4" placeholder="${t('trn_evidencePh')}">${escHtml(item?.evidence||'')}</textarea>
           </div>
           ${renderLinksBlock('tm', item?.linkedControls||[], item?.linkedPolicies||[])}
         </div>
       </div>
       <div class="training-form-footer">
-        <button class="btn btn-secondary" onclick="switchTrainingTab('plan')">Cancel</button>
+        <button class="btn btn-secondary" onclick="switchTrainingTab('plan')">${t('ui_cancel')}</button>
         <button class="btn btn-primary" onclick="saveTraining('${id||''}')">
-          <i class="ph ph-floppy-disk"></i> Save
+          <i class="ph ph-floppy-disk"></i> ${t('ui_save')}
         </button>
       </div>
     </div>
