@@ -948,9 +948,24 @@ function removeAllDynamicPanels() {
 
 // ── Reports ─────────────────────────────────────────────────────────
 // ── Findings: Severity- und Status-Labels ─────────────────────────────────────
-const FINDING_SEVERITY_LABELS = { critical:t('findings_critical'), high:t('findings_high'), medium:t('findings_medium'), low:t('findings_low'), observation:t('findings_observation') }
-const FINDING_STATUS_LABELS   = { open:t('findings_statusOpen'), in_progress:t('findings_statusInProgress'), resolved:t('findings_statusResolved'), accepted:t('findings_statusAccepted') }
-const FINDING_ACT_STATUS_LABELS = { open:t('findings_statusOpen'), in_progress:t('findings_statusInProgress'), done:t('findings_statusDone') }
+const FINDING_SEVERITY_LABELS = {
+  get critical()    { return t('findings_critical') },
+  get high()        { return t('findings_high') },
+  get medium()       { return t('findings_medium') },
+  get low()          { return t('findings_low') },
+  get observation()  { return t('findings_observation') },
+}
+const FINDING_STATUS_LABELS = {
+  get open()        { return t('findings_statusOpen') },
+  get in_progress()  { return t('findings_statusInProgress') },
+  get resolved()     { return t('findings_statusResolved') },
+  get accepted()     { return t('findings_statusAccepted') },
+}
+const FINDING_ACT_STATUS_LABELS = {
+  get open()        { return t('findings_statusOpen') },
+  get in_progress()  { return t('findings_statusInProgress') },
+  get done()         { return t('findings_statusDone') },
+}
 const FINDING_SEVERITY_COLOR  = { critical:'#f87171', high:'#fb923c', medium:'#fbbf24', low:'#4ade80', observation:'#60a5fa' }
 const FINDING_STATUS_COLOR    = { open:'#f87171', in_progress:'#fbbf24', resolved:'#4ade80', accepted:'#60a5fa' }
 
@@ -1116,12 +1131,22 @@ async function runReport(type) {
 
   try {
     const res = await fetch(url, { headers: apiHeaders('reader') })
-    if (!res.ok) { resultEl.innerHTML = `<p class="report-error">Error: ${res.status}</p>`; return }
+    if (!res.ok) { resultEl.innerHTML = `<p class="report-error">${t('error')}: ${res.status}</p>`; return }
     _lastReportData = await res.json()
     renderReportResult(type, _lastReportData, resultEl)
   } catch (e) {
     resultEl.innerHTML = `<p class="report-error">${t('err_network')}: ${e.message}</p>`
   }
+}
+
+function _docStatusLabel(s) {
+  return { draft: t('status_draft'), review: t('status_review'), approved: t('status_approved'), archived: t('status_archived') }[s] || s
+}
+function _riskLevelLabel(s) {
+  return { critical: t('riskl_critical'), high: t('riskl_high'), medium: t('riskl_medium'), low: t('riskl_low') }[s] || s || '—'
+}
+function _riskStatusLabel(s) {
+  return (RISK_STATUSES.find(x => x.id === s) || {}).label || s || '—'
 }
 
 function renderReportResult(type, data, el) {
@@ -1147,7 +1172,7 @@ function renderReportResult(type, data, el) {
   } else if (type === 'framework') {
     el.innerHTML = `<h3 class="report-result-title">${t('reports_fw')}</h3>
       <table class="report-table">
-        <thead><tr><th>${t('reports_framework')}</th><th>Controls</th><th>${t('soa_applicable')}</th><th>n/a</th><th>${t('soa_implemented')}</th><th>${t('reports_rate')}</th></tr></thead>
+        <thead><tr><th>${t('reports_framework')}</th><th>${t('reports_colControls')}</th><th>${t('soa_applicable')}</th><th>${t('reports_colNA')}</th><th>${t('soa_implemented')}</th><th>${t('reports_rate')}</th></tr></thead>
         <tbody>${(Array.isArray(data) ? data : [data]).map(fw => `
           <tr>
             <td><span class="fw-dot" style="background:${fw.color}"></span>${fw.label}</td>
@@ -1160,7 +1185,7 @@ function renderReportResult(type, data, el) {
   } else if (type === 'gap') {
     el.innerHTML = `<h3 class="report-result-title">${t('reports_gap')} — ${data.totalGaps} ${t('reports_controlsWithoutPolicy')}</h3>
       <table class="report-table">
-        <thead><tr><th>Control ID</th><th>${t('reports_framework')}</th><th>${t('col_title')}</th><th>${t('col_status')}</th><th>${t('col_owner')}</th></tr></thead>
+        <thead><tr><th>${t('reports_colControlId')}</th><th>${t('reports_framework')}</th><th>${t('col_title')}</th><th>${t('col_status')}</th><th>${t('col_owner')}</th></tr></thead>
         <tbody>${(data.gaps || []).map(g => `
           <tr><td class="picker-id">${g.id}</td><td>${g.framework}</td><td>${g.title}</td>
               <td>${g.status || '—'}</td><td>${g.owner || '—'}</td></tr>`).join('')}
@@ -1169,23 +1194,23 @@ function renderReportResult(type, data, el) {
   } else if (type === 'templates') {
     el.innerHTML = `<h3 class="report-result-title">${t('dash_templates')} (${data.total})</h3>
       <div class="report-kpi-row">
-        ${Object.entries(data.byStatus||{}).map(([s,n])=>`<div class="report-kpi"><span class="report-kpi-val">${n}</span><span class="report-kpi-label status-${s}">${s}</span></div>`).join('')}
+        ${Object.entries(data.byStatus||{}).map(([s,n])=>`<div class="report-kpi"><span class="report-kpi-val">${n}</span><span class="report-kpi-label status-${s}">${_docStatusLabel(s)}</span></div>`).join('')}
       </div>
       <table class="report-table">
-        <thead><tr><th>${t('col_type')}</th><th>${t('col_title')}</th><th>${t('col_status')}</th><th>${t('col_version')}</th><th>Controls</th></tr></thead>
-        <tbody>${(data.templates||[]).map(t=>`
-          <tr><td>${t.type}</td><td>${t.title}</td>
-              <td><span class="status-badge status-${t.status}">${t.status}</span></td>
-              <td>v${t.version}</td><td>${t.linkedControls.length}</td></tr>`).join('')}
+        <thead><tr><th>${t('col_type')}</th><th>${t('col_title')}</th><th>${t('col_status')}</th><th>${t('col_version')}</th><th>${t('reports_colControls')}</th></tr></thead>
+        <tbody>${(data.templates||[]).map(tpl=>`
+          <tr><td>${tpl.type}</td><td>${tpl.title}</td>
+              <td><span class="status-badge status-${tpl.status}">${_docStatusLabel(tpl.status)}</span></td>
+              <td>v${tpl.version}</td><td>${tpl.linkedControls.length}</td></tr>`).join('')}
         </tbody>
       </table>`
   } else if (type === 'reviews') {
     const fmtDate = d => d ? new Date(d).toLocaleDateString('en-GB') : '—'
-    const reviewRow = (t, cls) =>
-      `<tr class="${cls}"><td>${fmtDate(t.nextReviewDate)}</td><td>${t.type}</td>
-       <td>${escHtml(t.title)}</td><td><span class="status-badge status-${t.status}">${t.status}</span></td>
-       <td>${escHtml(t.owner||'—')}</td>
-       <td>${t.daysUntil !== null ? (t.daysUntil < 0 ? `<span style="color:var(--color-danger)">${t.daysUntil} days</span>` : `${t.daysUntil} days`) : '—'}</td></tr>`
+    const reviewRow = (row, cls) =>
+      `<tr class="${cls}"><td>${fmtDate(row.nextReviewDate)}</td><td>${row.type}</td>
+       <td>${escHtml(row.title)}</td><td><span class="status-badge status-${row.status}">${_docStatusLabel(row.status)}</span></td>
+       <td>${escHtml(row.owner||'—')}</td>
+       <td>${row.daysUntil !== null ? (row.daysUntil < 0 ? `<span style="color:var(--color-danger)">${row.daysUntil} ${t('reports_days')}</span>` : `${row.daysUntil} ${t('reports_days')}`) : '—'}</td></tr>`
     el.innerHTML = `
       <h3 class="report-result-title">${t('reports_reviews')}</h3>
       <div class="report-kpi-row">
@@ -1215,7 +1240,8 @@ function renderReportResult(type, data, el) {
             <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escHtml(ctrl.title)}">${escHtml(ctrl.title)}</td>
             ${(data.entities||[]).map(e=>{
               const s = ctrl[e.id] || 'n/a'
-              return `<td style="text-align:center;color:${statusColor(s)}" title="${s}">${statusEmoji(s)}</td>`
+              const sLabel = s === 'n/a' ? t('soa_notApplicable') : (STATUS_LABELS[s] || s)
+              return `<td style="text-align:center;color:${statusColor(s)}" title="${sLabel}">${statusEmoji(s)}</td>`
             }).join('')}
           </tr>`).join('')}
         </tbody>
@@ -1224,11 +1250,11 @@ function renderReportResult(type, data, el) {
   } else if (type === 'audit') {
     el.innerHTML = `<h3 class="report-result-title">${t('reports_audit')} (${data.total} ${t('auditLog_total').toLowerCase()})</h3>
       <table class="report-table">
-        <thead><tr><th>${t('col_date')}</th><th>Template</th><th>${t('col_type')}</th><th>${t('col_status')}</th><th>${t('reports_changedBy')}</th></tr></thead>
+        <thead><tr><th>${t('col_date')}</th><th>${t('reports_colTemplate')}</th><th>${t('col_type')}</th><th>${t('col_status')}</th><th>${t('reports_changedBy')}</th></tr></thead>
         <tbody>${(data.entries||[]).map(e=>`
           <tr><td>${new Date(e.changedAt).toLocaleString('en-GB')}</td>
               <td>${e.templateTitle}</td><td>${e.type}</td>
-              <td><span class="status-badge status-${e.status}">${e.status}</span></td>
+              <td><span class="status-badge status-${e.status}">${_docStatusLabel(e.status)}</span></td>
               <td>${e.changedBy}</td></tr>`).join('')}
         </tbody>
       </table>`
@@ -1248,14 +1274,14 @@ function renderReportResult(type, data, el) {
         ${data.overdueActions > 0 ? `<div class="report-kpi"><span class="report-kpi-val red">${data.overdueActions}</span><span class="report-kpi-label">${t('findings_overdue')}</span></div>` : ''}
       </div>
       <table class="report-table">
-        <thead><tr><th>Ref</th><th>${t('col_title')}</th><th>${t('findings_severity')}</th><th>${t('col_status')}</th><th>${t('findings_auditor')}</th><th>${t('findings_auditedArea')}</th><th>${t('findings_observation')}</th><th>${t('findings_requirement')}</th><th>${t('findings_openActions')}</th></tr></thead>
+        <thead><tr><th>${t('reports_colRef')}</th><th>${t('col_title')}</th><th>${t('findings_severity')}</th><th>${t('col_status')}</th><th>${t('findings_auditor')}</th><th>${t('findings_auditedArea')}</th><th>${t('findings_observation')}</th><th>${t('findings_requirement')}</th><th>${t('findings_openActions')}</th></tr></thead>
         <tbody>${(data.findings||[]).map(f => {
           const openActs = (f.actions||[]).filter(a => a.status !== 'done').length
           return `<tr>
             <td class="picker-id">${f.ref}</td>
             <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escHtml(f.title)}">${escHtml(f.title)}</td>
-            <td><span style="color:${sevColor[f.severity]||'#888'};font-weight:600">${f.severity}</span></td>
-            <td><span style="color:${stColor[f.status]||'#888'}">${f.status.replace(/_/g,' ')}</span></td>
+            <td><span style="color:${sevColor[f.severity]||'#888'};font-weight:600">${FINDING_SEVERITY_LABELS[f.severity]||f.severity}</span></td>
+            <td><span style="color:${stColor[f.status]||'#888'}">${FINDING_STATUS_LABELS[f.status]||f.status}</span></td>
             <td>${escHtml(f.auditor||'—')}</td>
             <td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${escHtml(f.auditedArea||'—')}</td>
             <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escHtml(f.observation||'')}">${escHtml(f.observation||'—')}</td>
@@ -1270,28 +1296,28 @@ function renderReportResult(type, data, el) {
     el.innerHTML = `
       <h3 class="report-result-title">${t('risk_register')} (${data.total} ${t('risk_approved').toLowerCase()})</h3>
       <div class="report-kpi-row" style="margin-bottom:16px">
-        <div class="report-kpi"><span class="report-kpi-val" style="color:#dc2626">${data.byLevel?.critical||0}</span><span class="report-kpi-label">Critical</span></div>
-        <div class="report-kpi"><span class="report-kpi-val" style="color:#ea580c">${data.byLevel?.high||0}</span><span class="report-kpi-label">High</span></div>
-        <div class="report-kpi"><span class="report-kpi-val" style="color:#ca8a04">${data.byLevel?.medium||0}</span><span class="report-kpi-label">Medium</span></div>
-        <div class="report-kpi"><span class="report-kpi-val" style="color:#16a34a">${data.byLevel?.low||0}</span><span class="report-kpi-label">Low</span></div>
+        <div class="report-kpi"><span class="report-kpi-val" style="color:#dc2626">${data.byLevel?.critical||0}</span><span class="report-kpi-label">${t('riskl_critical')}</span></div>
+        <div class="report-kpi"><span class="report-kpi-val" style="color:#ea580c">${data.byLevel?.high||0}</span><span class="report-kpi-label">${t('riskl_high')}</span></div>
+        <div class="report-kpi"><span class="report-kpi-val" style="color:#ca8a04">${data.byLevel?.medium||0}</span><span class="report-kpi-label">${t('riskl_medium')}</span></div>
+        <div class="report-kpi"><span class="report-kpi-val" style="color:#16a34a">${data.byLevel?.low||0}</span><span class="report-kpi-label">${t('riskl_low')}</span></div>
         <div class="report-kpi"><span class="report-kpi-val">${data.bySource?.scan||0}</span><span class="report-kpi-label">${t('reports_fromScan')}</span></div>
         <div class="report-kpi"><span class="report-kpi-val">${data.bySource?.manual||0}</span><span class="report-kpi-label">${t('reports_manual')}</span></div>
       </div>
       <table class="report-table">
-        <thead><tr><th>${t('col_title')}</th><th>${t('col_category')}</th><th>${t('findings_severity')}</th><th>${t('col_status')}</th><th>CVSS</th><th>CVEs</th><th>Score</th><th>${t('col_owner')}</th><th>${t('reports_source')}</th></tr></thead>
+        <thead><tr><th>${t('col_title')}</th><th>${t('col_category')}</th><th>${t('findings_severity')}</th><th>${t('col_status')}</th><th>CVSS</th><th>CVEs</th><th>${t('ui_score')}</th><th>${t('col_owner')}</th><th>${t('reports_source')}</th></tr></thead>
         <tbody>${(data.risks||[]).map(r => {
           const cvssVal  = r.cvssScore != null ? r.cvssScore.toFixed(1) : null
           const cvssData = cvssVal ? cvssInfo(r.cvssScore) : null
           return `<tr>
             <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escHtml(r.title)}">${escHtml(r.title)}</td>
             <td>${escHtml(r.category||'—')}</td>
-            <td><span style="color:${lvColor[r.level]||'#888'};font-weight:600">${r.level||'—'}</span></td>
-            <td><span class="status-badge status-${r.status}">${r.status||'—'}</span></td>
+            <td><span style="color:${lvColor[r.level]||'#888'};font-weight:600">${_riskLevelLabel(r.level)}</span></td>
+            <td><span class="status-badge status-${r.status}">${_riskStatusLabel(r.status)}</span></td>
             <td>${cvssVal ? `<span class="cvss-badge ${cvssData?.cls||''}" style="font-size:.75rem">${cvssVal}</span>` : '—'}</td>
             <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${(r.cveIds||[]).join(', ')||'—'}</td>
             <td style="text-align:center">${r.score != null ? r.score : '—'}</td>
             <td>${escHtml(r.owner||'—')}</td>
-            <td>${r.source === 'greenbone-scan' ? '<span class="badge-review-pending" style="background:#3b82f6;color:#fff;font-size:.7rem">Scan</span>' : t('reports_manual')}</td>
+            <td>${r.source === 'greenbone-scan' ? `<span class="badge-review-pending" style="background:#3b82f6;color:#fff;font-size:.7rem">${t('reports_scanBadge')}</span>` : t('reports_manual')}</td>
           </tr>`
         }).join('')}
         </tbody>
@@ -1354,7 +1380,7 @@ function exportReportPdf() {
     </style>
   </head><body>
     <h1>${title}</h1>
-    <div class="sub">Generated: ${new Date().toLocaleString('en-GB')} · ISMS Builder</div>
+    <div class="sub">${t('reports_generatedOn')}: ${new Date().toLocaleString('en-GB')} · ISMS Builder</div>
     ${resultEl.innerHTML}
     <script>window.onload = () => { window.print() }<\/script>
   </body></html>`)

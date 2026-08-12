@@ -1808,5 +1808,14 @@
     admin_pwLeaveBlankPh:    { de: 'Leer lassen = unverändert', en: 'Leave blank = unchanged', fr: 'Laisser vide = inchangé', nl: 'Leeg laten = ongewijzigd' },
     admin_pwMinCharsPh:      { de: 'Mindestens 6 Zeichen', en: 'At least 6 characters', fr: 'Au moins 6 caractères', nl: 'Minimaal 6 tekens' },
     admin_pwRepeatPh:        { de: 'Passwort wiederholen', en: 'Repeat password', fr: 'Répéter le mot de passe', nl: 'Wachtwoord herhalen' },
+
+    // ── Berichte ──
+    reports_colControls:     { de: 'Maßnahmen', en: 'Controls', fr: 'Mesures', nl: 'Beheersmaatregelen' },
+    reports_colNA:           { de: 'n/a', en: 'n/a', fr: 'n/a', nl: 'n/a' },
+    reports_colControlId:    { de: 'Maßnahmen-ID', en: 'Control ID', fr: 'ID de la mesure', nl: 'ID beheersmaatregel' },
+    reports_colTemplate:     { de: 'Vorlage', en: 'Template', fr: 'Modèle', nl: 'Sjabloon' },
+    reports_colRef:          { de: 'Ref.', en: 'Ref', fr: 'Réf.', nl: 'Ref.' },
+    reports_scanBadge:       { de: 'Scan', en: 'Scan', fr: 'Scan', nl: 'Scan' },
+    reports_generatedOn:     { de: 'Erstellt am', en: 'Generated', fr: 'Généré le', nl: 'Gegenereerd op' },
   };
 })();
