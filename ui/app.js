@@ -3805,7 +3805,7 @@ async function renderAdminOrgTab() {
   const sec  = secRes.ok ? await secRes.json() : { require2FA: false }
   const units = ouRes.ok ? await ouRes.json() : []
   _ORG_UNITS = units
-  const _ouTypeLabel = { cio: 'CIO', group: 'Group / Central', local: 'Local', external: 'External' }
+  const _ouTypeLabel = { cio: t('org_typeCio'), group: t('org_typeGroup'), local: t('org_typeLocal'), external: t('org_typeExternal') }
   const en   = s.emailNotifications || {}
   const smtp = s.smtpSettings || {}
   const nav  = Array.isArray(s.navOrder) && s.navOrder.length ? s.navOrder : _NAV_ORDER_DEFAULT.slice()
@@ -5267,10 +5267,10 @@ async function openOrgUnitModal(id) {
   const units = _ORG_UNITS.length ? _ORG_UNITS : await loadOrgUnits()
   const unit = id ? units.find(u => u.id === id) : null
   const typeOpts = [
-    { v:'cio',      l:'CIO' },
-    { v:'group',    l:'Group / Central' },
-    { v:'local',    l:'Local' },
-    { v:'external', l:'External' },
+    { v:'cio',      l:t('org_typeCio') },
+    { v:'group',    l:t('org_typeGroup') },
+    { v:'local',    l:t('org_typeLocal') },
+    { v:'external', l:t('org_typeExternal') },
   ]
   const parentOpts = units.filter(u => u.id !== id)
     .map(u => `<option value="${u.id}" ${unit?.parentId===u.id?'selected':''}>${escHtml(u.name)}</option>`)
@@ -5371,25 +5371,25 @@ async function getOrgUnitOptions(selectedId) {
 // ── Admin: Ende Organisationsdaten / Audit / Wartung ─────────────────────────
 
 const ROLES_LIST = [
-  { id: 'reader',       label: 'reader – Read access' },
-  { id: 'revision',     label: 'revision – Internal audit (read-only)' },
-  { id: 'editor',       label: 'editor – Create/edit content' },
-  { id: 'dept_head',    label: 'dept_head – Department head' },
-  { id: 'qmb',          label: 'qmb – Quality management officer' },
-  { id: 'contentowner', label: 'contentowner – CISO / ISB / DPO (approve, GDPR, risks)' },
-  { id: 'auditor',      label: 'auditor – ICS/OT security / Risk auditor' },
-  { id: 'admin',        label: 'admin – System administrator (all rights)' },
+  { id: 'reader',       get label() { return t('role_reader') } },
+  { id: 'revision',     get label() { return t('role_revision') } },
+  { id: 'editor',       get label() { return t('role_editor') } },
+  { id: 'dept_head',    get label() { return t('role_deptHead') } },
+  { id: 'qmb',          get label() { return t('role_qmb') } },
+  { id: 'contentowner', get label() { return t('role_contentowner') } },
+  { id: 'auditor',      get label() { return t('role_auditor') } },
+  { id: 'admin',        get label() { return t('role_admin') } },
 ]
 
 // Organisational functions (independent of RBAC rank)
 const FUNCTIONS_LIST = [
-  { id: 'ciso',         label: 'CISO – Chief Information Security Officer',   icon: 'ph-shield-warning' },
-  { id: 'dso',          label: 'DPO – Data Protection Officer',               icon: 'ph-lock-key' },
-  { id: 'qmb',          label: 'QMO – Quality Management Officer',            icon: 'ph-seal-check' },
-  { id: 'bcm_manager',  label: 'BCM Manager – Business Continuity',           icon: 'ph-lifebuoy' },
-  { id: 'dept_head',    label: 'Department Head',                             icon: 'ph-users-three' },
-  { id: 'auditor',      label: 'Internal Auditor',                            icon: 'ph-magnifying-glass' },
-  { id: 'admin_notify', label: 'Admin Notification (Contracts / Reviews)',    icon: 'ph-bell' },
+  { id: 'ciso',         get label() { return t('fn_ciso') },        icon: 'ph-shield-warning' },
+  { id: 'dso',          get label() { return t('fn_dso') },         icon: 'ph-lock-key' },
+  { id: 'qmb',          get label() { return t('fn_qmb') },         icon: 'ph-seal-check' },
+  { id: 'bcm_manager',  get label() { return t('fn_bcmManager') },  icon: 'ph-lifebuoy' },
+  { id: 'dept_head',    get label() { return t('fn_deptHead') },    icon: 'ph-users-three' },
+  { id: 'auditor',      get label() { return t('fn_auditor') },     icon: 'ph-magnifying-glass' },
+  { id: 'admin_notify', get label() { return t('fn_adminNotify') }, icon: 'ph-bell' },
 ]
 
 // Hilfsfunktion: Funktions-Label aus ID
@@ -5525,11 +5525,11 @@ function openUserModal(user) {
             <div>
               <label class="form-label">${isEdit ? t('settings_pwNew') : `${t('org_smtpPassword')} *`}</label>
               <input id="uModalPw" class="form-input" type="password"
-                placeholder="${isEdit ? 'Leave blank = unchanged' : 'At least 6 characters'}" />
+                placeholder="${isEdit ? t('admin_pwLeaveBlankPh') : t('admin_pwMinCharsPh')}" />
             </div>
             <div>
               <label class="form-label">${isEdit ? t('admin_confirmPassword') : `${t('settings_pwRepeat')} ${t('org_smtpPassword')} *`}</label>
-              <input id="uModalPw2" class="form-input" type="password" placeholder="Repeat password" />
+              <input id="uModalPw2" class="form-input" type="password" placeholder="${t('admin_pwRepeatPh')}" />
             </div>
           </div>
           <p id="uModalError" style="color:var(--danger-text);font-size:12px;display:none;margin:0;"></p>
