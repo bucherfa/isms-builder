@@ -10,6 +10,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Changed
+- **i18n-Nachzug, Teil 1: Einstellungen-Bildschirm.** Der komplette Einstellungen-Bereich (persoenliche Einstellungen, Passwort/2FA, CISO-, Datenschutz-, ICS/OT-, Revisions- und QM-Einstellungen, KRITIS-Sektoren, Vorlagenverwaltung, AI-Statuszeile) trug seine Anzeigetexte fest in Englisch verdrahtet und war fuer FR/NL durchgehend englisch. Jetzt ueber `t()` gefuellt — rund 80 neue Schluessel in DE/EN/FR/NL. Erfasst wurden neben `>Text<` auch `placeholder=`, `<h4>`-Ueberschriften und die dynamisch per `innerHTML` gesetzten Status-Badges.
+- **Severity-Woerter (Low/Medium/High/Critical) bleiben in DE und NL englisch** — nur FR wird uebersetzt. Bewusste Terminologie-Entscheidung; betrifft alle fuenf Schluesselfamilien (Governance, BCM, Lieferanten, Risk, Assets).
+
 ### Added
 - **Leseansicht und PDF-Ausgabe fuer Richtlinien** — schliesst [#61](https://github.com/coolstartnow/isms-builder/issues/61), gemeldet von @jasc76. Wer nicht bearbeiten darf, sah bisher dasselbe Autoren-Eingabefeld wie ein Redakteur — also rohen Markdown-Quelltext in einer 240px-Textarea. Jetzt bekommt jede Rolle unterhalb `editor` das **gerenderte Dokument**; Bearbeiter koennen per Knopf zwischen Bearbeiten und Vorschau umschalten.
 - **PDF je Dokument** und **Sammelexport nach Typ und Status** aus dem Listen-Panel, mit generiertem Dateinamen `Titel_vVERSION_STATUS_JJJJ-MM-TT` — genau die Uebergabe an ein HR-/Verteilsystem, die @jasc76 beschrieben hat. Aufbau wie der bestehende Guidance-Druck: eigenes Fenster, Druckdialog, keine neue Abhaengigkeit. **Kein Word** — das braeuchte eine zusaetzliche Abhaengigkeit; es bleibt bei PDF.

@@ -4756,17 +4756,17 @@ async function refreshAiStatus() {
     const st    = stRes.ok ? await stRes.json() : {}
 
     const enabledBadge = cfg.aiEnabled !== false
-      ? '<span style="background:rgba(74,222,128,.12);color:#4ade80;border:1px solid rgba(74,222,128,.3);border-radius:20px;padding:2px 10px;font-size:12px;font-weight:600;">✓ Enabled</span>'
-      : '<span style="background:rgba(255,255,255,.05);color:var(--text-subtle);border:1px solid var(--border);border-radius:20px;padding:2px 10px;font-size:12px;font-weight:600;">Disabled</span>'
+      ? `<span style="background:rgba(74,222,128,.12);color:#4ade80;border:1px solid rgba(74,222,128,.3);border-radius:20px;padding:2px 10px;font-size:12px;font-weight:600;">✓ ${t('ui_enabled')}</span>`
+      : `<span style="background:rgba(255,255,255,.05);color:var(--text-subtle);border:1px solid var(--border);border-radius:20px;padding:2px 10px;font-size:12px;font-weight:600;">${t('ui_disabled')}</span>`
 
     const ollamaBadge = st.ollama
-      ? '<span style="background:rgba(74,222,128,.12);color:#4ade80;border:1px solid rgba(74,222,128,.3);border-radius:20px;padding:2px 10px;font-size:12px;font-weight:600;margin-left:8px;">⬤ Ollama online</span>'
-      : '<span style="background:rgba(239,68,68,.1);color:#f87171;border:1px solid rgba(239,68,68,.3);border-radius:20px;padding:2px 10px;font-size:12px;font-weight:600;margin-left:8px;">⬤ Ollama offline</span>'
+      ? `<span style="background:rgba(74,222,128,.12);color:#4ade80;border:1px solid rgba(74,222,128,.3);border-radius:20px;padding:2px 10px;font-size:12px;font-weight:600;margin-left:8px;">⬤ ${t('ai_ollamaOnline')}</span>`
+      : `<span style="background:rgba(239,68,68,.1);color:#f87171;border:1px solid rgba(239,68,68,.3);border-radius:20px;padding:2px 10px;font-size:12px;font-weight:600;margin-left:8px;">⬤ ${t('ai_ollamaOffline')}</span>`
 
     const modeBadge = st.mode === 'semantic'
-      ? '<span style="background:rgba(168,85,247,.15);color:#a855f7;border:1px solid rgba(168,85,247,.3);border-radius:20px;padding:2px 10px;font-size:12px;font-weight:600;margin-left:8px;">Semantic search active</span>'
-      : '<span style="background:rgba(255,255,255,.06);color:var(--text-subtle);border:1px solid var(--border);border-radius:20px;padding:2px 10px;font-size:12px;font-weight:600;margin-left:8px;">Keyword search (fallback)</span>'
-    const indexBadge = `<span style="color:var(--text-subtle);font-size:12px;margin-left:10px;">${st.indexed ?? 0} documents indexed · Model: ${st.model || 'nomic-embed-text'}</span>`
+      ? `<span style="background:rgba(168,85,247,.15);color:#a855f7;border:1px solid rgba(168,85,247,.3);border-radius:20px;padding:2px 10px;font-size:12px;font-weight:600;margin-left:8px;">${t('ai_semanticActive')}</span>`
+      : `<span style="background:rgba(255,255,255,.06);color:var(--text-subtle);border:1px solid var(--border);border-radius:20px;padding:2px 10px;font-size:12px;font-weight:600;margin-left:8px;">${t('ai_keywordFallback')}</span>`
+    const indexBadge = `<span style="color:var(--text-subtle);font-size:12px;margin-left:10px;">${st.indexed ?? 0} ${t('ai_docsIndexed')} ${st.model || 'nomic-embed-text'}</span>`
 
     badge.innerHTML = enabledBadge + (cfg.aiEnabled !== false ? ollamaBadge + modeBadge + indexBadge : '')
   } catch {
@@ -6066,26 +6066,26 @@ async function renderSettingsPanel() {
 
   const cisoSection = showCiso ? `
     <div class="settings-section">
-      <h4><i class="ph ph-shield-warning"></i> CISO / ISB – Incident Settings</h4>
-      <p class="settings-desc">Configuration for incident management and escalation.</p>
+      <h4><i class="ph ph-shield-warning"></i> ${t('set_incidentSettings')}</h4>
+      <p class="settings-desc">${t('set_incidentDesc')}</p>
       <div class="org-grid" style="max-width:600px">
-        <label class="org-label">Escalation e-mail</label>
+        <label class="org-label">${t('set_escalationEmail')}</label>
         <input class="input" id="cisoEscalationEmail" value="${escHtml(cs.escalationEmail||'')}" type="email" placeholder="ciso@company.com">
-        <label class="org-label">Incident response SLA (hrs)</label>
+        <label class="org-label">${t('set_incidentSla')}</label>
         <input class="input" id="cisoSLA" value="${cs.incidentResponseSLA||24}" type="number" min="1" max="168" style="width:100px">
-        <label class="org-label">Reportable from risk level</label>
+        <label class="org-label">${t('set_reportableFrom')}</label>
         <select class="select" id="cisoThreshold">
-          <option value="low"      ${cs.reportableThreshold==='low'      ?'selected':''}>Low</option>
-          <option value="medium"   ${cs.reportableThreshold==='medium'   ?'selected':''}>Medium</option>
-          <option value="high"     ${cs.reportableThreshold==='high'     ?'selected':''}>High</option>
-          <option value="critical" ${cs.reportableThreshold==='critical' ?'selected':''}>Critical</option>
+          <option value="low"      ${cs.reportableThreshold==='low'      ?'selected':''}>${t('riskl_low')}</option>
+          <option value="medium"   ${cs.reportableThreshold==='medium'   ?'selected':''}>${t('riskl_medium')}</option>
+          <option value="high"     ${cs.reportableThreshold==='high'     ?'selected':''}>${t('riskl_high')}</option>
+          <option value="critical" ${cs.reportableThreshold==='critical' ?'selected':''}>${t('riskl_critical')}</option>
         </select>
-        <label class="org-label">Reportable incident types</label>
+        <label class="org-label">${t('set_reportableTypes')}</label>
         <select class="select" id="cisoReportableTypes" multiple size="4" style="height:auto">${incTypeOpts}</select>
       </div>
       <div class="settings-actions" style="margin-top:10px">
         <button class="btn btn-primary btn-sm" onclick="saveCisoSettings()">
-          <i class="ph ph-floppy-disk"></i> Save CISO settings
+          <i class="ph ph-floppy-disk"></i> ${t('set_saveCiso')}
         </button>
       </div>
       <p id="cisoSaveMsg" style="font-size:13px;margin-top:6px;display:none"></p>
@@ -6093,27 +6093,27 @@ async function renderSettingsPanel() {
 
   const gdpoSection = showDso ? `
     <div class="settings-section">
-      <h4><i class="ph ph-lock-key"></i> DPO / GDPO – Data Protection Settings</h4>
+      <h4><i class="ph ph-lock-key"></i> ${t('set_gdprSettings')}</h4>
       <p class="settings-desc">Configuration for DSAR deadlines, reporting obligations and default texts.</p>
       <div class="org-grid" style="max-width:600px">
-        <label class="org-label">DSAR default deadline (days)</label>
+        <label class="org-label">${t('set_dsarDeadline')}</label>
         <input class="input" id="gdpoDsar" value="${gs.dsarDeadlineDays||30}" type="number" min="1" max="90" style="width:100px">
-        <label class="org-label">Extended DSAR deadline (days)</label>
+        <label class="org-label">${t('set_dsarDeadlineExt')}</label>
         <input class="input" id="gdpoDsarExt" value="${gs.dsarExtendedDays||90}" type="number" min="1" max="180" style="width:100px">
         <label class="org-label">72h reporting obligation active</label>
         <label style="display:flex;align-items:center;gap:6px;font-size:13px">
           <input type="checkbox" id="gdpo72h" ${gs.timer72hEnabled!==false?'checked':''}> Enabled
         </label>
-        <label class="org-label">Data protection authority</label>
+        <label class="org-label">${t('set_dpAuthority')}</label>
         <input class="input" id="gdpoDSA" value="${escHtml(gs.supervisoryAuthority||'')}" placeholder="e.g. ICO, CNIL, BfDI">
-        <label class="org-label">Authority contact / URL</label>
+        <label class="org-label">${t('set_authorityContact')}</label>
         <input class="input" id="gdpoDSAContact" value="${escHtml(gs.supervisoryContact||'')}">
-        <label class="org-label">Default DSAR response text</label>
+        <label class="org-label">${t('set_dsarDefaultText')}</label>
         <textarea class="input" id="gdpoDsarText" rows="3" style="resize:vertical">${escHtml(gs.dsarDefaultResponse||'')}</textarea>
       </div>
       <div class="settings-actions" style="margin-top:10px">
         <button class="btn btn-primary btn-sm" onclick="saveGdpoSettings()">
-          <i class="ph ph-floppy-disk"></i> Save DPO settings
+          <i class="ph ph-floppy-disk"></i> ${t('set_saveDpo')}
         </button>
       </div>
       <p id="gdpoSaveMsg" style="font-size:13px;margin-top:6px;display:none"></p>
@@ -6121,55 +6121,55 @@ async function renderSettingsPanel() {
 
   const icsSection = rank >= ROLE_RANK.contentowner ? `
     <div class="settings-section">
-      <h4><i class="ph ph-factory"></i> ICS / OT – Operational Technology Settings</h4>
+      <h4><i class="ph ph-factory"></i> ${t('set_icsSettings')}</h4>
       <p class="settings-desc">Configuration for OT/ICS environments (PLC, SCADA, field devices, building technology) per IEC 62443 / NIS2.</p>
       ${!is.otResponsible ? `<div class="settings-notice"><i class="ph ph-warning"></i> No OT security responsible assigned — position not yet filled.</div>` : ''}
       <div class="org-grid" style="max-width:600px;margin-top:10px">
-        <label class="org-label">OT security responsible</label>
-        <input class="input" id="icsResponsible" value="${escHtml(is.otResponsible||'')}" placeholder="Name (position not yet filled)">
+        <label class="org-label">${t('set_otResponsible')}</label>
+        <input class="input" id="icsResponsible" value="${escHtml(is.otResponsible||'')}" placeholder="${t('set_phNamePending')}">
         <label class="org-label">E-Mail</label>
         <input class="input" id="icsEmail" value="${escHtml(is.otResponsibleEmail||'')}" type="email" placeholder="ot-security@company.com">
-        <label class="org-label">OT/ICS Scope</label>
+        <label class="org-label">${t('set_otScope')}</label>
         <textarea class="input" id="icsScope" rows="2" style="resize:vertical" placeholder="e.g. Production line 1–3, SCADA plant north, building management">${escHtml(is.otScope||'')}</textarea>
-        <label class="org-label">Applied standard</label>
+        <label class="org-label">${t('set_appliedStandard')}</label>
         <select class="select" id="icsStandard">
           <option value="iec62443" ${(is.otStandard||'iec62443')==='iec62443'?'selected':''}>IEC 62443</option>
           <option value="vdi2182"  ${is.otStandard==='vdi2182' ?'selected':''}>VDI/VDE 2182</option>
           <option value="namur"    ${is.otStandard==='namur'   ?'selected':''}>NAMUR NA 163</option>
-          <option value="bsi"      ${is.otStandard==='bsi'     ?'selected':''}>BSI ICS Security Compendium</option>
-          <option value="other"    ${is.otStandard==='other'   ?'selected':''}>Other</option>
+          <option value="bsi"      ${is.otStandard==='bsi'     ?'selected':''}>${t('set_bsiIcsCompendium')}</option>
+          <option value="other"    ${is.otStandard==='other'   ?'selected':''}>${t('ui_other')}</option>
         </select>
-        <label class="org-label">NIS2 sector</label>
+        <label class="org-label">${t('set_nis2Sector')}</label>
         <select class="select" id="icsNis2Sector">
           <option value=""           ${!is.otNis2Sector            ?'selected':''}>— not applicable —</option>
-          <option value="energie"    ${is.otNis2Sector==='energie'   ?'selected':''}>Energy</option>
-          <option value="wasser"     ${is.otNis2Sector==='wasser'    ?'selected':''}>Drinking water / Wastewater</option>
-          <option value="transport"  ${is.otNis2Sector==='transport' ?'selected':''}>Transport / Traffic</option>
-          <option value="produktion" ${is.otNis2Sector==='produktion'?'selected':''}>Manufacturing</option>
-          <option value="chemie"     ${is.otNis2Sector==='chemie'    ?'selected':''}>Chemicals</option>
-          <option value="lebensmittel"${is.otNis2Sector==='lebensmittel'?'selected':''}>Food</option>
-          <option value="other"      ${is.otNis2Sector==='other'     ?'selected':''}>Other</option>
+          <option value="energie"    ${is.otNis2Sector==='energie'   ?'selected':''}>${t('set_sectorEnergy')}</option>
+          <option value="wasser"     ${is.otNis2Sector==='wasser'    ?'selected':''}>${t('set_sectorWater')}</option>
+          <option value="transport"  ${is.otNis2Sector==='transport' ?'selected':''}>${t('set_sectorTransport')}</option>
+          <option value="produktion" ${is.otNis2Sector==='produktion'?'selected':''}>${t('set_sectorManufacturing')}</option>
+          <option value="chemie"     ${is.otNis2Sector==='chemie'    ?'selected':''}>${t('set_sectorChemicals')}</option>
+          <option value="lebensmittel"${is.otNis2Sector==='lebensmittel'?'selected':''}>${t('set_sectorFood')}</option>
+          <option value="other"      ${is.otNis2Sector==='other'     ?'selected':''}>${t('ui_other')}</option>
         </select>
-        <label class="org-label">Critical infrastructure relevant</label>
+        <label class="org-label">${t('set_kritisRelevant')}</label>
         <label style="display:flex;align-items:center;gap:6px;font-size:13px">
           <input type="checkbox" id="icsKritis" ${is.otKritisRelevant?'checked':''}> Yes, critical infrastructure operator
         </label>
-        <label class="org-label">Network segmentation</label>
+        <label class="org-label">${t('set_networkSegmentation')}</label>
         <select class="select" id="icsSegmentation">
-          <option value="implemented" ${is.otNetworkSegmentation==='implemented'?'selected':''}>Fully implemented</option>
-          <option value="partial"     ${(is.otNetworkSegmentation||'partial')==='partial'?'selected':''}>Partially implemented</option>
-          <option value="planned"     ${is.otNetworkSegmentation==='planned'    ?'selected':''}>Planned</option>
+          <option value="implemented" ${is.otNetworkSegmentation==='implemented'?'selected':''}>${t('set_segFull')}</option>
+          <option value="partial"     ${(is.otNetworkSegmentation||'partial')==='partial'?'selected':''}>${t('set_segPartial')}</option>
+          <option value="planned"     ${is.otNetworkSegmentation==='planned'    ?'selected':''}>${t('ui_planned')}</option>
         </select>
-        <label class="org-label">Patch cycle (weeks)</label>
+        <label class="org-label">${t('set_patchCycle')}</label>
         <input class="input" id="icsPatchCycle" value="${is.otPatchCycleWeeks||12}" type="number" min="1" max="52" style="width:100px">
-        <label class="org-label">Maintenance window</label>
+        <label class="org-label">${t('set_maintenanceWindow')}</label>
         <input class="input" id="icsMaintenanceWindow" value="${escHtml(is.otMaintenanceWindow||'')}" placeholder="e.g. Sat 02:00–06:00">
-        <label class="org-label">Emergency contact (control room / shift)</label>
-        <input class="input" id="icsEmergencyContact" value="${escHtml(is.otEmergencyContact||'')}" placeholder="Phone or shift supervisor name">
+        <label class="org-label">${t('set_emergencyContact')}</label>
+        <input class="input" id="icsEmergencyContact" value="${escHtml(is.otEmergencyContact||'')}" placeholder="${t('set_phShiftContact')}">
       </div>
       <div class="settings-actions" style="margin-top:10px">
         <button class="btn btn-primary btn-sm" onclick="saveIcsSettings()">
-          <i class="ph ph-floppy-disk"></i> Save OT/ICS settings
+          <i class="ph ph-floppy-disk"></i> ${t('set_saveIcs')}
         </button>
       </div>
       <p id="icsSaveMsg" style="font-size:13px;margin-top:6px;display:none"></p>
@@ -6177,34 +6177,34 @@ async function renderSettingsPanel() {
 
   const revSection = rank >= ROLE_RANK.contentowner ? `
     <div class="settings-section">
-      <h4><i class="ph ph-magnifying-glass"></i> Internal Audit</h4>
+      <h4><i class="ph ph-magnifying-glass"></i> ${t('set_internalAudit')}</h4>
       <p class="settings-desc">Independent audit function of the internal control system (ICS). Internal Audit is free from instructions and reports directly to management or the supervisory board.</p>
       ${!rs.revResponsible ? `<div class="settings-notice"><i class="ph ph-warning"></i> No audit responsible assigned — position not yet filled.</div>` : ''}
       <div class="org-grid" style="max-width:600px;margin-top:10px">
-        <label class="org-label">Head of Internal Audit</label>
-        <input class="input" id="revResponsible" value="${escHtml(rs.revResponsible||'')}" placeholder="Name (position not yet filled)">
+        <label class="org-label">${t('set_headInternalAudit')}</label>
+        <input class="input" id="revResponsible" value="${escHtml(rs.revResponsible||'')}" placeholder="${t('set_phNamePending')}">
         <label class="org-label">E-Mail</label>
         <input class="input" id="revEmail" value="${escHtml(rs.revResponsibleEmail||'')}" type="email" placeholder="audit@company.com">
-        <label class="org-label">Audit scope</label>
+        <label class="org-label">${t('set_auditScope')}</label>
         <textarea class="input" id="revScope" rows="2" style="resize:vertical" placeholder="e.g. All group entities, finance and IT processes">${escHtml(rs.revScope||'')}</textarea>
-        <label class="org-label">Reports to</label>
+        <label class="org-label">${t('set_reportsTo')}</label>
         <select class="select" id="revReportsTo">
-          <option value="gf"                ${(rs.revReportsTo||'gf')==='gf'               ?'selected':''}>Management board</option>
-          <option value="aufsichtsrat"       ${rs.revReportsTo==='aufsichtsrat'             ?'selected':''}>Supervisory board</option>
-          <option value="prüfungsausschuss"  ${rs.revReportsTo==='prüfungsausschuss'        ?'selected':''}>Audit committee</option>
+          <option value="gf"                ${(rs.revReportsTo||'gf')==='gf'               ?'selected':''}>${t('set_mgmtBoard')}</option>
+          <option value="aufsichtsrat"       ${rs.revReportsTo==='aufsichtsrat'             ?'selected':''}>${t('set_supervisoryBoard')}</option>
+          <option value="prüfungsausschuss"  ${rs.revReportsTo==='prüfungsausschuss'        ?'selected':''}>${t('set_auditCommittee')}</option>
         </select>
-        <label class="org-label">Audit cycle (months)</label>
+        <label class="org-label">${t('set_auditCycle')}</label>
         <input class="input" id="revCycle" value="${rs.revCycleMonths||12}" type="number" min="1" max="36" style="width:100px">
-        <label class="org-label">Last internal audit</label>
+        <label class="org-label">${t('set_lastInternalAudit')}</label>
         <input class="input" id="revLastAudit" type="date" value="${rs.revLastAuditDate||''}">
-        <label class="org-label">Next planned audit</label>
+        <label class="org-label">${t('set_nextPlannedAudit')}</label>
         <input class="input" id="revNextAudit" type="date" value="${rs.revNextAuditDate||''}">
-        <label class="org-label">External auditor / CA (optional)</label>
+        <label class="org-label">${t('set_externalAuditor')}</label>
         <input class="input" id="revExternal" value="${escHtml(rs.revExternalSupport||'')}" placeholder="e.g. KPMG, PwC, Deloitte">
       </div>
       <div class="settings-actions" style="margin-top:10px">
         <button class="btn btn-primary btn-sm" onclick="saveRevisionSettings()">
-          <i class="ph ph-floppy-disk"></i> Save audit settings
+          <i class="ph ph-floppy-disk"></i> ${t('set_saveAudit')}
         </button>
       </div>
       <p id="revSaveMsg" style="font-size:13px;margin-top:6px;display:none"></p>
@@ -6212,39 +6212,39 @@ async function renderSettingsPanel() {
 
   const qmSection = rank >= ROLE_RANK.contentowner ? `
     <div class="settings-section">
-      <h4><i class="ph ph-medal"></i> QMO – Quality Management</h4>
+      <h4><i class="ph ph-medal"></i> ${t('set_qmSettings')}</h4>
       <p class="settings-desc">The Quality Management Officer (QMO) is formally required under ISO 9001:2015 Cl. 5.3 and is responsible for the Quality Management System (QMS) across the group including certification and surveillance audits.</p>
       ${!qs.qmResponsible ? `<div class="settings-notice"><i class="ph ph-warning"></i> No QMO assigned — position not yet filled.</div>` : ''}
       <div class="org-grid" style="max-width:600px;margin-top:10px">
-        <label class="org-label">QMO – Name</label>
-        <input class="input" id="qmResponsible" value="${escHtml(qs.qmResponsible||'')}" placeholder="Name (position not yet filled)">
+        <label class="org-label">${t('set_qmoName')}</label>
+        <input class="input" id="qmResponsible" value="${escHtml(qs.qmResponsible||'')}" placeholder="${t('set_phNamePending')}">
         <label class="org-label">E-Mail</label>
         <input class="input" id="qmEmail" value="${escHtml(qs.qmResponsibleEmail||'')}" type="email" placeholder="qmo@company.com">
-        <label class="org-label">QMS scope</label>
+        <label class="org-label">${t('set_qmScope')}</label>
         <textarea class="input" id="qmScope" rows="2" style="resize:vertical" placeholder="e.g. Development, production and sales at all sites">${escHtml(qs.qmScope||'')}</textarea>
-        <label class="org-label">Standard / norm</label>
+        <label class="org-label">${t('set_standardNorm')}</label>
         <select class="select" id="qmStandard">
           <option value="iso9001"   ${(qs.qmStandard||'iso9001')==='iso9001'  ?'selected':''}>ISO 9001:2015</option>
           <option value="iso9000"   ${qs.qmStandard==='iso9000'               ?'selected':''}>ISO 9000 (Fundamentals)</option>
           <option value="iatf16949" ${qs.qmStandard==='iatf16949'             ?'selected':''}>IATF 16949 (Automotive)</option>
           <option value="iso13485"  ${qs.qmStandard==='iso13485'              ?'selected':''}>ISO 13485 (Medical devices)</option>
           <option value="as9100"    ${qs.qmStandard==='as9100'                ?'selected':''}>AS9100 (Aerospace)</option>
-          <option value="other"     ${qs.qmStandard==='other'                 ?'selected':''}>Other</option>
+          <option value="other"     ${qs.qmStandard==='other'                 ?'selected':''}>${t('ui_other')}</option>
         </select>
-        <label class="org-label">Certification body</label>
+        <label class="org-label">${t('set_certBody')}</label>
         <input class="input" id="qmCertBody" value="${escHtml(qs.qmCertBody||'')}" placeholder="e.g. TÜV SÜD, DQS, Bureau Veritas, DNV">
-        <label class="org-label">Certificate valid until</label>
+        <label class="org-label">${t('set_certValidUntil')}</label>
         <input class="input" id="qmCertValid" type="date" value="${qs.qmCertValidUntil||''}">
-        <label class="org-label">Last surveillance audit</label>
+        <label class="org-label">${t('set_lastSurveillance')}</label>
         <input class="input" id="qmLastAudit" type="date" value="${qs.qmLastAuditDate||''}">
-        <label class="org-label">Next surveillance audit</label>
+        <label class="org-label">${t('set_nextSurveillance')}</label>
         <input class="input" id="qmNextAudit" type="date" value="${qs.qmNextAuditDate||''}">
-        <label class="org-label">Next recertification</label>
+        <label class="org-label">${t('set_nextRecert')}</label>
         <input class="input" id="qmRecert" type="date" value="${qs.qmRecertDate||''}">
       </div>
       <div class="settings-actions" style="margin-top:10px">
         <button class="btn btn-primary btn-sm" onclick="saveQmSettings()">
-          <i class="ph ph-floppy-disk"></i> Save QM settings
+          <i class="ph ph-floppy-disk"></i> ${t('set_saveQm')}
         </button>
       </div>
       <p id="qmSaveMsg" style="font-size:13px;margin-top:6px;display:none"></p>
@@ -6278,20 +6278,20 @@ async function renderSettingsPanel() {
 
         <!-- ── Personal Settings ── -->
         <div class="personal-settings-section">
-          <h3><i class="ph ph-user-circle"></i> Personal Settings</h3>
-          <p class="settings-desc" style="margin-bottom:16px">Password and two-factor authentication for <strong>${escHtml(username)}</strong>.</p>
+          <h3><i class="ph ph-user-circle"></i> ${t('set_personalSettings')}</h3>
+          <p class="settings-desc" style="margin-bottom:16px">${t('set_passwordFor')} <strong>${escHtml(username)}</strong>.</p>
 
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:760px">
 
             <!-- Change password -->
             <div>
-              <h4 style="margin:0 0 10px;font-size:.9rem"><i class="ph ph-lock-key"></i> Change password</h4>
+              <h4 style="margin:0 0 10px;font-size:.9rem"><i class="ph ph-lock-key"></i> ${t('set_changePassword')}</h4>
               <div style="display:flex;flex-direction:column;gap:8px">
-                <input class="input" id="pwOld" type="password" placeholder="Current password" autocomplete="current-password">
-                <input class="input" id="pwNew" type="password" placeholder="New password (min. 6 characters)" autocomplete="new-password">
-                <input class="input" id="pwConfirm" type="password" placeholder="Confirm new password" autocomplete="new-password">
+                <input class="input" id="pwOld" type="password" placeholder="${t('pw_current')}" autocomplete="current-password">
+                <input class="input" id="pwNew" type="password" placeholder="${t('pw_new')}" autocomplete="new-password">
+                <input class="input" id="pwConfirm" type="password" placeholder="${t('pw_confirm')}" autocomplete="new-password">
                 <button class="btn btn-primary btn-sm" onclick="saveMyPassword()">
-                  <i class="ph ph-floppy-disk"></i> Save password
+                  <i class="ph ph-floppy-disk"></i> ${t('pw_save')}
                 </button>
                 <p id="pwSaveMsg" style="font-size:13px;display:none"></p>
               </div>
@@ -6299,8 +6299,8 @@ async function renderSettingsPanel() {
 
             <!-- 2FA -->
             <div id="twofa-settings-block">
-              <h4 style="margin:0 0 10px;font-size:.9rem"><i class="ph ph-shield-check"></i> Two-factor authentication (TOTP)</h4>
-              <p id="twofa-status-msg" style="font-size:.82rem;color:var(--text-subtle);margin-bottom:10px">Loading status…</p>
+              <h4 style="margin:0 0 10px;font-size:.9rem"><i class="ph ph-shield-check"></i> ${t('set_twoFactor')}</h4>
+              <p id="twofa-status-msg" style="font-size:.82rem;color:var(--text-subtle);margin-bottom:10px">${t('twofa_loadingStatus')}</p>
               <div id="twofa-setup-area"></div>
             </div>
           </div>
@@ -6314,15 +6314,15 @@ async function renderSettingsPanel() {
 
         ${(rank >= ROLE_RANK.contentowner || fns.includes('ciso')) ? `
         <div class="settings-section" id="tmplMgmtSection" style="border-top:1px solid var(--border);padding-top:16px;margin-top:8px">
-          <h3><i class="ph ph-files"></i> Template Management</h3>
-          <p class="settings-desc">All templates grouped by type. Edit or delete draft templates.</p>
-          <div id="tmplMgmtContent"><p class="report-loading">Loading…</p></div>
+          <h3><i class="ph ph-files"></i> ${t('set_templateMgmt')}</h3>
+          <p class="settings-desc">${t('set_templatesDesc')}</p>
+          <div id="tmplMgmtContent"><p class="report-loading">${t('ui_loading')}</p></div>
         </div>` : ''}
 
         <div class="settings-section" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">
           <p class="settings-desc" style="color:var(--text-subtle);font-size:12px">
-            <i class="ph ph-info"></i> System-wide configuration (users, entities, lists, organisation, audit) is located under
-            <strong>Admin</strong> in the navigation.
+            <i class="ph ph-info"></i> ${t('set_adminHint')}
+            <strong>${t('nav_admin')}</strong>.
           </p>
         </div>
       </div>
@@ -6348,10 +6348,10 @@ async function loadTmplManagement() {
 
   // Fetch all templates (no type filter = all)
   const res = await fetch('/templates', { headers: apiHeaders() })
-  if (!res.ok) { el.innerHTML = '<p class="report-empty">Error loading templates.</p>'; return }
+  if (!res.ok) { el.innerHTML = `<p class="report-empty">${t('err_load')}</p>`; return }
   const all = (await res.json()).filter(t => !t.deletedAt)
 
-  if (all.length === 0) { el.innerHTML = '<p class="report-empty">No templates found.</p>'; return }
+  if (all.length === 0) { el.innerHTML = `<p class="report-empty">${t('noTemplates')}</p>`; return }
 
   // Group by type
   const byType = {}
@@ -6396,10 +6396,10 @@ async function loadTmplManagement() {
         </h4>
         <table class="risk-table" style="width:100%;font-size:.85rem">
           <thead><tr>
-            <th style="width:110px">Type</th>
-            <th>Title</th>
-            <th style="width:100px">Status</th>
-            <th style="width:60px">Version</th>
+            <th style="width:110px">${t('col_type')}</th>
+            <th>${t('col_title')}</th>
+            <th style="width:100px">${t('col_status')}</th>
+            <th style="width:60px">${t('col_version')}</th>
             <th style="width:120px"></th>
           </tr></thead>
           <tbody>${rows}</tbody>
@@ -6436,7 +6436,7 @@ async function loadTmplManagement() {
             </h4>
             <table class="risk-table" style="width:100%;font-size:.85rem">
               <thead><tr>
-                <th style="width:110px">Type</th><th>Title</th><th style="width:100px">Status</th><th style="width:120px"></th>
+                <th style="width:110px">${t('col_type')}</th><th>${t('col_title')}</th><th style="width:100px">${t('col_status')}</th><th style="width:120px"></th>
               </tr></thead>
               <tbody>${trashRows}</tbody>
             </table>
@@ -6515,15 +6515,15 @@ async function _renderTwofaSettingsBlock() {
   } catch {}
 
   if (has2FA) {
-    statusMsg.innerHTML = '<span style="color:var(--success,#4ade80)"><i class="ph ph-check-circle"></i> 2FA is active.</span>'
+    statusMsg.innerHTML = `<span style="color:var(--success,#4ade80)"><i class="ph ph-check-circle"></i> ${t('twofa_active')}</span>`
     setupArea.innerHTML = `
-      <p style="font-size:.82rem;color:var(--text-subtle);margin-bottom:8px">You can disable 2FA — this significantly reduces account security.</p>
+      <p style="font-size:.82rem;color:var(--text-subtle);margin-bottom:8px">${t('twofa_disableWarn')}</p>
       <button class="btn btn-sm" style="border-color:var(--danger-text);color:var(--danger-text)" onclick="disable2FA()">
-        <i class="ph ph-shield-slash"></i> Disable 2FA
+        <i class="ph ph-shield-slash"></i> ${t('twofa_disable')}
       </button>
       <p id="twofaMsg" style="font-size:13px;margin-top:8px;display:none"></p>`
   } else {
-    statusMsg.innerHTML = '<span style="color:#f0b429"><i class="ph ph-shield-warning"></i> 2FA is <strong>not</strong> active. Your account is only protected by a password.</span>'
+    statusMsg.innerHTML = `<span style="color:#f0b429"><i class="ph ph-shield-warning"></i> ${t('twofa_inactive')}</span>`
     // Load QR code
     try {
       const r = await fetch('/2fa/setup', { headers: apiHeaders() })
@@ -6532,16 +6532,16 @@ async function _renderTwofaSettingsBlock() {
         const qrDataUrl = qrDataUri
         setupArea.innerHTML = `
           <div class="personal-2fa-qr">
-            <p style="font-size:.82rem;color:var(--text-subtle);margin:0">Scan this QR code with your authenticator app (Google Authenticator, Aegis, …):</p>
+            <p style="font-size:.82rem;color:var(--text-subtle);margin:0">${t('twofa_scan')}</p>
             <img src="${qrDataUrl}" alt="2FA QR Code" width="180" height="180">
             <details style="font-size:.78rem;color:var(--text-subtle)">
-              <summary style="cursor:pointer">Manual key (if QR code cannot be scanned)</summary>
+              <summary style="cursor:pointer">${t('twofa_manualKey')}</summary>
               <code style="font-family:monospace;word-break:break-all">${escHtml(secret||'')}</code>
             </details>
             <div style="display:flex;gap:8px;align-items:center;margin-top:4px">
-              <input class="input" id="totpVerifyCode" type="text" inputmode="numeric" maxlength="6" placeholder="6-digit code" style="width:140px">
+              <input class="input" id="totpVerifyCode" type="text" inputmode="numeric" maxlength="6" placeholder="${t('twofa_codePh')}" style="width:140px">
               <button class="btn btn-primary btn-sm" onclick="verify2FA()">
-                <i class="ph ph-check"></i> Enable
+                <i class="ph ph-check"></i> ${t('twofa_enable')}
               </button>
             </div>
             <p id="twofaMsg" style="font-size:13px;margin-top:4px;display:none"></p>
@@ -6550,7 +6550,7 @@ async function _renderTwofaSettingsBlock() {
         setupArea.innerHTML = '<p style="color:var(--danger-text);font-size:.82rem">2FA module not available.</p>'
       }
     } catch {
-      setupArea.innerHTML = '<p style="color:var(--danger-text);font-size:.82rem">Error loading 2FA setup.</p>'
+      setupArea.innerHTML = `<p style="color:var(--danger-text);font-size:.82rem">${t('twofa_setupError')}</p>`
     }
   }
 }
@@ -8387,7 +8387,7 @@ async function switchRiskTab(tab) {
   document.querySelectorAll('.risk-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab))
   const content = dom('riskTabContent')
   if (!content) return
-  content.innerHTML = '<p class="report-loading">Loading…</p>'
+  content.innerHTML = `<p class="report-loading">${t('ui_loading')}</p>`
   if (tab === 'register')   await renderRiskRegister(content)
   if (tab === 'heatmap')    await renderRiskHeatmap(content)
   if (tab === 'treatments') await renderRiskTreatments(content)
@@ -9501,7 +9501,7 @@ async function switchGdprTab(tab) {
   document.querySelectorAll('.gdpr-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab))
   const content = dom('gdprTabContent')
   if (!content) return
-  content.innerHTML = '<p class="report-loading">Loading…</p>'
+  content.innerHTML = `<p class="report-loading">${t('ui_loading')}</p>`
   try {
     if (tab === 'overview')  await renderGdprOverview(content)
     if (tab === 'vvt')       await renderGdprVvt(content)
@@ -13785,7 +13785,7 @@ async function switchBcmTab(tab) {
   _bcmTab = tab
   const el = dom('bcmTabContent')
   if (!el) return
-  el.innerHTML = '<p class="report-loading">Loading…</p>'
+  el.innerHTML = `<p class="report-loading">${t('ui_loading')}</p>`
   if (tab === 'bia')       await renderBcmBia(el)
   if (tab === 'plans')     await renderBcmPlans(el)
   if (tab === 'exercises') await renderBcmExercises(el)
@@ -14536,7 +14536,7 @@ async function switchSuppliersTab(tab) {
   _suppliersTab = tab
   const el = dom('suppliersTabContent')
   if (!el) return
-  el.innerHTML = '<p class="report-loading">Loading…</p>'
+  el.innerHTML = `<p class="report-loading">${t('ui_loading')}</p>`
 
   const res = await fetch('/suppliers', { headers: apiHeaders() })
   const list = res.ok ? await res.json() : []
@@ -14860,7 +14860,7 @@ async function openSupplierAssessments(supplierId) {
   const canEdit = rank >= ROLE_RANK.editor
   const isAdmin = rank >= ROLE_RANK.admin
 
-  el.innerHTML = '<p class="report-loading">Loading…</p>'
+  el.innerHTML = `<p class="report-loading">${t('ui_loading')}</p>`
 
   const [supplierName, listRes] = await Promise.all([
     _getSupplierName(supplierId),
