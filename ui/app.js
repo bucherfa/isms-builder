@@ -8285,10 +8285,10 @@ let RISK_TREATMENTS = [
   { id:'transfer', labelKey:'risk_treatmentTransfer' },
 ]
 const RISK_STATUSES = [
-  { id:'open',         label:'Open' },
-  { id:'in_treatment', label:'In Treatment' },
-  { id:'accepted',     label:'Accepted' },
-  { id:'closed',       label:'Closed' },
+  { id:'open',         get label() { return t('riskst_open') } },
+  { id:'in_treatment', get label() { return t('riskst_inTreatment') } },
+  { id:'accepted',     get label() { return t('riskst_accepted') } },
+  { id:'closed',       get label() { return t('riskst_closed') } },
 ]
 const RISK_LEVEL_CFG = {
   low:      { get label() { return t('riskl_low') },      cls:'risk-low' },
@@ -8364,16 +8364,16 @@ async function renderRisk() {
   container.innerHTML = `
     <div class="risk-fullpage">
       <div class="risk-header">
-        <h2><i class="ph ph-warning"></i> Risk & Compliance</h2>
+        <h2><i class="ph ph-warning"></i> ${t('risk_pageTitle')}</h2>
         ${canManageRisks() ? `<button class="btn btn-primary btn-sm" onclick="openRiskModal()">
           <i class="ph ph-plus"></i> ${t('risk_new')}
         </button>` : ''}
       </div>
       <div class="risk-tab-bar">
         <button class="risk-tab active" data-tab="register"  onclick="switchRiskTab('register')"><i class="ph ph-table"></i> ${t('risk_register')}</button>
-        <button class="risk-tab"        data-tab="heatmap"   onclick="switchRiskTab('heatmap')"><i class="ph ph-grid-four"></i> Heatmap</button>
+        <button class="risk-tab"        data-tab="heatmap"   onclick="switchRiskTab('heatmap')"><i class="ph ph-grid-four"></i> ${t('risk_heatmapTab')}</button>
         <button class="risk-tab"        data-tab="treatments"onclick="switchRiskTab('treatments')"><i class="ph ph-list-checks"></i> ${t('risk_treatmentsTab')}</button>
-        <button class="risk-tab"        data-tab="calendar"  onclick="switchRiskTab('calendar')"><i class="ph ph-calendar"></i> Kalender</button>
+        <button class="risk-tab"        data-tab="calendar"  onclick="switchRiskTab('calendar')"><i class="ph ph-calendar"></i> ${t('risk_calendarTab')}</button>
         <button class="risk-tab"        data-tab="reports"   onclick="switchRiskTab('reports')"><i class="ph ph-chart-bar"></i> ${t('risk_reportsTab')}</button>
       </div>
       <div class="risk-tab-content" id="riskTabContent"></div>
@@ -8413,13 +8413,13 @@ async function renderRiskRegister(el) {
     <div class="risk-filter-bar">
       <select class="select risk-filter-sel" onchange="_riskFilterCat=this.value;switchRiskTab('register')">${catOpts}</select>
       <select class="select risk-filter-sel" onchange="_riskFilterStatus=this.value;switchRiskTab('register')">${stOpts}</select>
-      <span class="risk-filter-count">${risks.length} Risk${risks.length !== 1 ? 's' : ''}</span>
+      <span class="risk-filter-count">${risks.length} ${t('risk_countLabel')}</span>
     </div>
-    ${risks.length === 0 ? '<p class="risk-empty">No risks found.</p>' : `
+    ${risks.length === 0 ? `<p class="risk-empty">${t('risk_noRisksFound')}</p>` : `
     <table class="risk-table">
       <thead><tr>
-        <th>Level</th><th>Title</th><th>Category</th>
-        <th>W × S = Score</th><th>Treatment</th><th>Status</th><th>Owner</th><th style="width:70px;"></th>
+        <th>${t('risk_levelCol')}</th><th>${t('col_title')}</th><th>${t('col_category')}</th>
+        <th>${t('risk_wsScoreCol')}</th><th>${t('risk_treatmentCol')}</th><th>${t('col_status')}</th><th>${t('ui_owner')}</th><th style="width:70px;"></th>
       </tr></thead>
       <tbody>
         ${risks.map(r => {
@@ -8432,15 +8432,15 @@ async function renderRiskRegister(el) {
               <span class="risk-badge ${lv.cls}">${lv.label}</span>
               ${r.cvssScore != null ? cvssBadgeHtml(r.cvssScore) : ''}
             </td>
-            <td class="risk-title-cell">${escHtml(r.title)}${r.needsReview ? ` <span class="badge-review-pending" title="${t('risk_approvalRequired')}">&#9888; Review</span>` : ''}</td>
+            <td class="risk-title-cell">${escHtml(r.title)}${r.needsReview ? ` <span class="badge-review-pending" title="${t('risk_approvalRequired')}">&#9888; ${t('ui_review')}</span>` : ''}</td>
             <td>${escHtml(riskCatLabel(cat) || r.category)}</td>
             <td class="risk-score-cell">${r.probability} × ${r.impact} = <strong>${r.score}</strong></td>
             <td>${escHtml(riskTreatmentLabel(tr) || r.treatmentOption)}</td>
             <td><span class="risk-status-badge risk-st-${r.status}">${st?.label || r.status}</span></td>
             <td>${escHtml(r.owner || '—')}</td>
             <td onclick="event.stopPropagation()" class="risk-actions">
-              ${canEditRisk(r) ? `<button class="btn btn-secondary btn-sm" title="Edit" onclick="openRiskModal('${r.id}')"><i class="ph ph-pencil"></i></button>` : ''}
-              ${getCurrentRole()==='admin' ? `<button class="btn btn-sm" style="color:var(--danger-text)" title="Delete" onclick="deleteRisk('${r.id}')"><i class="ph ph-trash"></i></button>` : ''}
+              ${canEditRisk(r) ? `<button class="btn btn-secondary btn-sm" title="${escHtml(t('edit'))}" onclick="openRiskModal('${r.id}')"><i class="ph ph-pencil"></i></button>` : ''}
+              ${getCurrentRole()==='admin' ? `<button class="btn btn-sm" style="color:var(--danger-text)" title="${escHtml(t('delete'))}" onclick="deleteRisk('${r.id}')"><i class="ph ph-trash"></i></button>` : ''}
             </td>
           </tr>`
         }).join('')}
@@ -8612,11 +8612,11 @@ async function renderRiskCalendar(el) {
   const events = res.ok ? await res.json() : []
 
   const today = new Date().toISOString().slice(0, 10)
-  const typeLabel = { risk_due:'Due Date', risk_review:'Review', treatment_due:'Measure' }
+  const typeLabel = { risk_due:t('col_dueDate'), risk_review:t('ui_review'), treatment_due:t('risk_measure') }
   const typeCls   = { risk_due:'cal-due', risk_review:'cal-review', treatment_due:'cal-treatment' }
 
   if (events.length === 0) {
-    el.innerHTML = '<p class="risk-empty">No events recorded.</p>'
+    el.innerHTML = `<p class="risk-empty">${t('risk_noEvents')}</p>`
     return
   }
 
@@ -8651,7 +8651,7 @@ async function renderRiskReports(el) {
   const s       = sumRes.ok     ? await sumRes.json()     : null
   const allRisks = allRes.ok    ? await allRes.json()     : []
   const pending  = pendingRes.ok ? await pendingRes.json() : []
-  if (!s) { el.innerHTML = '<p class="report-error">Error loading</p>'; return }
+  if (!s) { el.innerHTML = `<p class="report-error">${t('risk_loadError')}</p>`; return }
 
   const scanRisks = allRisks.filter(r => r.source === 'greenbone-scan')
 
@@ -8674,14 +8674,14 @@ async function renderRiskReports(el) {
   el.innerHTML = `
     <div class="risk-report-grid">
       <div class="risk-report-card">
-        <h4>Total</h4>
+        <h4>${t('risk_totalCard')}</h4>
         <div class="risk-kpi-big">${s.total}</div>
-        <div class="risk-kpi-sub">Risks recorded</div>
+        <div class="risk-kpi-sub">${t('risk_recordedSub')}</div>
       </div>
       <div class="risk-report-card">
-        <h4>Open Measures</h4>
+        <h4>${t('risk_openMeasuresCard')}</h4>
         <div class="risk-kpi-big ${s.openTreatments > 0 ? 'risk-kpi-warn' : ''}">${s.openTreatments}</div>
-        <div class="risk-kpi-sub">Treatment plans open</div>
+        <div class="risk-kpi-sub">${t('risk_openMeasuresSub')}</div>
       </div>
       <div class="risk-report-card">
         <h4>${t('risk_byLevel')}</h4>
@@ -8708,17 +8708,17 @@ async function renderRiskReports(el) {
           </div>`).join('')}
       </div>
       <div class="risk-report-card risk-report-full">
-        <h4>Top 5 Risks (by Score)</h4>
+        <h4>${t('risk_top5Title')}</h4>
         <table class="risk-table">
-          <thead><tr><th>Title</th><th>Level</th><th>Score</th><th>Status</th></tr></thead>
-          <tbody>${top5rows || '<tr><td colspan="4" style="color:var(--text-subtle)">No risks</td></tr>'}</tbody>
+          <thead><tr><th>${t('col_title')}</th><th>${t('risk_levelCol')}</th><th>${t('risk_scoreCol')}</th><th>${t('col_status')}</th></tr></thead>
+          <tbody>${top5rows || `<tr><td colspan="4" style="color:var(--text-subtle)">${t('risk_noRisksShort')}</td></tr>`}</tbody>
         </table>
       </div>
       ${pending.length > 0 ? `
       <div class="risk-report-card risk-report-full scan-review-banner" style="border-color:#f59e0b">
         <h4><i class="ph ph-shield-warning" style="color:#f59e0b"></i> ${t('risk_approvalPending')} (${pending.length})</h4>
         <table class="risk-table">
-          <thead><tr><th>${t('col_title')}</th><th>CVSS</th><th>${t('findings_severity')}</th><th>Host</th><th>CVEs</th><th>${t('common_action')}</th></tr></thead>
+          <thead><tr><th>${t('col_title')}</th><th>CVSS</th><th>${t('findings_severity')}</th><th>${t('risk_hostCol')}</th><th>${t('risk_cvesCol')}</th><th>${t('common_action')}</th></tr></thead>
           <tbody>${pending.map(r => `<tr>
             <td>${escHtml(r.title)}</td>
             <td>${r.cvssScore != null ? cvssBadgeHtml(r.cvssScore) : '—'}</td>
@@ -8734,7 +8734,7 @@ async function renderRiskReports(el) {
       <div class="risk-report-card risk-report-full">
         <h4><i class="ph ph-scan" style="color:#3b82f6"></i> ${t('risk_scanImports')} (${scanRisks.length} ${t('risk_approved').toLowerCase()})</h4>
         <table class="risk-table">
-          <thead><tr><th>${t('col_title')}</th><th>CVSS</th><th>${t('findings_severity')}</th><th>CVEs</th><th>Score</th><th>${t('col_status')}</th><th>${t('risk_approvedBy')}</th></tr></thead>
+          <thead><tr><th>${t('col_title')}</th><th>CVSS</th><th>${t('findings_severity')}</th><th>${t('risk_cvesCol')}</th><th>${t('risk_scoreCol')}</th><th>${t('col_status')}</th><th>${t('risk_approvedBy')}</th></tr></thead>
           <tbody>${scanRisks.map(r => `<tr onclick="openRiskDetail('${r.id}')" style="cursor:pointer">
             <td>${escHtml(r.title)}</td>
             <td>${r.cvssScore != null ? cvssBadgeHtml(r.cvssScore) : '—'}</td>
@@ -8765,7 +8765,7 @@ async function openRiskDetail(id) {
   const cat = RISK_CATS.find(c => c.id === r.category)
   const tr  = RISK_TREATMENTS.find(t => t.id === r.treatmentOption)
   const st  = RISK_STATUSES.find(s => s.id === r.status)
-  const tpStatusLabel = { open:'Open', in_progress:'In Progress', completed:'Completed' }
+  const tpStatusLabel = { open:t('findings_statusOpen'), in_progress:t('findings_statusInProgress'), completed:t('risk_statusCompleted') }
 
   const el = dom('riskTabContent')
   if (!el) return
@@ -8829,12 +8829,12 @@ async function openRiskDetail(id) {
           <div class="risk-detail-row"><label>${t('col_category')}</label><span>${escHtml(riskCatLabel(cat)||r.category)}</span></div>
           <div class="risk-detail-row"><label>${t('risk_probability')}</label><span>${r.probability} / 5</span></div>
           <div class="risk-detail-row"><label>${t('risk_impact')}</label><span>${r.impact} / 5</span></div>
-          <div class="risk-detail-row"><label>Score</label><span><strong>${r.score}</strong> — <span class="risk-badge ${lv.cls}">${lv.label}</span></span></div>
+          <div class="risk-detail-row"><label>${t('risk_scoreCol')}</label><span><strong>${r.score}</strong> — <span class="risk-badge ${lv.cls}">${lv.label}</span></span></div>
           <div class="risk-detail-row"><label>${t('risk_treatmentOpt')}</label><span>${escHtml(riskTreatmentLabel(tr)||r.treatmentOption)}</span></div>
           <div class="risk-detail-row"><label>${t('col_status')}</label><span class="risk-status-badge risk-st-${r.status}">${st?.label||r.status}</span></div>
-          <div class="risk-detail-row"><label>Owner</label><span>${escHtml(r.owner||'—')}</span></div>
+          <div class="risk-detail-row"><label>${t('ui_owner')}</label><span>${escHtml(r.owner||'—')}</span></div>
           <div class="risk-detail-row"><label>${t('col_dueDate')}</label><span>${r.dueDate ? new Date(r.dueDate).toLocaleDateString() : '—'}</span></div>
-          <div class="risk-detail-row"><label>Review</label><span>${r.reviewDate ? new Date(r.reviewDate).toLocaleDateString('de-DE') : '—'}</span></div>
+          <div class="risk-detail-row"><label>${t('ui_review')}</label><span>${r.reviewDate ? new Date(r.reviewDate).toLocaleDateString('de-DE') : '—'}</span></div>
         </div>
       </div>
 
@@ -8878,7 +8878,7 @@ async function openRiskDetail(id) {
       </div>` : ''}
 
       ${r.linkedPolicies?.length ? `<div class="risk-detail-section" style="margin-top:16px">
-        <h4>Verknüpfte Policies (${r.linkedPolicies.length})</h4>
+        <h4>${t('risk_linkedPolicies')} (${r.linkedPolicies.length})</h4>
         <div class="tmpl-controls-bar" style="display:flex;flex-wrap:wrap;gap:6px;">
           ${r.linkedPolicies.map(c => `<span class="tmpl-bar-pill">${escHtml(c)}</span>`).join('')}
         </div>
@@ -9004,84 +9004,84 @@ async function openRiskModal(id) {
     <div class="risk-fullpage">
       <div class="risk-header">
         <button class="btn btn-secondary btn-sm" onclick="renderRisk()">
-          <i class="ph ph-arrow-left"></i> Back
+          <i class="ph ph-arrow-left"></i> ${t('common_back')}
         </button>
-        <h2><i class="ph ph-warning"></i> ${risk ? 'Edit Risk' : 'New Risk'}</h2>
+        <h2><i class="ph ph-warning"></i> ${risk ? t('risk_editRisk') : t('risk_new')}</h2>
       </div>
       <div class="risk-form-body">
         <div class="risk-form-grid">
 
           <div class="risk-form-card risk-form-full">
-            <h3 class="risk-form-section-title"><i class="ph ph-text-align-left"></i> Basic Information</h3>
+            <h3 class="risk-form-section-title"><i class="ph ph-text-align-left"></i> ${t('asset_basicInfo')}</h3>
             <div class="risk-form-row">
               <div class="risk-form-field risk-form-wide">
                 <label class="form-label">${t('col_title')} *</label>
-                <input id="rModalTitle" class="form-input" value="${escHtml(risk?.title||'')}" placeholder="Short, concise risk title…" />
+                <input id="rModalTitle" class="form-input" value="${escHtml(risk?.title||'')}" placeholder="${t('risk_titlePh')}" />
               </div>
               <div class="risk-form-field">
-                <label class="form-label">Category</label>
+                <label class="form-label">${t('col_category')}</label>
                 <select id="rModalCat" class="select">${catOpts}</select>
               </div>
             </div>
             <div class="risk-form-field" style="margin-top:10px;">
-              <label class="form-label">Description</label>
-              <textarea id="rModalDesc" class="form-textarea" rows="3" placeholder="Detailed description of the risk…">${escHtml(risk?.description||'')}</textarea>
+              <label class="form-label">${t('ui_description')}</label>
+              <textarea id="rModalDesc" class="form-textarea" rows="3" placeholder="${t('risk_descPh')}">${escHtml(risk?.description||'')}</textarea>
             </div>
           </div>
 
           <div class="risk-form-card">
-            <h3 class="risk-form-section-title"><i class="ph ph-bug"></i> Threat & Vulnerability</h3>
+            <h3 class="risk-form-section-title"><i class="ph ph-bug"></i> ${t('risk_threatVulnTitle')}</h3>
             <div class="risk-form-field">
-              <label class="form-label">Threat</label>
-              <textarea id="rModalThreat" class="form-textarea" rows="3" placeholder="What threat exists?">${escHtml(risk?.threat||'')}</textarea>
+              <label class="form-label">${t('risk_threat')}</label>
+              <textarea id="rModalThreat" class="form-textarea" rows="3" placeholder="${t('risk_threatPh')}">${escHtml(risk?.threat||'')}</textarea>
             </div>
             <div class="risk-form-field" style="margin-top:10px;">
-              <label class="form-label">Vulnerability</label>
-              <textarea id="rModalVuln" class="form-textarea" rows="3" placeholder="Which vulnerability is being exploited?">${escHtml(risk?.vulnerability||'')}</textarea>
+              <label class="form-label">${t('risk_vulnerability')}</label>
+              <textarea id="rModalVuln" class="form-textarea" rows="3" placeholder="${t('risk_vulnPh')}">${escHtml(risk?.vulnerability||'')}</textarea>
             </div>
           </div>
 
           <div class="risk-form-card">
-            <h3 class="risk-form-section-title"><i class="ph ph-chart-line-up"></i> Risk Assessment</h3>
+            <h3 class="risk-form-section-title"><i class="ph ph-chart-line-up"></i> ${t('risk_assessment')}</h3>
             <div class="risk-form-row">
               <div class="risk-form-field">
-                <label class="form-label">Likelihood (1–5)</label>
+                <label class="form-label">${t('risk_likelihoodFull')}</label>
                 <select id="rModalProb" class="select" onchange="updateRiskScorePreview()">${scaleOpts('probability')}</select>
               </div>
               <div class="risk-form-field">
-                <label class="form-label">Impact (1–5)</label>
+                <label class="form-label">${t('risk_impactFull')}</label>
                 <select id="rModalImpact" class="select" onchange="updateRiskScorePreview()">${scaleOpts('impact')}</select>
               </div>
             </div>
             <div id="rScorePreview" class="risk-score-preview" style="margin-top:12px;"></div>
             <div class="risk-form-field" style="margin-top:12px;">
-              <label class="form-label">Treatment Option</label>
+              <label class="form-label">${t('risk_treatmentOpt')}</label>
               <select id="rModalTreat" class="select">${trOpts}</select>
             </div>
             <div class="risk-form-field" style="margin-top:10px;">
-              <label class="form-label">Risk Mitigation Measures</label>
+              <label class="form-label">${t('risk_mitigationMeasures')}</label>
               <textarea id="rModalMitigation" class="form-textarea" rows="4"
-                placeholder="Describe concrete measures to reduce, avoid or transfer this risk…">${escHtml(risk?.mitigationNotes||'')}</textarea>
+                placeholder="${t('risk_mitigationPh')}">${escHtml(risk?.mitigationNotes||'')}</textarea>
             </div>
           </div>
 
           <div class="risk-form-card">
-            <h3 class="risk-form-section-title"><i class="ph ph-clock"></i> Control & Dates</h3>
+            <h3 class="risk-form-section-title"><i class="ph ph-clock"></i> ${t('risk_controlDatesTitle')}</h3>
             <div class="risk-form-field">
-              <label class="form-label">Status</label>
+              <label class="form-label">${t('col_status')}</label>
               <select id="rModalStatus" class="select">${stOpts}</select>
             </div>
             <div class="risk-form-field" style="margin-top:10px;">
-              <label class="form-label">Owner / Responsible *</label>
-              <input id="rModalOwner" class="form-input" value="${escHtml(risk?.owner||'')}" placeholder="Name or role" />
+              <label class="form-label">${t('risk_ownerResponsible')}</label>
+              <input id="rModalOwner" class="form-input" value="${escHtml(risk?.owner||'')}" placeholder="${t('risk_nameRolePh')}" />
             </div>
             <div class="risk-form-row" style="margin-top:10px;">
               <div class="risk-form-field">
-                <label class="form-label">Due Date</label>
+                <label class="form-label">${t('col_dueDate')}</label>
                 <input id="rModalDue" class="form-input" type="date" value="${risk?.dueDate||''}" />
               </div>
               <div class="risk-form-field">
-                <label class="form-label">Review Date</label>
+                <label class="form-label">${t('risk_reviewDate')}</label>
                 <input id="rModalReview" class="form-input" type="date" value="${risk?.reviewDate||''}" />
               </div>
             </div>
@@ -9089,11 +9089,11 @@ async function openRiskModal(id) {
 
           ${entityTree.length ? `
           <div class="risk-form-card risk-form-full">
-            <h3 class="risk-form-section-title"><i class="ph ph-buildings"></i> Applicable Entities</h3>
+            <h3 class="risk-form-section-title"><i class="ph ph-buildings"></i> ${t('common_applicableEntities')}</h3>
             <div class="ent-tree-wrap">
               <label class="ent-tree-all-label">
                 <input type="checkbox" id="rEntitySelectAll" onchange="riskEntitySelectAll(this)">
-                <strong>Select all entities</strong>
+                <strong>${t('risk_selectAllEntities')}</strong>
               </label>
               <div class="ent-tree-divider"></div>
               <div class="ent-tree-root">${entTreeHtml}</div>
@@ -9101,7 +9101,7 @@ async function openRiskModal(id) {
           </div>` : ''}
 
           <div class="risk-form-card risk-form-full">
-            <h3 class="risk-form-section-title"><i class="ph ph-link"></i> Linked Controls & Policies</h3>
+            <h3 class="risk-form-section-title"><i class="ph ph-link"></i> ${t('risk_linkedControlsPolicies')}</h3>
             ${renderLinksBlock('risk', risk?.linkedControls||[], risk?.linkedPolicies||[])}
           </div>
 
@@ -9109,9 +9109,9 @@ async function openRiskModal(id) {
 
         <div class="risk-form-footer">
           <p id="rModalError" style="color:var(--danger-text);font-size:13px;display:none;flex:1;margin:0;"></p>
-          <button class="btn btn-secondary" onclick="renderRisk()">Cancel</button>
+          <button class="btn btn-secondary" onclick="renderRisk()">${t('ui_cancel')}</button>
           <button class="btn btn-primary btn-lg" onclick="submitRiskForm()">
-            <i class="ph ph-floppy-disk"></i> Save Risk
+            <i class="ph ph-floppy-disk"></i> ${t('risk_saveRisk')}
           </button>
         </div>
       </div>
@@ -9169,7 +9169,7 @@ function updateRiskScorePreview() {
   if (!el) return
   el.innerHTML = `
     <div class="risk-score-preview-inner">
-      <span class="risk-score-preview-label">Risk Score</span>
+      <span class="risk-score-preview-label">${t('risk_scorePreviewLabel')}</span>
       <span class="risk-score-preview-val">${p} × ${i} = <strong>${score}</strong></span>
       <span class="risk-badge ${cfg.cls}">${cfg.label}</span>
     </div>`
@@ -9180,10 +9180,10 @@ async function submitRiskForm() {
   const show = msg => { errEl.textContent = msg; errEl.style.display = '' }
 
   const title = dom('rModalTitle')?.value.trim()
-  if (!title) return show('Title is required.')
+  if (!title) return show(t('risk_titleRequiredErr'))
 
   const owner = dom('rModalOwner')?.value.trim()
-  if (!owner) return show('Owner / Responsible is required.')
+  if (!owner) return show(t('risk_ownerRequiredErr'))
 
   const applicableEntities = [...document.querySelectorAll('#riskContainer .ent-tree-cb:checked')]
     .map(cb => cb.value)
@@ -9211,7 +9211,7 @@ async function submitRiskForm() {
   const url    = editId ? `/risks/${editId}` : '/risks'
   const method = editId ? 'PUT' : 'POST'
   const res = await fetch(url, { method, headers: apiHeaders(), body: JSON.stringify(body) })
-  if (!res.ok) { const e = await res.json(); return show(e.error || 'Error saving') }
+  if (!res.ok) { const e = await res.json(); return show(e.error || t('err_saveFailed')) }
   const saved = await res.json()
   _riskEditId = null
   if (editId) await openRiskDetail(saved.id)
@@ -9239,47 +9239,47 @@ async function openTreatmentModal(riskId, tpOrId) {
     <div id="treatmentModal" class="modal" style="visibility:visible;">
       <div class="modal-content">
         <div class="modal-header">
-          <h3 class="modal-title"><i class="ph ph-list-checks"></i> ${tp ? 'Edit Measure' : 'New Measure'}</h3>
+          <h3 class="modal-title"><i class="ph ph-list-checks"></i> ${tp ? t('risk_editMeasure') : t('risk_newMeasure')}</h3>
           <button class="modal-close" onclick="document.getElementById('treatmentModal').remove()"><i class="ph ph-x"></i></button>
         </div>
         <div class="modal-body" style="display:flex;flex-direction:column;gap:12px;">
           <div>
             <label class="form-label">${t('col_title')} *</label>
-            <input id="tpTitle" class="form-input" value="${escHtml(tp?.title||'')}" placeholder="Measure title…" />
+            <input id="tpTitle" class="form-input" value="${escHtml(tp?.title||'')}" placeholder="${t('risk_measureTitlePh')}" />
           </div>
           <div>
-            <label class="form-label">Description</label>
+            <label class="form-label">${t('ui_description')}</label>
             <textarea id="tpDesc" class="form-textarea" rows="3">${escHtml(tp?.description||'')}</textarea>
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
             <div>
-              <label class="form-label">Responsible (Person)</label>
-              <input id="tpResp" class="form-input" value="${escHtml(tp?.responsible||'')}" placeholder="Name or role" />
+              <label class="form-label">${t('risk_responsiblePerson')}</label>
+              <input id="tpResp" class="form-input" value="${escHtml(tp?.responsible||'')}" placeholder="${t('risk_nameRolePh')}" />
             </div>
             <div>
-              <label class="form-label">Responsible Unit (OE)</label>
+              <label class="form-label">${t('asset_responsibleUnit')}</label>
               <select id="tpOrgUnit" class="select">${ouOpts}</select>
             </div>
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
             <div>
-              <label class="form-label">Due Date</label>
+              <label class="form-label">${t('col_dueDate')}</label>
               <input id="tpDue" class="form-input" type="date" value="${tp?.dueDate||''}" />
             </div>
             <div>
-              <label class="form-label">Status</label>
+              <label class="form-label">${t('col_status')}</label>
               <select id="tpStatus" class="select">
-                <option value="open"        ${tp?.status==='open'?'selected':''}>Open</option>
-                <option value="in_progress" ${tp?.status==='in_progress'?'selected':''}>In Progress</option>
-                <option value="completed"   ${tp?.status==='completed'?'selected':''}>Completed</option>
+                <option value="open"        ${tp?.status==='open'?'selected':''}>${t('findings_statusOpen')}</option>
+                <option value="in_progress" ${tp?.status==='in_progress'?'selected':''}>${t('findings_statusInProgress')}</option>
+                <option value="completed"   ${tp?.status==='completed'?'selected':''}>${t('risk_statusCompleted')}</option>
               </select>
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <button class="btn btn-secondary" onclick="document.getElementById('treatmentModal').remove()">Cancel</button>
+          <button class="btn btn-secondary" onclick="document.getElementById('treatmentModal').remove()">${t('ui_cancel')}</button>
           <button class="btn btn-primary" onclick="submitTreatmentModal('${riskId}','${tp?.id||''}')">
-            <i class="ph ph-floppy-disk"></i> Save
+            <i class="ph ph-floppy-disk"></i> ${t('ui_save')}
           </button>
         </div>
       </div>
