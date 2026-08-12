@@ -12589,6 +12589,10 @@ const NIS2_PHASE_I18N = {
   finalReport:  'nis2_phaseFinal',
 }
 
+function _nis2PrioLabel(p) {
+  return { CRITICAL: t('nis2_prioCritical'), HIGH: t('nis2_prioHigh'), MEDIUM: t('nis2_prioMedium') }[p] || p
+}
+
 function nis2Badge(text, color) {
   return `<span class="asset-badge" style="color:${color};border-color:${color}">${escHtml(text)}</span>`
 }
@@ -12648,7 +12652,7 @@ async function switchNis2Tab(tab) {
     if (tab === 'governance') await renderNis2Governance(el)
     if (tab === 'deadlines')  await renderNis2Deadlines(el)
   } catch (e) {
-    el.innerHTML = `<p style="color:var(--danger-text);padding:24px"><i class="ph ph-warning"></i> Error: ${escHtml(e.message)}</p>`
+    el.innerHTML = `<p style="color:var(--danger-text);padding:24px"><i class="ph ph-warning"></i> ${t('error')}: ${escHtml(e.message)}</p>`
   }
 }
 
@@ -12690,7 +12694,7 @@ async function renderNis2Governance(el) {
     <div class="asset-filter-bar">
       <select id="nis2FilterPrio" onchange="_filterNis2()">
         <option value="">${escHtml(t('nis2_allPriorities'))}</option>
-        ${Object.keys(NIS2_PRIO).map(p => `<option value="${p}">${p}</option>`).join('')}
+        ${Object.keys(NIS2_PRIO).map(p => `<option value="${p}">${_nis2PrioLabel(p)}</option>`).join('')}
       </select>
       <select id="nis2FilterStatus" onchange="_filterNis2()">
         <option value="">${escHtml(t('nis2_allStatuses'))}</option>
@@ -12700,7 +12704,7 @@ async function renderNis2Governance(el) {
         <option value="">${escHtml(t('nis2_allSubs'))}</option>
         ${'abcdefghij'.split('').map(c => `<option value="${c}">${c})</option>`).join('')}
       </select>
-      <input id="nis2Search" placeholder="Search…" oninput="_filterNis2()" style="flex:1;min-width:140px">
+      <input id="nis2Search" placeholder="${t('ui_searchPh')}" oninput="_filterNis2()" style="flex:1;min-width:140px">
     </div>
     <div id="nis2TableWrap"></div>
   `
@@ -12715,7 +12719,7 @@ function _renderNis2Table(items, canEdit) {
   const el = dom('nis2TableWrap')
   if (!el) return
   if (!items.length) {
-    el.innerHTML = '<p style="color:var(--text-subtle);padding:16px">No items found.</p>'
+    el.innerHTML = `<p style="color:var(--text-subtle);padding:16px">${t('nis2_noItems')}</p>`
     return
   }
 
@@ -12724,9 +12728,9 @@ function _renderNis2Table(items, canEdit) {
       <thead><tr>
         <th>#</th>
         <th>${escHtml(t('nis2_subParagraph'))}</th>
-        <th>Priorität</th>
-        <th>Titel</th>
-        <th>Status</th>
+        <th>${escHtml(t('ui_priority'))}</th>
+        <th>${escHtml(t('col_title'))}</th>
+        <th>${escHtml(t('col_status'))}</th>
         <th>${escHtml(t('nis2_owner'))}</th>
         <th>${escHtml(t('nis2_withEvidence'))}</th>
         ${canEdit ? '<th></th>' : ''}
@@ -12735,7 +12739,7 @@ function _renderNis2Table(items, canEdit) {
         ${items.map(item => `<tr>
           <td style="font-size:.75rem;color:var(--text-subtle)">${escHtml(item.id.replace('nis2_gov_', ''))}</td>
           <td style="font-size:.78rem" title="${escHtml(item.subParagraphText)}">${escHtml(item.subParagraph)})</td>
-          <td>${nis2Badge(item.priority, NIS2_PRIO[item.priority]?.color || '#8C9BAB')}</td>
+          <td>${nis2Badge(_nis2PrioLabel(item.priority), NIS2_PRIO[item.priority]?.color || '#8C9BAB')}</td>
           <td>
             <strong>${escHtml(item.title)}</strong>
             <br><span style="font-size:.74rem;color:var(--text-subtle)">${escHtml(item.category)}</span>
@@ -12789,7 +12793,7 @@ async function openNis2ItemForm(id) {
     <div class="training-form-page">
       <div class="training-form-header">
         <button class="btn btn-secondary btn-sm" onclick="switchNis2Tab('governance')">
-          <i class="ph ph-arrow-left"></i> Back
+          <i class="ph ph-arrow-left"></i> ${t('ui_back')}
         </button>
         <h3 class="training-form-title">
           <i class="ph ph-shield-star"></i> ${escHtml(item.title)}
@@ -12809,10 +12813,10 @@ async function openNis2ItemForm(id) {
         </div>
 
         <div class="training-form-section">
-          <h4 class="training-form-section-title"><i class="ph ph-check-square"></i> Status</h4>
+          <h4 class="training-form-section-title"><i class="ph ph-check-square"></i> ${t('col_status')}</h4>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Status</label>
+              <label class="form-label">${t('col_status')}</label>
               <select id="nis2Status" class="select">${statusOptions}</select>
             </div>
             <div class="form-group">
@@ -12843,9 +12847,9 @@ async function openNis2ItemForm(id) {
 
       </div>
       <div class="training-form-footer">
-        <button class="btn btn-secondary" onclick="switchNis2Tab('governance')">Cancel</button>
+        <button class="btn btn-secondary" onclick="switchNis2Tab('governance')">${t('ui_cancel')}</button>
         <button class="btn btn-primary" onclick="saveNis2Item('${item.id}')">
-          <i class="ph ph-floppy-disk"></i> Save
+          <i class="ph ph-floppy-disk"></i> ${t('ui_save')}
         </button>
       </div>
     </div>
@@ -12944,7 +12948,7 @@ async function renderNis2Deadlines(el) {
 
     ${rows.length ? `<table class="asset-table">
       <thead><tr>
-        <th>Vorfall</th><th>${escHtml(t('nis2_deadline'))}</th><th>Status</th><th></th>
+        <th>${escHtml(t('nis2_incidentCol'))}</th><th>${escHtml(t('nis2_deadline'))}</th><th>${escHtml(t('col_status'))}</th><th></th>
       </tr></thead>
       <tbody>${deadlineRows}</tbody>
     </table>` : `<p class="asset-prot-hint" style="padding:16px">${escHtml(t('nis2_noDeadlines'))}</p>`}
@@ -12988,7 +12992,7 @@ async function openNis2IncidentForm(id) {
       <div class="training-form-page">
         <div class="training-form-header">
           <button class="btn btn-secondary btn-sm" onclick="switchNis2Tab('deadlines')">
-            <i class="ph ph-arrow-left"></i> Back
+            <i class="ph ph-arrow-left"></i> ${t('ui_back')}
           </button>
           <h3 class="training-form-title">
             <i class="ph ph-timer"></i> ${escHtml(incident.refNumber || incident.id)}
@@ -13006,7 +13010,7 @@ async function openNis2IncidentForm(id) {
           </div>
         </div>
         <div class="training-form-footer">
-          <button class="btn btn-secondary" onclick="switchNis2Tab('deadlines')">Cancel</button>
+          <button class="btn btn-secondary" onclick="switchNis2Tab('deadlines')">${t('ui_cancel')}</button>
           ${canEdit ? `<button class="btn btn-primary" onclick="startNis2Tracking('${incident.id}')">
             <i class="ph ph-timer"></i> ${escHtml(t('nis2_startTracking'))}
           </button>` : ''}
@@ -13021,7 +13025,7 @@ async function openNis2IncidentForm(id) {
     const left   = p.minutesLeft === null ? ''
       : p.minutesLeft < 0
         ? ` — ${Math.abs(Math.round(p.minutesLeft / 60))} h ${t('nis2_stateOverdue').toLowerCase()}`
-        : ` — noch ${Math.round(p.minutesLeft / 60)} h`
+        : ` — ${t('nis2_hoursLeft', { h: Math.round(p.minutesLeft / 60) })}`
 
     return `<div class="training-form-section">
       <h4 class="training-form-section-title">
@@ -13069,7 +13073,7 @@ async function openNis2IncidentForm(id) {
         ${phasesHtml}
       </div>
       <div class="training-form-footer">
-        <button class="btn btn-secondary" onclick="switchNis2Tab('deadlines')">Back</button>
+        <button class="btn btn-secondary" onclick="switchNis2Tab('deadlines')">${t('ui_back')}</button>
         <button class="btn btn-primary" onclick="exportNis2Report('${incident.id}')">
           <i class="ph ph-download-simple"></i> ${escHtml(t('nis2_exportReport'))}
         </button>
@@ -13184,7 +13188,7 @@ async function switchGovTab(tab) {
     if (tab === 'actions')  await renderGovActions(el)
     if (tab === 'meetings') await renderGovMeetings(el)
   } catch(e) {
-    el.innerHTML = `<p style="color:var(--danger-text);padding:24px"><i class="ph ph-warning"></i> Error: ${escHtml(e.message)}</p>`
+    el.innerHTML = `<p style="color:var(--danger-text);padding:24px"><i class="ph ph-warning"></i> ${t('error')}: ${escHtml(e.message)}</p>`
   }
 }
 
@@ -13260,10 +13264,10 @@ async function renderGovActions(el) {
         ${Object.entries(GOV_PRIORITY_LABELS).map(([v,l])=>`<option value="${v}">${l}</option>`).join('')}
       </select>
       <select id="govActSourceFilter" onchange="filterGovActions()">
-        <option value="">All sources</option>
+        <option value="">${t('gov_allSources')}</option>
         ${Object.entries(GOV_SOURCE_LABELS).map(([v,l])=>`<option value="${v}">${l}</option>`).join('')}
       </select>
-      <input id="govActSearch" type="text" placeholder="Search…" oninput="filterGovActions()" style="flex:1;min-width:120px">
+      <input id="govActSearch" type="text" placeholder="${t('ui_searchPh')}" oninput="filterGovActions()" style="flex:1;min-width:120px">
       ${canEdit ? `<button class="btn btn-primary btn-sm" onclick="openGovActionForm()"><i class="ph ph-plus"></i> ${t('gov_newAction')}</button>` : ''}
     </div>
     <div id="govActTableWrap"></div>

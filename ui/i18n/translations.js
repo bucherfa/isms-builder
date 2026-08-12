@@ -1847,5 +1847,14 @@
     link_policiesTemplates:   { de: 'Richtlinien / Vorlagen', en: 'Policies / Templates', fr: 'Politiques / Modèles', nl: 'Beleid / Sjablonen' },
     link_search:               { de: 'Suchen…', en: 'Search…', fr: 'Rechercher…', nl: 'Zoeken…' },
     link_dblClickAdd:          { de: 'Doppelklick zum Hinzufügen', en: 'Double-click to add', fr: 'Double-cliquez pour ajouter', nl: 'Dubbelklik om toe te voegen' },
+
+    // ── NIS2 ──
+    nis2_hoursLeft:            { de: 'noch {h} h', en: '{h} h left', fr: '{h} h restantes', nl: 'nog {h} u' },
+    nis2_prioCritical:         { de: 'CRITICAL', en: 'CRITICAL', fr: 'CRITIQUE', nl: 'CRITICAL' },
+    nis2_prioHigh:             { de: 'HIGH', en: 'HIGH', fr: 'ÉLEVÉ', nl: 'HIGH' },
+    nis2_prioMedium:           { de: 'MEDIUM', en: 'MEDIUM', fr: 'MOYEN', nl: 'MEDIUM' },
+    nis2_noItems:              { de: 'Keine Einträge gefunden.', en: 'No items found.', fr: 'Aucune entrée trouvée.', nl: 'Geen items gevonden.' },
+    nis2_incidentCol:          { de: 'Vorfall', en: 'Incident', fr: 'Incident', nl: 'Incident' },
+    gov_allSources:            { de: 'Alle Quellen', en: 'All sources', fr: 'Toutes les sources', nl: 'Alle bronnen' },
   };
 })();
