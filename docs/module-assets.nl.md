@@ -66,6 +66,29 @@ gaat.
 
 Met **Herstellen** keert de lijst terug naar de standaardwaarden.
 
+### Beschermingsdoelen per type instellen
+
+Elk type kan vertrouwelijkheid, integriteit, beschikbaarheid en authenticiteit vastleggen
+(niveaus 1–4). Bedrijfsmiddelen van dat type nemen die waarden over zonder ze afzonderlijk te
+onderhouden.
+
+Drie regels zijn daarbij van belang:
+
+- **De standaard werkt per doel.** Een type „Database" kan alleen de vertrouwelijkheid op 4
+  zetten; integriteit en beschikbaarheid blijven dan bij het bedrijfsmiddel zelf.
+- **De koppeling blijft bestaan.** Een latere correctie op het type geldt onmiddellijk voor alle
+  bedrijfsmiddelen die deze niet hebben overschreven — het is geen eenmalige startwaarde.
+- **Afwijken kan** met de schakelaar „Beschermingsdoelen los van het type instellen". Zolang die
+  uit staat, zijn de vier velden vergrendeld en tonen ze de waarde van het type.
+
+**Samenspel met afhankelijkheden:** de overerving volgens het maximumprincipe gaat nog steeds
+voor. Hangt een bedrijfsmiddel met een hoge beschermingsbehoefte af van een ander, dan wordt dat
+andere verhoogd — ook als de waarde daar bewust lager is gezet. Dat is bedoeld: een server waarop
+een kritieke toepassing draait, is niet minder beschermenswaardig dan de toepassing zelf. Het
+formulier toont dan welk bedrijfsmiddel de waarde verhoogt.
+
+---
+
 ### Talen: wat wordt vertaald en wat niet
 
 Dit is een bewuste keuze, geen tekortkoming:

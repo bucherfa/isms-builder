@@ -3537,7 +3537,10 @@ const LIST_META = [
   // Editor danebenzustellen.
   { id: 'assetTypes',        get label() { return t('admin_assetTypes') },   type: 'object',
     extraSelect: { key: 'category',
-      get options() { return Object.fromEntries(Object.keys(ASSET_CAT_LABELS).map(c => [c, assetCatLabel(c)])) } } },
+      get options() { return Object.fromEntries(Object.keys(ASSET_CAT_LABELS).map(c => [c, assetCatLabel(c)])) } },
+    // Schutzziel-Vorgaben je Typ (#64, Teil 2). Vier optionale Stufen 1–4;
+    // leer bedeutet: der Typ macht zu diesem Ziel keine Vorgabe.
+    protectionGoals: true },
 ]
 
 let _adminListsData   = null  // cached from server
@@ -3614,6 +3617,7 @@ function _renderListPanel() {
           <i class="ph ph-arrow-counter-clockwise"></i> ${t('reset')}
         </button>
       </div>
+      ${meta.protectionGoals ? `<p class="admin-lists-hint">${escHtml(t('at_protHint'))}</p>` : ''}
       <div class="admin-lists-add-row" style="gap:6px">
         <input class="input" id="adminListNewId"    placeholder="ID (e.g. my_cat)"  style="width:160px">
         <input class="input" id="adminListNewLabel" placeholder="${t('admin_labelPlaceholder')}"             style="flex:1"
@@ -3642,11 +3646,44 @@ function _renderListPanel() {
               ${Object.entries(meta.extraSelect.options).map(([v, l]) =>
                 `<option value="${escHtml(v)}"${item[meta.extraSelect.key] === v ? ' selected' : ''}>${escHtml(l)}</option>`).join('')}
             </select>` : ''}
+            ${meta.protectionGoals ? _protGoalSelects(idx, item) : ''}
             <button class="btn btn-sm" style="color:var(--danger-text)" onclick="_adminListRemoveItem(${idx})"
                     title="${t('remove')}"><i class="ph ph-trash"></i></button>
           </div>`).join('')}
       </div>`
   }
+}
+
+/** Vier Stufenfelder (C/I/A/Authentizität) für einen Asset-Typ. */
+function _protGoalSelects(idx, item) {
+  // Kürzel aus ASSET_PROT_GOALS statt aus dem Label: Auf Deutsch beginnen
+  // Vertraulichkeit und Verfügbarkeit beide mit „V".
+  const lvl = [1, 2, 3, 4]
+  return ASSET_PROT_GOALS.map(({ key: g, letter, i18n }) => {
+    const label = t(i18n)
+    const cur = item.protection?.[g] ?? ''
+    return `<label class="admin-prot-goal" title="${escHtml(label)}">
+      <span>${escHtml(letter)}</span>
+      <select class="input" onchange="_adminListUpdateProtection(${idx},'${g}',this.value)">
+        <option value="">–</option>
+        ${lvl.map(l => `<option value="${l}"${String(cur) === String(l) ? ' selected' : ''}>${l}</option>`).join('')}
+      </select>
+    </label>`
+  }).join('')
+}
+
+/** Setzt oder entfernt ein Schutzziel am Typ; leert sich das Objekt, fällt es weg. */
+function _adminListUpdateProtection(idx, goal, value) {
+  const items = _adminListsData[_adminActiveList]
+  if (!items || !items[idx]) return
+  const prot = { ...(items[idx].protection || {}) }
+  if (value === '') delete prot[goal]
+  else prot[goal] = parseInt(value, 10)
+  const next = { ...items[idx] }
+  if (Object.keys(prot).length) next.protection = prot
+  else delete next.protection
+  items[idx] = next
+  _adminListSave()
 }
 
 function _adminListAddString() {
@@ -11676,7 +11713,15 @@ function _assetProtFields(item) {
   const own = item?.protection          || {}
   const eff = item?.effectiveProtection || {}
   const org = item?.protectionOrigins   || {}
+  const src = item?.protectionSources   || {}
   const defaults = { c: 2, i: 2, a: 2, auth: null }
+
+  // #64 Teil 2: Gibt der Typ Schutzziele vor und ist die Vererbung nicht
+  // gebrochen, sind die Felder gesperrt — sonst schriebe ein Speichern den
+  // Typwert als Eigenwert fest und der Bezug ginge still verloren.
+  const typeProt = ASSET_TYPES.find(at => at.id === item?.type)?.protection || null
+  const overridden = !!item?.protectionOverride
+  const lockedByType = !!typeProt && !overridden
 
   return ASSET_PROT_GOALS.map(g => {
     const optional = g.key === 'auth'
@@ -11687,12 +11732,15 @@ function _assetProtFields(item) {
           `<option value="${v}"${cur === v ? ' selected' : ''}>${escHtml(ASSET_PROT_LEVELS[v].label)}</option>`
         ).join('')
 
-    const src = (item && org[g.key] && org[g.key] !== item.id) ? org[g.key] : null
+    const from = (item && org[g.key] && org[g.key] !== item.id) ? org[g.key] : null
     let hint = ''
-    if (src) {
+    if (from) {
+      // Ein anderes Asset hebt den Wert an — Maximumprinzip, gewinnt immer.
       hint = `<span class="apf-inherit"><i class="ph ph-arrow-fat-line-up"></i> ${escHtml(t('assets_effective'))}:
         <strong style="color:${protLevelColor(eff[g.key])}">${eff[g.key]}</strong>
-        — ${escHtml(t('assets_inheritedFrom'))} ${escHtml(_assetNames[src] || src)}</span>`
+        — ${escHtml(t('assets_inheritedFrom'))} ${escHtml(_assetNames[from] || from)}</span>`
+    } else if (src[g.key] === 'type') {
+      hint = `<span class="apf-inherit apf-from-type"><i class="ph ph-tag"></i> ${escHtml(t('at_fromType'))}</span>`
     } else if (optional) {
       hint = `<span class="apf-inherit">${escHtml(t('assets_protAuthHint'))}</span>`
     }
@@ -11702,10 +11750,30 @@ function _assetProtFields(item) {
         <span class="apf-label">${escHtml(t(g.i18n))}</span>
         <span class="apf-letter">${g.letter}</span>
       </div>
-      <select id="asProt_${g.key}" class="select"${g.key === 'c' ? ' onchange="_syncAssetConfidentiality(\'level\')"' : ''}>${opts}</select>
+      <select id="asProt_${g.key}" class="select"${lockedByType ? ' disabled' : ''}${g.key === 'c' ? ' onchange="_syncAssetConfidentiality(\'level\')"' : ''}>${opts}</select>
       ${hint}
     </div>`
   }).join('')
+}
+
+/** Schalter, der die Schutzziel-Vorgabe des Typs für dieses Asset aufhebt. */
+function _assetProtOverrideToggle(item) {
+  const typeProt = ASSET_TYPES.find(at => at.id === item?.type)?.protection || null
+  if (!typeProt) return ''      // ohne Typvorgabe gibt es nichts zu übersteuern
+  const on = !!item?.protectionOverride
+  return `<label class="asset-prot-override">
+    <input type="checkbox" id="asProtOverride"${on ? ' checked' : ''} onchange="_toggleAssetProtOverride(this.checked)">
+    <span>${escHtml(t('at_override'))}</span>
+    <small>${escHtml(t('at_overrideHint'))}</small>
+  </label>`
+}
+
+/** Sperrt bzw. entsperrt die vier Stufenfelder ohne Neuladen des Formulars. */
+function _toggleAssetProtOverride(on) {
+  ASSET_PROT_GOALS.forEach(g => {
+    const el = dom(`asProt_${g.key}`)
+    if (el) el.disabled = !on
+  })
 }
 
 /** Checkbox-Liste aller anderen Assets als Abhängigkeits-Auswahl. */
@@ -11894,6 +11962,7 @@ async function openAssetForm(id) {
           <p class="asset-prot-hint">${escHtml(t('assets_inheritHint'))}</p>
           <div class="asset-prot-grid">
             ${_assetProtFields(item)}
+            ${_assetProtOverrideToggle(item)}
           </div>
         </div>
 
@@ -12015,13 +12084,23 @@ async function saveAsset(id) {
     notes:          dom('asNotes')?.value             || '',
     linkedControls: getLinkedValues('as', 'ctrl'),
     linkedPolicies: getLinkedValues('as', 'pol'),
-    protection: {
+    dependsOn: [..._assetFormDeps],
+  }
+
+  // #64 Teil 2: Gesperrte Felder zeigen die Vorgabe des Typs. Würden sie
+  // mitgesendet, schriebe das Speichern den Typwert als Eigenwert fest und der
+  // Bezug zum Typ ginge unbemerkt verloren. Deshalb: nur senden, wenn der
+  // Nutzer die Werte auch bearbeiten durfte.
+  const overrideEl = dom('asProtOverride')
+  payload.protectionOverride = overrideEl ? overrideEl.checked : false
+  const felderGesperrt = !!overrideEl && !overrideEl.checked
+  if (!felderGesperrt) {
+    payload.protection = {
       c:    dom('asProt_c')?.value    || null,
       i:    dom('asProt_i')?.value    || null,
       a:    dom('asProt_a')?.value    || null,
       auth: dom('asProt_auth')?.value || null,
-    },
-    dependsOn: [..._assetFormDeps],
+    }
   }
   if (!payload.name) { alert('Name is required'); return }
   const url    = id ? `/assets/${id}` : '/assets'

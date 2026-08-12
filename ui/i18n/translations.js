@@ -1207,5 +1207,12 @@
     assl_stActive:           { de: 'Aktiv', en: 'Active', fr: 'Actif', nl: 'Actief' },
     assl_stPlanned:          { de: 'Geplant', en: 'Planned', fr: 'Planifié', nl: 'Gepland' },
     assl_stDecommissioned:   { de: 'Ausgemustert', en: 'Decommissioned', fr: 'Mis hors service', nl: 'Buiten gebruik' },
+    // ── Schutzziele je Asset-Typ (#64, Teil 2) ─────────────────────────────
+    at_protHint:      { de: 'Schutzziel-Vorgabe je Typ — Assets dieses Typs übernehmen sie, bis sie übersteuert wird.', en: 'Protection defaults per type — assets of this type inherit them until overridden.', fr: 'Valeurs de protection par type — les actifs de ce type en héritent jusqu\'à substitution.', nl: 'Beschermingsstandaard per type — bedrijfsmiddelen van dit type erven deze tot ze worden overschreven.' },
+    at_noDefault:     { de: '— keine Vorgabe', en: '— no default', fr: '— aucune valeur', nl: '— geen standaard' },
+    at_override:      { de: 'Schutzziele abweichend vom Typ festlegen', en: 'Set protection goals independently of the type', fr: 'Définir les objectifs indépendamment du type', nl: 'Beschermingsdoelen los van het type instellen' },
+    at_fromType:      { de: 'Vom Typ übernommen', en: 'Inherited from type', fr: 'Hérité du type', nl: 'Overgenomen van type' },
+    at_overrideHint:  { de: 'Solange nicht gesetzt, wirkt eine Änderung am Typ sofort auf dieses Asset.', en: 'While unset, a change to the type takes effect on this asset immediately.', fr: 'Tant que non défini, une modification du type s\'applique immédiatement à cet actif.', nl: 'Zolang dit niet is ingesteld, werkt een wijziging aan het type direct door.' },
+    at_raisedBy:      { de: 'Angehoben durch {name}', en: 'Raised by {name}', fr: 'Relevé par {name}', nl: 'Verhoogd door {name}' },
   };
 })();

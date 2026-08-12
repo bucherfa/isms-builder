@@ -8,6 +8,19 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [Unreleased]
+
+### Added
+- **Oberflaeche zu den Schutzzielen je Asset-Typ** — schliesst Teil 2 von [#64](https://github.com/coolstartnow/isms-builder/issues/64). Im Typ-Editor (Administration -> Listen -> Asset-Typen) stehen je Typ vier Stufenfelder fuer C/I/A/Authentizitaet; leer bedeutet „keine Vorgabe". Im Asset-Formular gibt es den Schalter „Schutzziele abweichend vom Typ festlegen".
+- Solange nicht uebersteuert wird, sind die vier Felder am Asset **gesperrt** und zeigen den Wert des Typs. Ohne diese Sperre schriebe ein Speichern den Typwert als Eigenwert fest und der Bezug zum Typ ginge unbemerkt verloren — genau das, was die dauerhafte Vererbung verhindern soll.
+- Das Formular weist die Herkunft je Schutzziel aus: „Vom Typ uebernommen" oder, wenn ein abhaengiges Asset den Wert anhebt, dessen Name. Ohne diese Anzeige wirkt eine Hochstufung nach dem Maximumprinzip wie ein Fehler.
+- Schutzziele am Typ werden im Knex-Backend im vorhandenen `data`-JSON-Feld mitgefuehrt — kein Schema-Change.
+
+### Fixed
+- Die Kuerzel der Schutzziele im Typ-Editor wurden aus dem Label abgeleitet und ergaben auf Deutsch zweimal „V" (Vertraulichkeit und Verfuegbarkeit). Sie kommen jetzt aus `ASSET_PROT_GOALS` (C/I/A/Au).
+
+---
+
 ## [1.37.2] — 2026-08-10
 
 ### Added

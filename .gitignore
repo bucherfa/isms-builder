@@ -17,6 +17,9 @@ current_conversation.md
 resume.sh
 ARBEITSPAKET_NIS2_ART21_ART23.md
 
+# Protokolle
+*usage.txt
+
 # Internal-only scripts — personal infra/workflow, not for public repo
 scripts/setup-server.sh
 scripts/reset-data.sh

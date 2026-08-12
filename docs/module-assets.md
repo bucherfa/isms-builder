@@ -65,6 +65,29 @@ Formular erscheint er als „Unbekannter Typ", damit er beim Bearbeiten nicht ve
 
 Über **Zurücksetzen** kehrt die Liste zur Vorgabe zurück.
 
+### Schutzziele je Typ vorgeben
+
+Jeder Typ kann Vertraulichkeit, Integrität, Verfügbarkeit und Authentizität vorgeben (Stufen 1–4).
+Assets dieses Typs übernehmen die Werte, ohne dass jemand sie einzeln pflegen muss.
+
+Drei Regeln sind dabei wichtig:
+
+- **Die Vorgabe wirkt je Schutzziel einzeln.** Ein Typ „Datenbank" kann nur die Vertraulichkeit
+  auf 4 setzen; Integrität und Verfügbarkeit bleiben dann beim einzelnen Asset.
+- **Der Bezug bleibt bestehen.** Wird die Vorgabe am Typ später korrigiert, gilt der neue Wert
+  sofort für alle Assets, die ihn nicht übersteuert haben — es ist kein einmaliger Startwert.
+- **Abweichen ist möglich:** Im Asset-Formular gibt es den Schalter „Schutzziele abweichend vom
+  Typ festlegen". Solange er aus ist, sind die vier Felder gesperrt und zeigen den Wert des Typs.
+
+**Wichtig zum Zusammenspiel mit Abhängigkeiten:** Über der Typvorgabe liegt weiterhin die
+Vererbung nach dem Maximumprinzip. Hängt ein Asset mit hohem Schutzbedarf von einem anderen ab,
+wird dieses angehoben — auch dann, wenn sein Wert per Übersteuerung bewusst niedriger gesetzt
+wurde. Das ist beabsichtigt: Ein Serversystem, auf dem eine kritische Anwendung läuft, ist nicht
+weniger schützenswert als die Anwendung selbst. Das Formular zeigt in diesem Fall an, welches
+Asset den Wert anhebt.
+
+---
+
 ### Sprachen: was übersetzt wird und was nicht
 
 Dies ist eine bewusste Festlegung, keine Lücke:

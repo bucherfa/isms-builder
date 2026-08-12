@@ -32,6 +32,8 @@ function rowToAsset(row) {
     linkedPolicies: d.linkedPolicies || [],
     // Schutzziele + Abhängigkeiten liegen im data-Blob — kein Schema-Change nötig
     protection: d.protection || null,
+    // #64 Teil 2: bricht die Vererbung vom Asset-Typ
+    protectionOverride: !!d.protectionOverride,
     dependsOn: Array.isArray(d.dependsOn) ? d.dependsOn : [],
     applicableEntities: _json(row.applicable_entities, []),
     createdBy: row.created_by, createdAt: row.created_at,
@@ -48,6 +50,7 @@ function packData(a) {
     tags: a.tags || [], notes: a.notes || '',
     linkedPolicies: a.linkedPolicies || [],
     protection: a.protection || null,
+    protectionOverride: !!a.protectionOverride,
     dependsOn: a.dependsOn || [],
     updatedBy: a.updatedBy || '', deletedBy: a.deletedBy || '',
   })
@@ -159,7 +162,8 @@ module.exports = {
     const a = rowToAsset(row)
     const allowed = ['name','category','type','description','owner','ownerEmail','custodian','entityId',
       'location','classification','criticality','status','vendor','version','serialNumber',
-      'purchaseDate','endOfLifeDate','tags','notes','linkedControls','linkedPolicies']
+      'purchaseDate','endOfLifeDate','tags','notes','linkedControls','linkedPolicies',
+      'protectionOverride']
     for (const k of allowed) {
       if (patch[k] !== undefined) a[k] = patch[k]
     }

@@ -67,6 +67,29 @@ d'une modification.
 
 **Réinitialiser** rétablit les valeurs par défaut.
 
+### Définir les objectifs de protection par type
+
+Chaque type peut définir la confidentialité, l'intégrité, la disponibilité et l'authenticité
+(niveaux 1 à 4). Les actifs de ce type en héritent sans qu'il faille les saisir un par un.
+
+Trois règles importantes :
+
+- **La valeur s'applique objectif par objectif.** Un type « Base de données » peut ne fixer que
+  la confidentialité à 4 ; l'intégrité et la disponibilité restent alors propres à l'actif.
+- **Le lien persiste.** Une correction ultérieure sur le type s'applique immédiatement à tous les
+  actifs qui ne l'ont pas substituée — il ne s'agit pas d'une valeur initiale unique.
+- **La dérogation est possible** via l'interrupteur « Définir les objectifs indépendamment du
+  type ». Tant qu'il est désactivé, les quatre champs sont verrouillés et affichent la valeur du
+  type.
+
+**Interaction avec les dépendances :** l'héritage par le principe du maximum reste prioritaire.
+Si un actif à fort besoin de protection dépend d'un autre, ce dernier est relevé — même lorsque
+sa valeur a été volontairement abaissée. C'est voulu : un serveur hébergeant une application
+critique n'est pas moins digne de protection que l'application elle-même. Le formulaire indique
+alors quel actif relève la valeur.
+
+---
+
 ### Langues : ce qui est traduit et ce qui ne l'est pas
 
 Il s'agit d'un choix délibéré, non d'une lacune :

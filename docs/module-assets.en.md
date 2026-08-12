@@ -65,6 +65,28 @@ under "Unknown type" so that it is not silently lost while editing.
 
 **Reset** restores the shipped defaults.
 
+### Setting protection goals per type
+
+Each type can define confidentiality, integrity, availability and authenticity (levels 1–4).
+Assets of that type inherit those values without anyone having to maintain them individually.
+
+Three rules matter here:
+
+- **The default applies per goal.** A "Database" type can set confidentiality to 4 alone;
+  integrity and availability then remain with the individual asset.
+- **The link persists.** Correcting the default on the type later applies immediately to every
+  asset that has not overridden it — it is not a one-off starting value.
+- **Deviating is possible:** the asset form has a "Set protection goals independently of the
+  type" switch. While it is off, the four fields are locked and show the type's value.
+
+**Important interaction with dependencies:** inheritance by the maximum principle still sits
+above the type default. If an asset with a high protection requirement depends on another, that
+other asset is raised — even where its value was deliberately lowered by an override. This is
+intended: a server running a critical application is no less worth protecting than the
+application itself. The form then shows which asset raises the value.
+
+---
+
 ### Languages: what is translated and what is not
 
 This is a deliberate design decision, not a gap:

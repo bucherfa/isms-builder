@@ -741,6 +741,26 @@ hr { border: none; border-top: 1px solid var(--border); margin: 0; }
 .admin-lists-item-input { font-size: 13px; }
 .admin-lists-item-id    { font-size: 13px; font-family: var(--font-mono, monospace); color: var(--text-subtle); }
 
+/* Schutzziel-Vorgaben je Asset-Typ (#64): vier schmale Stufenfelder in der Zeile */
+.admin-lists-hint     { font-size: 12.5px; color: var(--text-subtle); margin: 4px 0 10px; }
+.admin-prot-goal      { display: flex; align-items: center; gap: 3px; }
+.admin-prot-goal > span {
+  font-size: 11px; color: var(--text-subtle); width: 18px; text-align: right;
+  font-family: var(--font-mono, monospace);
+}
+.admin-lists-item-input { min-width: 150px; }
+.admin-prot-goal select { width: 52px; font-size: 12.5px; padding: 4px 6px; }
+
+/* Übersteuerungsschalter im Asset-Formular (#64 Teil 2) */
+.asset-prot-override {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
+  margin-top: 10px; padding: 10px 12px; border: 1px solid var(--border);
+  border-radius: 6px; background: var(--surface-raised, transparent); cursor: pointer;
+}
+.asset-prot-override small { width: 100%; color: var(--text-subtle); font-size: 12px; }
+.apf-from-type { color: var(--text-subtle); }
+.asset-prot-field select:disabled { opacity: .65; cursor: not-allowed; }
+
 /* ── Admin: Organisationsdaten ── */
 .org-settings-panel { padding: 4px 0 20px; max-width: 800px; }
 .org-section        { margin-bottom: 24px; }
