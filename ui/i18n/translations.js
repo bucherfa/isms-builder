@@ -1881,5 +1881,23 @@
     guidance_uploadFile:       { de: 'Datei hochladen', en: 'Upload File', fr: 'Téléverser un fichier', nl: 'Bestand uploaden' },
     guidance_fileLabel:        { de: 'Datei (PDF, DOCX, DOC · max. 20 MB)', en: 'File (PDF, DOCX, DOC · max. 20 MB)', fr: 'Fichier (PDF, DOCX, DOC · max. 20 Mo)', nl: 'Bestand (PDF, DOCX, DOC · max. 20 MB)' },
     guidance_selectFileHint:   { de: 'Datei auswählen oder hierher ziehen', en: 'Select file or drag here', fr: 'Sélectionner un fichier ou le glisser ici', nl: 'Bestand selecteren of hierheen slepen' },
+
+    // ── Lieferanten-Selbstauskunft: Review ──
+    sup_reviewTitle:           { de: 'Review: {title} — {supplier}', en: 'Review: {title} — {supplier}', fr: 'Révision : {title} — {supplier}', nl: 'Beoordeling: {title} — {supplier}' },
+    sup_questionCol:           { de: 'Frage', en: 'Question', fr: 'Question', nl: 'Vraag' },
+    sup_answerCol:             { de: 'Antwort', en: 'Answer', fr: 'Réponse', nl: 'Antwoord' },
+    sup_reviewNote:            { de: 'Prüfnotiz', en: 'Review Note', fr: 'Note de révision', nl: 'Beoordelingsnotitie' },
+    sup_reviewNotePh:          { de: 'Bewertungskommentar…', en: 'Assessment comment…', fr: 'Commentaire d’évaluation…', nl: 'Beoordelingscommentaar…' },
+    sup_saveReview:            { de: 'Review speichern', en: 'Save Review', fr: 'Enregistrer la révision', nl: 'Beoordeling opslaan' },
+    sup_newAssessmentLinkTitle:{ de: 'Neuer Assessment-Link — {supplier}', en: 'New Assessment Link — {supplier}', fr: 'Nouveau lien d’évaluation — {supplier}', nl: 'Nieuwe beoordelingslink — {supplier}' },
+    sup_language:              { de: 'Sprache', en: 'Language', fr: 'Langue', nl: 'Taal' },
+    sup_dueDateOptional:       { de: 'Fälligkeitsdatum (optional)', en: 'Due Date (optional)', fr: 'Date d’échéance (optionnel)', nl: 'Vervaldatum (optioneel)' },
+    sup_noteToSupplier:        { de: 'Notiz an Lieferant (optional)', en: 'Note to Supplier (optional)', fr: 'Note au fournisseur (optionnel)', nl: 'Notitie aan leverancier (optioneel)' },
+    sup_generateLink:          { de: 'Link generieren', en: 'Generate Link', fr: 'Générer le lien', nl: 'Link genereren' },
+    sup_linkGenerated:         { de: 'Link generiert!', en: 'Link generated!', fr: 'Lien généré !', nl: 'Link gegenereerd!' },
+    sup_assessmentLinkFor:     { de: 'Assessment-Link für {supplier}:', en: 'Assessment link for {supplier}:', fr: 'Lien d’évaluation pour {supplier} :', nl: 'Beoordelingslink voor {supplier}:' },
+    sup_linkHint:              { de: 'Diesen Link an den Lieferanten senden. Kein Login erforderlich. Der Link bleibt aktiv, bis der Fragebogen abgeschickt wurde.', en: 'Send this link to the supplier. No login required. The link stays active until the questionnaire is submitted.', fr: 'Envoyez ce lien au fournisseur. Aucune connexion requise. Le lien reste actif jusqu’à la soumission du questionnaire.', nl: 'Stuur deze link naar de leverancier. Geen login vereist. De link blijft actief totdat de vragenlijst is ingediend.' },
+    sup_backToAssessments:     { de: 'Zurück zu den Assessments', en: 'Back to Assessments', fr: 'Retour aux évaluations', nl: 'Terug naar beoordelingen' },
+    sup_copied:                { de: 'Kopiert!', en: 'Copied!', fr: 'Copié !', nl: 'Gekopieerd!' },
   };
 })();

@@ -14874,7 +14874,7 @@ function _assessmentAnswersTable(a) {
       const ans = (a.answers || []).find(x => x.id === q.id)
       const val = ans?.value || '—'
       const display = q.type === 'yesno'
-        ? (val === 'yes' ? '✓ Ja' : val === 'no' ? '✗ Nein' : '—')
+        ? (val === 'yes' ? `✓ ${t('yes')}` : val === 'no' ? `✗ ${t('no')}` : '—')
         : escHtml(val)
       const color = q.type === 'yesno' ? (val === 'yes' ? 'var(--success-text)' : val === 'no' ? 'var(--danger-text)' : '') : ''
       return `<tr><td style="width:65%">${escHtml(q.text)}</td><td style="font-weight:600;color:${color}">${display}</td></tr>`
@@ -14960,12 +14960,12 @@ async function openCreateAssessment(supplierId) {
     <div class="training-form-page">
       <div class="training-form-header">
         <button class="btn btn-secondary btn-sm" onclick="openSupplierAssessments('${supplierId}')">
-          <i class="ph ph-arrow-left"></i> Back
+          <i class="ph ph-arrow-left"></i> ${t('ui_back')}
         </button>
-        <h3 style="margin:0">New Assessment Link — ${escHtml(supplierName)}</h3>
+        <h3 style="margin:0">${t('sup_newAssessmentLinkTitle', { supplier: escHtml(supplierName) })}</h3>
       </div>
       <div class="form-grid" style="margin-top:20px;max-width:600px">
-        <label class="form-label">Language</label>
+        <label class="form-label">${t('sup_language')}</label>
         <select id="assLanguage" class="form-select" onchange="updateAssTitle(this)">
           <option value="de">🇩🇪 Deutsch</option>
           <option value="en">🇬🇧 English</option>
@@ -14973,20 +14973,20 @@ async function openCreateAssessment(supplierId) {
           <option value="nl">🇳🇱 Nederlands</option>
         </select>
 
-        <label class="form-label">Title</label>
+        <label class="form-label">${t('col_title')}</label>
         <input id="assTitle" class="form-input" value="Lieferanten-Selbstauskunft" />
 
-        <label class="form-label">Due Date (optional)</label>
+        <label class="form-label">${t('sup_dueDateOptional')}</label>
         <input id="assDueDate" type="date" class="form-input" />
 
-        <label class="form-label">Note to Supplier (optional)</label>
+        <label class="form-label">${t('sup_noteToSupplier')}</label>
         <textarea id="assNote" class="form-textarea" rows="2" placeholder="Bitte bis zum Fälligkeitsdatum ausfüllen."></textarea>
 
         <div style="display:flex;gap:10px;margin-top:8px">
           <button class="btn btn-primary" onclick="createAssessment('${supplierId}')">
-            <i class="ph ph-link"></i> Generate Link
+            <i class="ph ph-link"></i> ${t('sup_generateLink')}
           </button>
-          <button class="btn btn-secondary" onclick="openSupplierAssessments('${supplierId}')">Cancel</button>
+          <button class="btn btn-secondary" onclick="openSupplierAssessments('${supplierId}')">${t('ui_cancel')}</button>
         </div>
       </div>
     </div>`
@@ -15024,23 +15024,23 @@ async function createAssessment(supplierId) {
   el.innerHTML = `
     <div class="training-form-page">
       <div class="training-form-header">
-        <h3 style="margin:0"><i class="ph ph-check-circle" style="color:var(--success-text)"></i> Link generated!</h3>
+        <h3 style="margin:0"><i class="ph ph-check-circle" style="color:var(--success-text)"></i> ${t('sup_linkGenerated')}</h3>
       </div>
       <div class="dash-card" style="margin-top:20px;max-width:700px;padding:24px">
-        <p style="margin:0 0 8px;font-weight:600">Assessment link for ${escHtml(a.supplierName)}:</p>
+        <p style="margin:0 0 8px;font-weight:600">${t('sup_assessmentLinkFor', { supplier: escHtml(a.supplierName) })}</p>
         <div style="display:flex;gap:8px;align-items:center">
           <input type="text" class="form-input" id="assessLinkInput" value="${escHtml(link)}" readonly style="font-family:monospace;font-size:13px;flex:1" />
           <button class="btn btn-primary" data-token="${a.token}" onclick="copyAssessmentLink(this)">
-            <i class="ph ph-copy"></i> Copy
+            <i class="ph ph-copy"></i> ${t('sup_copyLink')}
           </button>
         </div>
         <p style="margin:12px 0 0;color:var(--text-subtle);font-size:13px">
-          Send this link to the supplier. No login required. The link stays active until the questionnaire is submitted.
+          ${t('sup_linkHint')}
         </p>
       </div>
       <div style="margin-top:16px;display:flex;gap:10px">
         <button class="btn btn-secondary" onclick="openSupplierAssessments('${supplierId}')">
-          <i class="ph ph-arrow-left"></i> Back to Assessments
+          <i class="ph ph-arrow-left"></i> ${t('sup_backToAssessments')}
         </button>
       </div>
     </div>`
@@ -15051,7 +15051,7 @@ function copyAssessmentLink(btn) {
   const link  = `${location.origin}/supplier-assessment/${token}`
   navigator.clipboard.writeText(link).then(() => {
     const old = btn.innerHTML
-    btn.innerHTML = '<i class="ph ph-check"></i> Copied!'
+    btn.innerHTML = `<i class="ph ph-check"></i> ${t('sup_copied')}`
     setTimeout(() => { btn.innerHTML = old }, 2000)
   }).catch(() => { prompt('Copy link:', link) })
 }
@@ -15068,17 +15068,17 @@ async function openAssessmentDetail(id) {
     <div class="training-form-page">
       <div class="training-form-header">
         <button class="btn btn-secondary btn-sm" onclick="openSupplierAssessments('${a.supplierId}')">
-          <i class="ph ph-arrow-left"></i> Back
+          <i class="ph ph-arrow-left"></i> ${t('ui_back')}
         </button>
         <h3 style="margin:0">${escHtml(a.title)} — ${escHtml(a.supplierName)}</h3>
         ${a.score !== null ? `<span style="font-size:1.4rem;font-weight:700;color:${scoreColor}">${a.score}%</span>` : ''}
       </div>
       ${a.reviewNote ? `<div class="dash-card" style="margin:12px 0;padding:14px 18px;border-left:4px solid var(--color-B300,#0052cc)">
-        <strong>Review Note:</strong> ${escHtml(a.reviewNote)}
+        <strong>${t('sup_reviewNote')}:</strong> ${escHtml(a.reviewNote)}
         ${a.reviewedBy ? `<span style="color:var(--text-subtle);font-size:12px;margin-left:8px">— ${escHtml(a.reviewedBy)}, ${new Date(a.reviewedAt).toLocaleDateString('de-DE')}</span>` : ''}
       </div>` : ''}
       <table class="bcm-table" style="margin-top:12px">
-        <thead><tr><th>Question</th><th>Answer</th></tr></thead>
+        <thead><tr><th>${t('sup_questionCol')}</th><th>${t('sup_answerCol')}</th></tr></thead>
         <tbody>${_assessmentAnswersTable(a)}</tbody>
       </table>
     </div>`
@@ -15096,29 +15096,29 @@ async function openAssessmentReview(id) {
     <div class="training-form-page">
       <div class="training-form-header">
         <button class="btn btn-secondary btn-sm" onclick="openSupplierAssessments('${a.supplierId}')">
-          <i class="ph ph-arrow-left"></i> Back
+          <i class="ph ph-arrow-left"></i> ${t('ui_back')}
         </button>
-        <h3 style="margin:0">Review: ${escHtml(a.title)} — ${escHtml(a.supplierName)}</h3>
-        ${a.score !== null ? `<span style="font-size:1.4rem;font-weight:700;color:${scoreColor}">Score: ${a.score}%</span>` : ''}
+        <h3 style="margin:0">${t('sup_reviewTitle', { title: escHtml(a.title), supplier: escHtml(a.supplierName) })}</h3>
+        ${a.score !== null ? `<span style="font-size:1.4rem;font-weight:700;color:${scoreColor}">${t('ui_score')}: ${a.score}%</span>` : ''}
       </div>
       <table class="bcm-table" style="margin:12px 0 20px">
-        <thead><tr><th>Question</th><th>Answer</th></tr></thead>
+        <thead><tr><th>${t('sup_questionCol')}</th><th>${t('sup_answerCol')}</th></tr></thead>
         <tbody>${_assessmentAnswersTable(a)}</tbody>
       </table>
       <div class="form-grid" style="max-width:600px">
-        <label class="form-label">Review Note</label>
-        <textarea id="assReviewNote" class="form-textarea" rows="3" placeholder="Bewertungskommentar…"></textarea>
-        <label class="form-label">Status</label>
+        <label class="form-label">${t('sup_reviewNote')}</label>
+        <textarea id="assReviewNote" class="form-textarea" rows="3" placeholder="${t('sup_reviewNotePh')}"></textarea>
+        <label class="form-label">${t('col_status')}</label>
         <select id="assReviewStatus" class="form-select">
-          <option value="reviewed">Reviewed</option>
-          <option value="accepted">Accepted</option>
-          <option value="rejected">Rejected</option>
+          <option value="reviewed">${t('sup_statReviewed')}</option>
+          <option value="accepted">${t('sup_statAccepted')}</option>
+          <option value="rejected">${t('sup_statRejected')}</option>
         </select>
         <div style="display:flex;gap:10px;margin-top:8px">
           <button class="btn btn-primary" onclick="submitAssessmentReview('${id}', '${a.supplierId}')">
-            <i class="ph ph-check"></i> Save Review
+            <i class="ph ph-check"></i> ${t('sup_saveReview')}
           </button>
-          <button class="btn btn-secondary" onclick="openSupplierAssessments('${a.supplierId}')">Cancel</button>
+          <button class="btn btn-secondary" onclick="openSupplierAssessments('${a.supplierId}')">${t('ui_cancel')}</button>
         </div>
       </div>
     </div>`
