@@ -5,11 +5,19 @@ node_modules
 .server.pid
 .server.log
 data
-docs
+# docs/ wird ins Image kopiert — die Guidance-Seeds (ARCH_SEED in
+# guidanceStore.js) lesen README.md, CONTRIBUTING.md, CHANGELOG.md,
+# THIRD-PARTY-LICENSES.md und Teile von docs/ zur Laufzeit. Nur die
+# grossen/internen Teile bleiben aussen vor:
+docs/private
+docs/community
+docs/screenshots
+docs/presentation
+docs/badges
+docs/isms-builder-banner.png
 patches
 tools
 session*.md
-README.md
 Dockerfile
 docker-compose*.yml
 *.tar.gz

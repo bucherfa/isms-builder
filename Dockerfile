@@ -29,6 +29,12 @@ COPY --from=deps /app/node_modules ./node_modules
 # Copy application source (kein data/ – wird als Bind-Mount gemountet)
 COPY server ./server
 COPY ui     ./ui
+# docs/ + die vier Root-Markdown-Dateien: werden von den Guidance-Seeds
+# (ARCH_SEED in guidanceStore.js) zur Laufzeit eingelesen. .dockerignore
+# filtert die grossen/internen Teile (docs/private, docs/community, ...)
+# bereits raus — Gesamtgewicht der kopierten docs/ < 1 MB.
+COPY docs ./docs
+COPY README.md CONTRIBUTING.md CHANGELOG.md THIRD-PARTY-LICENSES.md ./
 COPY package.json ./
 COPY docker-entrypoint.sh ./
 
