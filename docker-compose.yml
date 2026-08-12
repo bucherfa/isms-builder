@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   isms:
     build:
@@ -25,3 +23,77 @@ services:
       timeout: 5s
       retries: 3
       start_period: 15s
+
+  # ── Optionale SQL-Backends (siehe #42) ───────────────────────────────────
+  # `docker compose up` startet standardmäßig NUR isms (STORAGE_BACKEND=json,
+  # Daten als JSON-Dateien in ./data) — diese beiden Services bleiben dabei
+  # inaktiv. Wer sqlite/mariadb/postgres testen oder betreiben will:
+  #
+  #   docker compose --env-file .env.docker --profile mariadb  up -d
+  #   docker compose --env-file .env.docker --profile postgres up -d
+  #
+  # --env-file .env.docker ist hier wichtig: Compose liest die ${DB_USER}/
+  # ${DB_PASS}/${DB_NAME}-Platzhalter unten sonst aus einer eigenen, separaten
+  # .env-Datei im Projektverzeichnis (Compose-Konvention) statt aus
+  # .env.docker — mit dem Flag reicht eine einzige Datei für beides: die
+  # DB-Zugangsdaten für den DB-Container hier UND die App-eigene Laufzeit-
+  # konfiguration (env_file: oben bei isms).
+  #
+  # In .env.docker zusätzlich setzen (siehe dortiger Beispielblock):
+  #   STORAGE_BACKEND=mariadb   (bzw. postgres)
+  #   DB_HOST=mariadb           (bzw. postgres — der Servicename hier unten,
+  #                              über das Compose-Standardnetzwerk erreichbar)
+  #   DB_USER / DB_PASS / DB_NAME — DB_PASS MUSS gesetzt werden, kein Default.
+  #
+  # sqlite braucht keinen eigenen Service — es speichert direkt im ohnehin
+  # gemounteten ./data-Verzeichnis (STORAGE_BACKEND=sqlite reicht aus).
+  #
+  # Reihenfolge: isms hat bewusst kein depends_on auf diese Services — ein
+  # unbedingtes depends_on würde den Start OHNE aktives Profil brechen
+  # (Compose verweigert dann den Start, weil die Zieldatenbank nicht existiert).
+  # Startet isms vor der DB, greift bootstrap() (#42) nicht — die DB nimmt noch
+  # keine Verbindungen an — der Container beendet sich sauber mit Fehlermeldung
+  # und `restart: unless-stopped` versucht es erneut, bis die DB bereit ist.
+  # Das ist beabsichtigt, kein Bug: derselbe Mechanismus greift bei einem
+  # Pod-Neustart in Kubernetes.
+
+  mariadb:
+    image: mariadb:11
+    container_name: isms-mariadb
+    profiles: ["mariadb"]
+    restart: unless-stopped
+    environment:
+      - MARIADB_DATABASE=${DB_NAME:-isms_builder}
+      - MARIADB_USER=${DB_USER:-isms}
+      - MARIADB_PASSWORD=${DB_PASS:?DB_PASS muss gesetzt sein, z.B. in .env}
+      - MARIADB_RANDOM_ROOT_PASSWORD=yes
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 20s
+
+  postgres:
+    image: postgres:17-alpine
+    container_name: isms-postgres
+    profiles: ["postgres"]
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=${DB_NAME:-isms_builder}
+      - POSTGRES_USER=${DB_USER:-isms}
+      - POSTGRES_PASSWORD=${DB_PASS:?DB_PASS muss gesetzt sein, z.B. in .env}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-isms} -d ${DB_NAME:-isms_builder}"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 15s
+
+volumes:
+  mariadb_data:
+  postgres_data:
