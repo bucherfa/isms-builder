@@ -43,7 +43,7 @@ Dans le menu **« Policy Acknowledgements »**, cliquer sur **« + Nouvelle dist
 
 **Étape 3 — Envoyer**
 Via **« Envoyer »**, chaque destinataire reçoit un e-mail avec un **lien de confirmation
-personnalisé**. Le lien est associé à la personne et fonctionne sans connexion.
+personnalisé**. Le lien est associé à la personne et fonctionne sans connexion. Le destinataire voit la politique **mise en forme** (Markdown rendu : titres, tableaux, listes), et non plus en texte brut.
 
 **Étape 4 — Confirmation par le destinataire**
 Le destinataire ouvre le lien, voit le texte complet de la politique et clique sur

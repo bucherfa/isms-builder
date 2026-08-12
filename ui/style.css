@@ -2339,3 +2339,24 @@ tr.review-upcoming { background: rgba(234,179,8,.05); }
 .cvss-cve-label { font-size:.75rem; font-weight:600; color:var(--text-subtle); }
 .cvss-cve-chip { font-size:.72rem; background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:1px 7px; color:var(--text-subtle); font-family:monospace; }
 .cvss-detail-source-note { font-size:.72rem; color:var(--text-subtle); margin:0; }
+
+
+/* #61: Leseansicht, Export-Aktionen und gerenderte Richtlinien */
+.list-panel-actions { display: flex; align-items: center; gap: 6px; }
+.input-sm { font-size: 12.5px; padding: 4px 8px; }
+.tmpl-viewer {
+  border: 1px solid var(--border); border-radius: 6px; padding: 20px 22px;
+  min-height: 240px; max-height: 60vh; overflow-y: auto;
+  background: var(--surface, transparent); line-height: 1.65;
+}
+.tmpl-viewer h1 { font-size: 20px; margin: 0 0 12px; }
+.tmpl-viewer h2 { font-size: 16px; margin: 18px 0 8px; }
+.tmpl-viewer h3 { font-size: 14px; margin: 14px 0 6px; }
+.tmpl-viewer ul, .tmpl-viewer ol { padding-left: 22px; }
+.tmpl-viewer table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 13px; }
+.tmpl-viewer th, .tmpl-viewer td { border: 1px solid var(--border); padding: 5px 9px; text-align: left; }
+.tmpl-viewer th { background: var(--surface-raised, rgba(128,128,128,.08)); }
+.tmpl-viewer pre { background: var(--surface-raised, rgba(128,128,128,.08)); padding: 10px; border-radius: 4px; overflow-x: auto; }
+.tmpl-viewer code { background: var(--surface-raised, rgba(128,128,128,.08)); padding: 1px 4px; border-radius: 3px; }
+.tmpl-viewer blockquote { border-left: 3px solid var(--border); margin: 10px 0; padding: 2px 0 2px 12px; color: var(--text-subtle); }
+.tmpl-viewer a { color: var(--accent, #4c9aff); }

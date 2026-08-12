@@ -14,6 +14,7 @@ to the relevant persons and that those persons have **confirmed their understand
 ISMS Builder fully automates this process:
 - Select policy → define recipients → send link by email
 - Recipient confirms via a personalised link (no login required)
+- The recipient sees the policy **properly formatted** (rendered Markdown: headings, tables, lists), no longer as raw source
 - Complete audit trail with timestamp and CSV export
 
 ---

@@ -11,6 +11,17 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- **Leseansicht und PDF-Ausgabe fuer Richtlinien** — schliesst [#61](https://github.com/coolstartnow/isms-builder/issues/61), gemeldet von @jasc76. Wer nicht bearbeiten darf, sah bisher dasselbe Autoren-Eingabefeld wie ein Redakteur — also rohen Markdown-Quelltext in einer 240px-Textarea. Jetzt bekommt jede Rolle unterhalb `editor` das **gerenderte Dokument**; Bearbeiter koennen per Knopf zwischen Bearbeiten und Vorschau umschalten.
+- **PDF je Dokument** und **Sammelexport nach Typ und Status** aus dem Listen-Panel, mit generiertem Dateinamen `Titel_vVERSION_STATUS_JJJJ-MM-TT` — genau die Uebergabe an ein HR-/Verteilsystem, die @jasc76 beschrieben hat. Aufbau wie der bestehende Guidance-Druck: eigenes Fenster, Druckdialog, keine neue Abhaengigkeit. **Kein Word** — das braeuchte eine zusaetzliche Abhaengigkeit; es bleibt bei PDF.
+- `tests/templateReadView.test.js` (20 Tests).
+
+### Fixed
+- **Die Bestaetigungsseite (`/ack/:token`) zeigte die Richtlinie im Rohformat.** Empfaenger bestaetigten also, „## Ueberschrift" und „**fett**" gelesen und verstanden zu haben. Sie wird jetzt als gerendertes Markdown angezeigt — mit der ohnehin vorhandenen Bibliothek im Browser, der Server bleibt ohne zusaetzliche Abhaengigkeit.
+- Markdown-Entschaerfung: nur `<` wird zu `&lt;` (kein eingebettetes HTML), `>` bleibt — sonst brechen Blockzitate. `javascript:`-Verweise werden nachtraeglich entfernt. Gilt fuer Leseansicht, PDF und Bestaetigungsseite gleichermassen; letztere ist ohne Login erreichbar.
+- Die Bestaetigungsseite wird mit `Cache-Control: no-store` ausgeliefert — Inhalt und Bestaetigungsstand koennen sich aendern, eine veraltete Fassung darf nicht im Cache haengenbleiben.
+- Ein neues High-Advisory in `js-yaml` (transitiv ueber jest und puppeteer, GHSA-5p4m-2wfm-xmqj) haette die CI rot gemacht. Behoben mit `npm audit fix`: nur `package-lock.json` aendert sich (3.15.0->3.15.1, 4.3.0->4.3.1), keine Produktivabhaengigkeit betroffen, `npm audit` meldet 0 Vulnerabilities.
+
+### Added
 - **Oberflaeche zu den Schutzzielen je Asset-Typ** — schliesst Teil 2 von [#64](https://github.com/coolstartnow/isms-builder/issues/64). Im Typ-Editor (Administration -> Listen -> Asset-Typen) stehen je Typ vier Stufenfelder fuer C/I/A/Authentizitaet; leer bedeutet „keine Vorgabe". Im Asset-Formular gibt es den Schalter „Schutzziele abweichend vom Typ festlegen".
 - Solange nicht uebersteuert wird, sind die vier Felder am Asset **gesperrt** und zeigen den Wert des Typs. Ohne diese Sperre schriebe ein Speichern den Typwert als Eigenwert fest und der Bezug zum Typ ginge unbemerkt verloren — genau das, was die dauerhafte Vererbung verhindern soll.
 - Das Formular weist die Herkunft je Schutzziel aus: „Vom Typ uebernommen" oder, wenn ein abhaengiges Asset den Wert anhebt, dessen Name. Ohne diese Anzeige wirkt eine Hochstufung nach dem Maximumprinzip wie ein Fehler.

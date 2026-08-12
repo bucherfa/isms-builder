@@ -1214,5 +1214,14 @@
     at_fromType:      { de: 'Vom Typ übernommen', en: 'Inherited from type', fr: 'Hérité du type', nl: 'Overgenomen van type' },
     at_overrideHint:  { de: 'Solange nicht gesetzt, wirkt eine Änderung am Typ sofort auf dieses Asset.', en: 'While unset, a change to the type takes effect on this asset immediately.', fr: 'Tant que non défini, une modification du type s\'applique immédiatement à cet actif.', nl: 'Zolang dit niet is ingesteld, werkt een wijziging aan het type direct door.' },
     at_raisedBy:      { de: 'Angehoben durch {name}', en: 'Raised by {name}', fr: 'Relevé par {name}', nl: 'Verhoogd door {name}' },
+    // ── Leseansicht und PDF-Ausgabe fuer Richtlinien (#61) ─────────────────
+    tmpl_preview:        { de: 'Vorschau', en: 'Preview', fr: 'Aperçu', nl: 'Voorbeeld' },
+    tmpl_edit:           { de: 'Bearbeiten', en: 'Edit', fr: 'Modifier', nl: 'Bewerken' },
+    tmpl_version:        { de: 'Version', en: 'Version', fr: 'Version', nl: 'Versie' },
+    tmpl_noneToPrint:    { de: 'Keine Dokumente zum Drucken vorhanden.', en: 'No documents to print.', fr: 'Aucun document à imprimer.', nl: 'Geen documenten om af te drukken.' },
+    tmpl_exportSet:      { de: 'Auswahl als PDF', en: 'Export selection as PDF', fr: 'Exporter la sélection en PDF', nl: 'Selectie als PDF' },
+    filter_allTypes:     { de: 'Alle Typen', en: 'All types', fr: 'Tous les types', nl: 'Alle typen' },
+    filter_allStatus:    { de: 'Alle Status', en: 'All statuses', fr: 'Tous les statuts', nl: 'Alle statussen' },
+    tmpl_readOnly:       { de: 'Nur Lesezugriff', en: 'Read-only', fr: 'Lecture seule', nl: 'Alleen-lezen' },
   };
 })();

@@ -8,6 +8,8 @@ const storage  = require('../storage')
 
 // ── GET /ack/:token — Bestätigungsseite anzeigen ──────────────────────────────
 router.get('/ack/:token', async (req, res) => {
+  // Nie aus dem Cache: Inhalt und Bestaetigungsstand koennen sich aendern.
+  res.setHeader('Cache-Control', 'no-store')
   const ack  = await ackStore.getAckByToken(req.params.token)
   if (!ack) {
     return res.status(404).send(`<!DOCTYPE html><html lang="de"><head><meta charset="UTF-8">
@@ -74,7 +76,17 @@ router.get('/ack/:token', async (req, res) => {
     .policy-content { background: #f8f9fa; border: 1px solid #dfe1e6; border-radius: 6px;
                       padding: 20px; max-height: 400px; overflow-y: auto;
                       font-size: 14px; line-height: 1.7; margin-bottom: 24px;
-                      white-space: pre-wrap; word-wrap: break-word; }
+                      word-wrap: break-word; }
+    .policy-content h1 { font-size: 19px; margin: 0 0 10px; }
+    .policy-content h2 { font-size: 16px; margin: 18px 0 8px; }
+    .policy-content h3 { font-size: 14.5px; margin: 14px 0 6px; }
+    .policy-content ul, .policy-content ol { padding-left: 22px; }
+    .policy-content table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 13px; }
+    .policy-content th, .policy-content td { border: 1px solid #dfe1e6; padding: 5px 8px; text-align: left; }
+    .policy-content th { background: #eef1f4; }
+    .policy-content pre { background: #eef1f4; padding: 10px; border-radius: 4px; overflow-x: auto; }
+    .policy-content code { background: #eef1f4; padding: 1px 4px; border-radius: 3px; }
+    .policy-content blockquote { border-left: 3px solid #dfe1e6; margin: 10px 0; padding: 2px 0 2px 12px; color: #5e6c84; }
     .confirmed-banner { background: #e3fcef; border: 1px solid #abf5d1; border-radius: 6px;
                         padding: 16px 20px; color: #006644; font-weight: 600; margin-bottom: 16px; }
     .ack-form label { display: block; font-weight: 600; margin-bottom: 6px; }
@@ -102,12 +114,41 @@ router.get('/ack/:token', async (req, res) => {
     ${dueDateHtml}
     ${confirmedHtml}
 
-    <div class="policy-content">${escapeHtml(policyContent) || '<em>Kein Inhalt verfügbar.</em>'}</div>
+    <div class="policy-content" id="policyContent"></div>
 
     ${formHtml}
 
     <div class="footer">ISMS Builder &mdash; automatisch generierter Bestätigungslink</div>
   </div>
+
+  <script src="/ui/vendor/marked.min.js"></script>
+  <script>
+    // #61: Bis hierher stand die Richtlinie als Rohtext auf dieser Seite —
+    // Empfänger bestätigten also "## Überschrift" gelesen zu haben.
+    //
+    // Gerendert wird im Browser mit der ohnehin vorhandenen Bibliothek; der
+    // Server bleibt ohne zusätzliche Abhängigkeit. Spitze Klammern werden
+    // vorher entschärft (kein eingebettetes HTML) und javascript:-Verweise
+    // nachträglich entfernt: Diese Seite ist ohne Login erreichbar, der Inhalt
+    // stammt aus dem Redaktionssystem.
+    (function () {
+      var raw = ${JSON.stringify(policyContent || '')};
+      var box = document.getElementById('policyContent');
+      if (!raw) { box.innerHTML = '<em>Kein Inhalt verfügbar.</em>'; return; }
+      if (typeof marked === 'undefined') {
+        var pre = document.createElement('pre');
+        pre.style.whiteSpace = 'pre-wrap';
+        pre.textContent = raw;
+        box.appendChild(pre);
+        return;
+      }
+      box.innerHTML = marked.parse(raw.replace(/</g, '&lt;'));
+      box.querySelectorAll('a[href]').forEach(function (a) {
+        if (/^\s*javascript:/i.test(a.getAttribute('href') || '')) a.removeAttribute('href');
+        else { a.target = '_blank'; a.rel = 'noopener noreferrer'; }
+      });
+    })();
+  <\/script>
 </body>
 </html>`)
 })

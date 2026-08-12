@@ -14,6 +14,7 @@ Personen **bekannt gemacht** wurden und diese ihr **Verständnis bestätigt** ha
 Das ISMS Builder automatisiert diesen Prozess vollständig:
 - Richtlinie auswählen → Verteiler definieren → Link per E-Mail versenden
 - Empfänger bestätigt über einen personalisierten Link (kein Login erforderlich)
+- Der Empfänger sieht die Richtlinie **lesbar formatiert** (gerendertes Markdown: Überschriften, Tabellen, Listen), nicht mehr im Rohformat
 - Vollständige Nachweisdokumentation mit Zeitstempel und CSV-Export
 
 ---

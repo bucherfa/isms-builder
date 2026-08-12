@@ -14,6 +14,7 @@ betrokken personen **bekend zijn gemaakt** en dat deze hun **begrip hebben beves
 De ISMS Builder automatiseert dit proces volledig:
 - Beleidsregel selecteren → distributielijst definiëren → link per e-mail versturen
 - Ontvanger bevestigt via een gepersonaliseerde link (geen login vereist)
+- De ontvanger ziet het beleid **leesbaar opgemaakt** (weergegeven Markdown: koppen, tabellen, lijsten), niet meer als ruwe brontekst
 - Volledige bewijsdocumentatie met tijdstempel en CSV-export
 
 ---

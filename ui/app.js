@@ -566,7 +566,10 @@ async function init() {
   if (modal) { modal.style.display = 'flex'; modal.style.visibility = 'hidden' }
 }
 
+let _activeTemplateType = null
+
 function selectType(type, init=false) {
+  _activeTemplateType = type
   currentType = type
   document.querySelectorAll('#typeList .sidebar-tree-parent').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.type === type)
@@ -6711,6 +6714,7 @@ function loadTemplate(t) {
   renderTmplEntityBar(t)
   renderAttachmentsBar(t)
   renderBreadcrumb(t)
+  applyTemplateViewMode(t)
   // Kind-Seite + Verschieben nur für contentowner+
   const rank = ROLE_RANK[getCurrentRole()] || 0
   const canMove = rank >= ROLE_RANK.contentowner
@@ -6718,6 +6722,159 @@ function loadTemplate(t) {
   if (btnChild) btnChild.style.display = canMove ? '' : 'none'
   const btnMove = dom('btnMovePage')
   if (btnMove) btnMove.style.display = canMove ? '' : 'none'
+}
+
+// ── #61: Leseansicht statt Eingabefeld ───────────────────────────────────────
+//
+// Bis hierher bekam JEDE Rolle das Autoren-Eingabefeld zu sehen — ein Leser
+// also rohen Markdown-Quelltext in einer 240px hohen Textarea. Wer nicht
+// bearbeiten darf, sieht jetzt das gerenderte Dokument; Bearbeiter koennen
+// zwischen beidem umschalten.
+let _tmplPreviewOn = false
+
+function templateCanEdit() {
+  return (ROLE_RANK[getCurrentRole()] || 0) >= ROLE_RANK.editor
+}
+
+/** Rendert Markdown sicher: kein Roh-HTML, keine javascript:-Verweise. */
+function renderMarkdownSafe(md) {
+  const text = String(md || '')
+  if (typeof marked === 'undefined') return `<pre>${escHtml(text)}</pre>`
+  // Eingebettetes HTML entschaerfen, ohne Markdown zu zerstoeren: Nur '<'
+  // neutralisieren (damit kein Tag entsteht) — '>' bleibt, sonst brechen
+  // Blockzitate. Der Inhalt stammt aus dem eigenen Haus, wandert aber auch auf
+  // die login-freie Bestaetigungsseite, deshalb ueberhaupt diese Vorsicht.
+  const html = marked.parse(text.replace(/</g, '&lt;'))
+  const box = document.createElement('div')
+  box.innerHTML = html
+  box.querySelectorAll('a[href]').forEach(a => {
+    if (/^\s*javascript:/i.test(a.getAttribute('href') || '')) a.removeAttribute('href')
+    else { a.target = '_blank'; a.rel = 'noopener noreferrer' }
+  })
+  return box.innerHTML
+}
+
+/** Zeigt Editor oder Leseansicht, je nach Recht und Umschalter. */
+function applyTemplateViewMode(tmpl) {
+  const editor = dom('contentEditor')
+  const viewer = dom('contentViewer')
+  const save   = dom('btnSave')
+  const prev   = dom('btnPreview')
+  const label  = dom('btnPreviewLabel')
+  if (!editor || !viewer) return
+
+  const canEdit = templateCanEdit()
+  const showViewer = !canEdit || _tmplPreviewOn
+
+  if (showViewer) viewer.innerHTML = renderMarkdownSafe(tmpl ? tmpl.content : editor.value)
+  viewer.style.display = showViewer ? '' : 'none'
+  editor.style.display = showViewer ? 'none' : ''
+
+  // Ohne Schreibrecht gibt es nichts zu speichern und nichts umzuschalten.
+  if (save) save.style.display = canEdit ? '' : 'none'
+  if (prev) prev.style.display = canEdit ? '' : 'none'
+  if (label) label.textContent = _tmplPreviewOn ? t('tmpl_edit') : t('tmpl_preview')
+  document.querySelectorAll('#inputTitle, #inputNextReview').forEach(el => { el.readOnly = !canEdit })
+}
+
+// ── #61: PDF-Ausgabe fuer Richtlinien ────────────────────────────────────────
+//
+// Bisher gab es PDF fuer Reports, Findings und Guidance — ausgerechnet fuer die
+// Richtlinien selbst nicht. Aufbau wie _printGuidanceDocs: eigenes Fenster,
+// Druckdialog, keine Abhaengigkeit.
+
+/** Dateiname nach Muster: Titel_vVERSION_STATUS_JJJJ-MM-TT */
+function templateFileName(tmpl) {
+  const clean = String(tmpl.title || 'document')
+    .replace(/[^\p{L}\p{N}]+/gu, '_')
+    .replace(/^_+|_+$/g, '')
+    .slice(0, 60) || 'document'
+  const version = tmpl.version ? `_v${tmpl.version}` : ''
+  const status  = tmpl.status ? `_${tmpl.status}` : ''
+  return `${clean}${version}${status}_${new Date().toISOString().slice(0, 10)}`
+}
+
+function printCurrentTemplate() {
+  if (!currentTemplate) return
+  _printTemplates([currentTemplate], templateFileName(currentTemplate))
+}
+
+/**
+ * Druckfenster fuer eine oder mehrere Richtlinien.
+ * `name` wird als Fenster- und Dokumenttitel gesetzt — die meisten Browser
+ * uebernehmen ihn als Vorschlag fuer den Dateinamen beim "Als PDF speichern".
+ */
+function _printTemplates(docs, name) {
+  if (!docs || !docs.length) return alert(t('tmpl_noneToPrint'))
+
+  const body = docs.map(d => `
+    <section class="doc-section">
+      <h1 class="doc-title">${escHtml(d.title || '')}</h1>
+      <div class="doc-meta">
+        ${escHtml(t('col_type'))}: ${escHtml(d.type || '—')} ·
+        ${escHtml(t('col_status'))}: ${escHtml(d.status || '—')}
+        ${d.version ? ` · ${escHtml(t('tmpl_version'))}: ${escHtml(String(d.version))}` : ''}
+        ${d.owner ? ` · ${escHtml(t('col_owner'))}: ${escHtml(d.owner)}` : ''}
+        ${d.nextReviewDate ? ` · ${escHtml(t('tmpl_nextReview'))} ${escHtml(String(d.nextReviewDate).slice(0, 10))}` : ''}
+      </div>
+      <div class="doc-body">${renderMarkdownSafe(d.content)}</div>
+    </section>`).join('<div class="page-break"></div>')
+
+  const win = window.open('', '_blank')
+  if (!win) return alert(t('err_popupBlocked'))
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+    <title>${escHtml(name || 'documents')}</title>
+    <style>
+      body { font-family: Arial, sans-serif; font-size: 12px; color: #111; margin: 24px; max-width: 900px; }
+      h1.doc-title { font-size: 18px; border-bottom: 2px solid #333; padding-bottom: 6px; margin: 0 0 4px; }
+      .doc-meta { font-size: 10.5px; color: #666; margin-bottom: 14px; }
+      h1,h2,h3 { margin-top: 1.2em; } h2 { font-size: 15px; } h3 { font-size: 13px; }
+      table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 11px; }
+      th, td { border: 1px solid #ccc; padding: 4px 8px; text-align: left; }
+      th { background: #f0f0f0; font-weight: bold; }
+      pre, code { background: #f5f5f5; padding: 2px 4px; font-size: 11px; border-radius: 3px; }
+      pre { padding: 8px; white-space: pre-wrap; word-break: break-all; }
+      .page-break { page-break-after: always; }
+      .doc-section { margin-bottom: 24px; }
+      .print-foot { font-size: 10px; color: #999; margin-top: 20px; }
+      @media print { body { margin: 0; } .print-foot { position: fixed; bottom: 0; } }
+    </style></head><body>
+    ${body}
+    <div class="print-foot">ISMS Builder · ${escHtml(name || '')} · ${new Date().toLocaleDateString()}</div>
+    <script>window.onload = () => { window.print() }<\/script>
+  </body></html>`)
+  win.document.close()
+}
+
+/** Vom Export-Knopf im Listen-Panel: aktiver Typ + gewaehlter Status. */
+function exportTemplateSet() {
+  const status = dom('tmplExportStatus')?.value || ''
+  printTemplateSet(_activeTemplateType, status)
+}
+
+/** Sammelausgabe: alle Dokumente eines Typs, gefiltert nach Status. */
+async function printTemplateSet(type, status) {
+  const res = await fetch('/templates', { headers: apiHeaders('reader') })
+  if (!res.ok) return alert(t('err_load'))
+  const all = await res.json()
+  let docs = all.filter(d => !type || d.type === type)
+  if (status) docs = docs.filter(d => d.status === status)
+  if (!docs.length) return alert(t('tmpl_noneToPrint'))
+
+  // Volltext nachladen: die Uebersicht liefert nicht immer den Inhalt mit.
+  const full = []
+  for (const d of docs) {
+    const r = await fetch(`/template/${encodeURIComponent(d.type)}/${encodeURIComponent(d.id)}`,
+      { headers: apiHeaders('reader') })
+    full.push(r.ok ? await r.json() : d)
+  }
+  const label = [type || t('filter_allTypes'), status || t('filter_allStatus')].join('_')
+  _printTemplates(full, `ISMS_${label}_${new Date().toISOString().slice(0, 10)}`)
+}
+
+function toggleTemplatePreview() {
+  _tmplPreviewOn = !_tmplPreviewOn
+  applyTemplateViewMode(currentTemplate)
 }
 
 async function renderBreadcrumb(t) {
