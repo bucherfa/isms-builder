@@ -13815,9 +13815,9 @@ async function renderBcmBia(el) {
     return `
       <table class="bcm-table">
         <thead><tr>
-          <th>Process</th><th>Responsible</th><th>Department</th>
-          <th>Criticality</th><th>RTO (h)</th><th>RPO (h)</th>
-          <th>Status</th><th>Actions</th>
+          <th>${t('bcm_process')}</th><th>${t('bcm_responsible')}</th><th>${t('bcm_department')}</th>
+          <th>${t('assets_criticality')}</th><th>${t('bcm_rtoShort')}</th><th>${t('bcm_rpoShort')}</th>
+          <th>${t('col_status')}</th><th>${t('ui_actions')}</th>
         </tr></thead>
         <tbody>
           ${rows.length ? rows.map(b => `
@@ -13841,7 +13841,7 @@ async function renderBcmBia(el) {
 
   el.innerHTML = `
     <div class="bcm-filter-bar">
-      ${canEdit ? `<button class="btn btn-primary btn-sm" onclick="openBiaForm()"><i class="ph ph-plus"></i> New BIA</button>` : ''}
+      ${canEdit ? `<button class="btn btn-primary btn-sm" onclick="openBiaForm()"><i class="ph ph-plus"></i> ${t('bcm_newBia')}</button>` : ''}
       <select id="bcmBiaCrit" class="select" style="max-width:150px">
         <option value="">${t('assets_allCrit')}</option>
         ${Object.entries(BCM_CRIT_LABELS).map(([v,l])=>`<option value="${v}">${l}</option>`).join('')}
@@ -13883,38 +13883,38 @@ async function openBiaForm(id = null) {
     <div class="training-form-page">
       <div class="training-form-header">
         <button class="btn btn-secondary btn-sm" onclick="switchBcmTab('bia')">
-          <i class="ph ph-arrow-left"></i> Back to BIA Register
+          <i class="ph ph-arrow-left"></i> ${t('ui_backToBiaRegister')}
         </button>
         <h3 class="training-form-title">
           <i class="ph ph-clipboard-text"></i>
-          ${isEdit ? 'Edit BIA' : 'New BIA'}
+          ${isEdit ? t('bcm_editBia') : t('bcm_newBia')}
         </h3>
       </div>
       <div class="training-form-body">
         <div class="training-form-section">
           <div class="form-group">
-            <label class="form-label">Process / System <span class="form-required">*</span></label>
-            <input id="biaTitle" class="form-input" value="${escHtml(item?.title||'')}" placeholder="Business process or system name">
+            <label class="form-label">${t('bcm_processSystem')} <span class="form-required">*</span></label>
+            <input id="biaTitle" class="form-input" value="${escHtml(item?.title||'')}" placeholder="${t('bcm_processSystemPh')}">
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Process Owner</label>
-              <input id="biaOwner" class="form-input" value="${escHtml(item?.processOwner||'')}" placeholder="Name (role)">
+              <label class="form-label">${t('bcm_processOwner')}</label>
+              <input id="biaOwner" class="form-input" value="${escHtml(item?.processOwner||'')}" placeholder="${t('ui_nameRolePh')}">
             </div>
             <div class="form-group">
-              <label class="form-label">Department</label>
-              <input id="biaDept" class="form-input" value="${escHtml(item?.department||'')}" placeholder="e.g. IT, Production, HR">
+              <label class="form-label">${t('bcm_department')}</label>
+              <input id="biaDept" class="form-input" value="${escHtml(item?.department||'')}" placeholder="${t('bcm_deptPh')}">
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Criticality</label>
+              <label class="form-label">${t('assets_criticality')}</label>
               <select id="biaCrit" class="select">
                 ${Object.entries(BCM_CRIT_LABELS).map(([v,l])=>`<option value="${v}"${item?.criticality===v?' selected':''}>${l}</option>`).join('')}
               </select>
             </div>
             <div class="form-group">
-              <label class="form-label">Status</label>
+              <label class="form-label">${t('col_status')}</label>
               <select id="biaStatus" class="select">
                 ${Object.entries(BCM_STATUS_LABELS).map(([v,l])=>`<option value="${v}"${item?.status===v?' selected':''}>${l}</option>`).join('')}
               </select>
@@ -13922,61 +13922,61 @@ async function openBiaForm(id = null) {
           </div>
         </div>
         <div class="training-form-section">
-          <h4 class="training-form-section-title"><i class="ph ph-timer"></i> Recovery Objectives</h4>
+          <h4 class="training-form-section-title"><i class="ph ph-timer"></i> ${t('bcm_recoveryObjectives')}</h4>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">RTO – Recovery Time Objective (hours)</label>
-              <input id="biaRto" type="number" min="0" class="form-input" value="${item?.rto??''}" placeholder="e.g. 4">
+              <label class="form-label">${t('bcm_rtoFull')}</label>
+              <input id="biaRto" type="number" min="0" class="form-input" value="${item?.rto??''}" placeholder="${t('bcm_rtoPh')}">
             </div>
             <div class="form-group">
-              <label class="form-label">RPO – Recovery Point Objective (hours)</label>
-              <input id="biaRpo" type="number" min="0" class="form-input" value="${item?.rpo??''}" placeholder="e.g. 1">
+              <label class="form-label">${t('bcm_rpoFull')}</label>
+              <input id="biaRpo" type="number" min="0" class="form-input" value="${item?.rpo??''}" placeholder="${t('bcm_rpoPh')}">
             </div>
             <div class="form-group">
-              <label class="form-label">MTPD – Max. Tolerable Period of Disruption (hours)</label>
-              <input id="biaMtpd" type="number" min="0" class="form-input" value="${item?.mtpd??''}" placeholder="e.g. 8">
+              <label class="form-label">${t('bcm_mtpdFull')}</label>
+              <input id="biaMtpd" type="number" min="0" class="form-input" value="${item?.mtpd??''}" placeholder="${t('bcm_mtpdPh')}">
             </div>
           </div>
         </div>
         <div class="training-form-section">
-          <h4 class="training-form-section-title"><i class="ph ph-link"></i> Dependencies &amp; Systems</h4>
+          <h4 class="training-form-section-title"><i class="ph ph-link"></i> ${t('bcm_depsSystemsTitle')}</h4>
           <div class="form-group">
-            <label class="form-label">Dependencies (comma-separated)</label>
-            <textarea id="biaDeps" class="form-input" rows="2" placeholder="e.g. Network, Power, SAP">${escHtml((item?.dependencies||[]).join(', '))}</textarea>
+            <label class="form-label">${t('bcm_depsCsv')}</label>
+            <textarea id="biaDeps" class="form-input" rows="2" placeholder="${t('bcm_depsPh')}">${escHtml((item?.dependencies||[]).join(', '))}</textarea>
           </div>
           <div class="form-group">
-            <label class="form-label">Affected Systems (comma-separated)</label>
-            <textarea id="biaSystems" class="form-input" rows="2" placeholder="e.g. SAP S/4HANA, Oracle DB">${escHtml((item?.affectedSystems||[]).join(', '))}</textarea>
+            <label class="form-label">${t('bcm_affectedSystemsCsv')}</label>
+            <textarea id="biaSystems" class="form-input" rows="2" placeholder="${t('bcm_sysPh')}">${escHtml((item?.affectedSystems||[]).join(', '))}</textarea>
           </div>
         </div>
         <div class="training-form-section">
-          <h4 class="training-form-section-title"><i class="ph ph-calendar"></i> Review</h4>
+          <h4 class="training-form-section-title"><i class="ph ph-calendar"></i> ${t('ui_review')}</h4>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Last Review</label>
+              <label class="form-label">${t('ui_lastReview')}</label>
               <input id="biaReview" type="date" class="form-input" value="${item?.lastReviewDate||''}" style="color-scheme:dark">
             </div>
             <div class="form-group">
-              <label class="form-label">Entity</label>
+              <label class="form-label">${t('ui_entity')}</label>
               <select id="biaEntity" class="select">
-                <option value="">— No entity —</option>
+                <option value="">${t('ui_noEntity')}</option>
                 ${entities.map(e=>`<option value="${e.id}"${item?.entityId===e.id?' selected':''}>${escHtml(e.name)}</option>`).join('')}
               </select>
             </div>
           </div>
           <div class="form-group">
-            <label class="form-label">Notes / Remarks</label>
-            <textarea id="biaNotes" class="form-input" rows="3" placeholder="Additional notes on the BIA">${escHtml(item?.notes||'')}</textarea>
+            <label class="form-label">${t('bcm_notesRemarks')}</label>
+            <textarea id="biaNotes" class="form-input" rows="3" placeholder="${t('bcm_biaNotesPh')}">${escHtml(item?.notes||'')}</textarea>
           </div>
           ${renderLinksBlock('bia', item?.linkedControls||[], item?.linkedPolicies||[])}
         </div>
       </div>
-      ${id ? `<div style="padding:0 24px 16px"><div class="gov-section-title">Documents &amp; Attachments</div>
+      ${id ? `<div style="padding:0 24px 16px"><div class="gov-section-title">${t('ui_docsAttachments')}</div>
         <div id="bcmBiaAttachPanel"></div></div>` : ''}
       <div class="training-form-footer">
-        <button class="btn btn-secondary" onclick="switchBcmTab('bia')">Cancel</button>
+        <button class="btn btn-secondary" onclick="switchBcmTab('bia')">${t('ui_cancel')}</button>
         <button class="btn btn-primary" onclick="saveBia('${id||''}')">
-          <i class="ph ph-floppy-disk"></i> Save
+          <i class="ph ph-floppy-disk"></i> ${t('ui_save')}
         </button>
       </div>
     </div>
@@ -14048,9 +14048,9 @@ async function renderBcmPlans(el) {
     return `
       <table class="bcm-table">
         <thead><tr>
-          <th>Title</th><th>Type</th><th>Responsible</th>
-          <th>Status</th><th>Last Test</th>
-          <th>Next Test</th><th>Test Result</th><th>Actions</th>
+          <th>${t('col_title')}</th><th>${t('col_type')}</th><th>${t('bcm_responsible')}</th>
+          <th>${t('col_status')}</th><th>${t('bcm_lastTest')}</th>
+          <th>${t('bcm_nextTest')}</th><th>${t('bcm_testResult')}</th><th>${t('ui_actions')}</th>
         </tr></thead>
         <tbody>
           ${rows.length ? rows.map(p => {
@@ -14061,14 +14061,14 @@ async function renderBcmPlans(el) {
               <td>${escHtml(p.planOwner)}</td>
               <td>${bcmStatusBadge(p.status)}</td>
               <td>${p.lastTested||'—'}</td>
-              <td class="${overdue?'bcm-overdue':''}">${p.nextTest||'—'}${overdue?' <i class="ph ph-warning-circle" title="Overdue!"></i>':''}</td>
+              <td class="${overdue?'bcm-overdue':''}">${p.nextTest||'—'}${overdue?` <i class="ph ph-warning-circle" title="${escHtml(t('bcm_overdue'))}"></i>`:''}</td>
               <td>${bcmResultBadge(p.testResult)}</td>
               <td style="white-space:nowrap">
                 ${canEdit ? `<button class="btn btn-secondary btn-xs" onclick="openPlanForm('${p.id}')"><i class="ph ph-pencil"></i></button>` : ''}
                 ${isAdmin ? `<button class="btn btn-danger btn-xs" onclick="deletePlan('${p.id}')"><i class="ph ph-trash"></i></button>` : ''}
               </td>
             </tr>`
-          }).join('') : `<tr><td colspan="8" class="dash-empty">No plans found</td></tr>`}
+          }).join('') : `<tr><td colspan="8" class="dash-empty">${t('bcm_noPlansFound')}</td></tr>`}
         </tbody>
       </table>
     `
@@ -14076,9 +14076,9 @@ async function renderBcmPlans(el) {
 
   el.innerHTML = `
     <div class="bcm-filter-bar">
-      ${canEdit ? `<button class="btn btn-primary btn-sm" onclick="openPlanForm()"><i class="ph ph-plus"></i> New Plan</button>` : ''}
+      ${canEdit ? `<button class="btn btn-primary btn-sm" onclick="openPlanForm()"><i class="ph ph-plus"></i> ${t('bcm_newPlan')}</button>` : ''}
       <select id="bcmPlanType" class="select" style="max-width:180px">
-        <option value="">All Types</option>
+        <option value="">${t('ui_allTypes')}</option>
         ${Object.entries(BCM_PLAN_TYPE_LABELS).map(([v,l])=>`<option value="${v}">${l}</option>`).join('')}
       </select>
       <select id="bcmPlanStatus" class="select" style="max-width:160px">
@@ -14118,61 +14118,61 @@ async function openPlanForm(id = null) {
     <div class="training-form-page">
       <div class="training-form-header">
         <button class="btn btn-secondary btn-sm" onclick="switchBcmTab('plans')">
-          <i class="ph ph-arrow-left"></i> Back to Plans
+          <i class="ph ph-arrow-left"></i> ${t('ui_backToPlans')}
         </button>
         <h3 class="training-form-title">
           <i class="ph ph-file-doc"></i>
-          ${isEdit ? 'Edit Plan' : 'New Plan'}
+          ${isEdit ? t('bcm_editPlan') : t('bcm_newPlan')}
         </h3>
       </div>
       <div class="training-form-body">
         <div class="training-form-section">
           <div class="form-group">
-            <label class="form-label">Title <span class="form-required">*</span></label>
-            <input id="planTitle" class="form-input" value="${escHtml(item?.title||'')}" placeholder="Continuity plan title">
+            <label class="form-label">${t('col_title')} <span class="form-required">*</span></label>
+            <input id="planTitle" class="form-input" value="${escHtml(item?.title||'')}" placeholder="${t('bcm_planTitlePh')}">
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Type</label>
+              <label class="form-label">${t('col_type')}</label>
               <select id="planType" class="select">
                 ${Object.entries(BCM_PLAN_TYPE_LABELS).map(([v,l])=>`<option value="${v}"${item?.type===v?' selected':''}>${l}</option>`).join('')}
               </select>
             </div>
             <div class="form-group">
-              <label class="form-label">Status</label>
+              <label class="form-label">${t('col_status')}</label>
               <select id="planStatus" class="select">
                 ${Object.entries(BCM_STATUS_LABELS).map(([v,l])=>`<option value="${v}"${item?.status===v?' selected':''}>${l}</option>`).join('')}
               </select>
             </div>
             <div class="form-group">
-              <label class="form-label">Version</label>
-              <input id="planVersion" class="form-input" value="${escHtml(item?.version||'1.0')}" placeholder="e.g. 1.0">
+              <label class="form-label">${t('ui_version')}</label>
+              <input id="planVersion" class="form-input" value="${escHtml(item?.version||'1.0')}" placeholder="${t('bcm_versionPh')}">
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Scope</label>
-              <input id="planScope" class="form-input" value="${escHtml(item?.scope||'')}" placeholder="Affected systems / processes">
+              <label class="form-label">${t('bcm_scope')}</label>
+              <input id="planScope" class="form-input" value="${escHtml(item?.scope||'')}" placeholder="${t('bcm_scopePh')}">
             </div>
             <div class="form-group">
-              <label class="form-label">Plan Owner</label>
-              <input id="planOwner" class="form-input" value="${escHtml(item?.planOwner||'')}" placeholder="Name (role)">
+              <label class="form-label">${t('bcm_planOwner')}</label>
+              <input id="planOwner" class="form-input" value="${escHtml(item?.planOwner||'')}" placeholder="${t('ui_nameRolePh')}">
             </div>
           </div>
         </div>
         <div class="training-form-section">
-          <h4 class="training-form-section-title"><i class="ph ph-calendar-check"></i> Tests</h4>
+          <h4 class="training-form-section-title"><i class="ph ph-calendar-check"></i> ${t('bcm_tests')}</h4>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Last Test</label>
+              <label class="form-label">${t('bcm_lastTest')}</label>
               <input id="planLastTested" type="date" class="form-input" value="${item?.lastTested||''}" style="color-scheme:dark">
             </div>
             <div class="form-group">
-              <label class="form-label">Next Test</label>
+              <label class="form-label">${t('bcm_nextTest')}</label>
               <input id="planNextTest" type="date" class="form-input" value="${item?.nextTest||''}" style="color-scheme:dark">
             </div>
             <div class="form-group">
-              <label class="form-label">Test Result</label>
+              <label class="form-label">${t('bcm_testResult')}</label>
               <select id="planTestResult" class="select">
                 ${Object.entries(BCM_RESULT_LABELS).map(([v,l])=>`<option value="${v}"${item?.testResult===v?' selected':''}>${l}</option>`).join('')}
               </select>
@@ -14180,29 +14180,29 @@ async function openPlanForm(id = null) {
           </div>
         </div>
         <div class="training-form-section">
-          <h4 class="training-form-section-title"><i class="ph ph-link"></i> Linked BIAs</h4>
+          <h4 class="training-form-section-title"><i class="ph ph-link"></i> ${t('bcm_linkedBias')}</h4>
           <div class="form-group">
-            <label class="form-label">BIAs (multi-select with Ctrl/Cmd)</label>
+            <label class="form-label">${t('bcm_biasMultiSelect')}</label>
             <select id="planBias" class="select" multiple style="height:120px">
               ${biaList.map(b=>`<option value="${b.id}"${(item?.linkedBiaIds||[]).includes(b.id)?' selected':''}>${escHtml(b.title)} (${BCM_CRIT_LABELS[b.criticality]||b.criticality})</option>`).join('')}
             </select>
           </div>
         </div>
         <div class="training-form-section">
-          <h4 class="training-form-section-title"><i class="ph ph-list-checks"></i> Actions &amp; Procedures</h4>
+          <h4 class="training-form-section-title"><i class="ph ph-list-checks"></i> ${t('bcm_actionsProcedures')}</h4>
           <div class="form-group">
-            <label class="form-label">Emergency Procedures</label>
-            <textarea id="planProcs" class="form-input" rows="6" placeholder="Step-by-step instructions…">${escHtml(item?.procedures||'')}</textarea>
+            <label class="form-label">${t('bcm_emergencyProcs')}</label>
+            <textarea id="planProcs" class="form-input" rows="6" placeholder="${t('bcm_procsPh')}">${escHtml(item?.procedures||'')}</textarea>
           </div>
           ${renderLinksBlock('plan', item?.linkedControls||[], item?.linkedPolicies||[])}
         </div>
       </div>
-      ${id ? `<div style="padding:0 24px 16px"><div class="gov-section-title">Documents &amp; Attachments</div>
+      ${id ? `<div style="padding:0 24px 16px"><div class="gov-section-title">${t('ui_docsAttachments')}</div>
         <div id="bcmPlanAttachPanel"></div></div>` : ''}
       <div class="training-form-footer">
-        <button class="btn btn-secondary" onclick="switchBcmTab('plans')">Cancel</button>
+        <button class="btn btn-secondary" onclick="switchBcmTab('plans')">${t('ui_cancel')}</button>
         <button class="btn btn-primary" onclick="savePlan('${id||''}')">
-          <i class="ph ph-floppy-disk"></i> Save
+          <i class="ph ph-floppy-disk"></i> ${t('ui_save')}
         </button>
       </div>
     </div>
@@ -14264,12 +14264,12 @@ async function renderBcmExercises(el) {
 
   el.innerHTML = `
     <div class="bcm-filter-bar">
-      ${canEdit ? `<button class="btn btn-primary btn-sm" onclick="openExerciseForm()"><i class="ph ph-plus"></i> New Exercise</button>` : ''}
+      ${canEdit ? `<button class="btn btn-primary btn-sm" onclick="openExerciseForm()"><i class="ph ph-plus"></i> ${t('bcm_newExercise')}</button>` : ''}
     </div>
     <table class="bcm-table">
       <thead><tr>
-        <th>Title</th><th>Type</th><th>Date</th><th>Conductor</th>
-        <th>Result</th><th>Linked Plan</th><th>Actions</th>
+        <th>${t('col_title')}</th><th>${t('col_type')}</th><th>${t('ui_date')}</th><th>${t('bcm_conductor')}</th>
+        <th>${t('bcm_result')}</th><th>${t('bcm_linkedPlan')}</th><th>${t('ui_actions')}</th>
       </tr></thead>
       <tbody>
         ${list.length ? list.map(e => `
@@ -14284,7 +14284,7 @@ async function renderBcmExercises(el) {
               ${canEdit ? `<button class="btn btn-secondary btn-xs" onclick="openExerciseForm('${e.id}')"><i class="ph ph-pencil"></i></button>` : ''}
               ${isAdmin ? `<button class="btn btn-danger btn-xs" onclick="deleteExercise('${e.id}')"><i class="ph ph-trash"></i></button>` : ''}
             </td>
-          </tr>`).join('') : `<tr><td colspan="7" class="dash-empty">No exercises found</td></tr>`}
+          </tr>`).join('') : `<tr><td colspan="7" class="dash-empty">${t('bcm_noExercisesFound')}</td></tr>`}
       </tbody>
     </table>
   `
@@ -14309,32 +14309,32 @@ async function openExerciseForm(id = null) {
     <div class="training-form-page">
       <div class="training-form-header">
         <button class="btn btn-secondary btn-sm" onclick="switchBcmTab('exercises')">
-          <i class="ph ph-arrow-left"></i> Back to Exercises
+          <i class="ph ph-arrow-left"></i> ${t('ui_backToExercises')}
         </button>
         <h3 class="training-form-title">
           <i class="ph ph-flag-checkered"></i>
-          ${isEdit ? 'Edit Exercise' : 'New Exercise'}
+          ${isEdit ? t('bcm_editExercise') : t('bcm_newExercise')}
         </h3>
       </div>
       <div class="training-form-body">
         <div class="training-form-section">
           <div class="form-group">
-            <label class="form-label">Title <span class="form-required">*</span></label>
-            <input id="exTitle" class="form-input" value="${escHtml(item?.title||'')}" placeholder="Exercise title">
+            <label class="form-label">${t('col_title')} <span class="form-required">*</span></label>
+            <input id="exTitle" class="form-input" value="${escHtml(item?.title||'')}" placeholder="${t('bcm_exerciseTitlePh')}">
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Exercise Type</label>
+              <label class="form-label">${t('bcm_exerciseType')}</label>
               <select id="exType" class="select">
                 ${Object.entries(BCM_EXERCISE_TYPE_LABELS).map(([v,l])=>`<option value="${v}"${item?.type===v?' selected':''}>${l}</option>`).join('')}
               </select>
             </div>
             <div class="form-group">
-              <label class="form-label">Date</label>
+              <label class="form-label">${t('ui_date')}</label>
               <input id="exDate" type="date" class="form-input" value="${item?.date||''}" style="color-scheme:dark">
             </div>
             <div class="form-group">
-              <label class="form-label">Result</label>
+              <label class="form-label">${t('bcm_result')}</label>
               <select id="exResult" class="select">
                 ${Object.entries(BCM_RESULT_LABELS).map(([v,l])=>`<option value="${v}"${item?.result===v?' selected':''}>${l}</option>`).join('')}
               </select>
@@ -14342,45 +14342,45 @@ async function openExerciseForm(id = null) {
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Conductor</label>
-              <input id="exConductor" class="form-input" value="${escHtml(item?.conductor||'')}" placeholder="Name (Role)">
+              <label class="form-label">${t('bcm_conductor')}</label>
+              <input id="exConductor" class="form-input" value="${escHtml(item?.conductor||'')}" placeholder="${t('bcm_conductorPh')}">
             </div>
             <div class="form-group">
-              <label class="form-label">Linked Plan</label>
+              <label class="form-label">${t('bcm_linkedPlan')}</label>
               <select id="exPlan" class="select">
-                <option value="">— No Plan —</option>
+                <option value="">${t('bcm_noPlan')}</option>
                 ${plans.map(p=>`<option value="${p.id}"${item?.linkedPlanId===p.id?' selected':''}>${escHtml(p.title)}</option>`).join('')}
               </select>
             </div>
           </div>
           <div class="form-group">
             <label class="form-label">${t('ui_participantsCsv')}</label>
-            <textarea id="exParticipants" class="form-input" rows="2" placeholder="e.g. CISO, CIO, HR Manager">${escHtml((item?.participants||[]).join(', '))}</textarea>
+            <textarea id="exParticipants" class="form-input" rows="2" placeholder="${t('bcm_participantsPh')}">${escHtml((item?.participants||[]).join(', '))}</textarea>
           </div>
         </div>
         <div class="training-form-section">
-          <h4 class="training-form-section-title"><i class="ph ph-note-pencil"></i> Results & Follow-up</h4>
+          <h4 class="training-form-section-title"><i class="ph ph-note-pencil"></i> ${t('bcm_resultsFollowup')}</h4>
           <div class="form-group">
-            <label class="form-label">Findings</label>
-            <textarea id="exFindings" class="form-input" rows="4" placeholder="What was observed?">${escHtml(item?.findings||'')}</textarea>
+            <label class="form-label">${t('bcm_findings')}</label>
+            <textarea id="exFindings" class="form-input" rows="4" placeholder="${t('bcm_findingsPh')}">${escHtml(item?.findings||'')}</textarea>
           </div>
           <div class="form-group">
-            <label class="form-label">Actions</label>
-            <textarea id="exActions" class="form-input" rows="3" placeholder="Derived actions with due dates">${escHtml(item?.actions||'')}</textarea>
+            <label class="form-label">${t('ui_actions')}</label>
+            <textarea id="exActions" class="form-input" rows="3" placeholder="${t('bcm_actionsPh')}">${escHtml(item?.actions||'')}</textarea>
           </div>
           <div class="form-group">
-            <label class="form-label">Next Exercise</label>
+            <label class="form-label">${t('bcm_nextExercise')}</label>
             <input id="exNext" type="date" class="form-input" value="${item?.nextExercise||''}" style="color-scheme:dark">
           </div>
           ${renderLinksBlock('ex', item?.linkedControls||[], item?.linkedPolicies||[])}
         </div>
       </div>
-      ${id ? `<div style="padding:0 24px 16px"><div class="gov-section-title">Documents & Attachments</div>
+      ${id ? `<div style="padding:0 24px 16px"><div class="gov-section-title">${t('ui_docsAttachments')}</div>
         <div id="bcmExerciseAttachPanel"></div></div>` : ''}
       <div class="training-form-footer">
-        <button class="btn btn-secondary" onclick="switchBcmTab('exercises')">Cancel</button>
+        <button class="btn btn-secondary" onclick="switchBcmTab('exercises')">${t('ui_cancel')}</button>
         <button class="btn btn-primary" onclick="saveExercise('${id||''}')">
-          <i class="ph ph-floppy-disk"></i> Save
+          <i class="ph ph-floppy-disk"></i> ${t('ui_save')}
         </button>
       </div>
     </div>
