@@ -11160,7 +11160,7 @@ async function openLegalForm(type, id) {
 
   const attachSection = isEdit ? `
     <div class="legal-form-section">
-      <h4 class="legal-form-section-title"><i class="ph ph-paperclip"></i> Attachments</h4>
+      <h4 class="legal-form-section-title"><i class="ph ph-paperclip"></i> ${t('ui_attachments')}</h4>
       <div id="legalAttachList">${_renderLegalAttachList(item?.attachments||[], LEGAL_ENDPOINT[type], id)}</div>
       <div class="legal-attach-upload">
         <label class="form-label">Upload document (PDF, DOCX, XLSX, PPTX, PNG, JPG, TXT, ZIP – max. 20 MB)</label>
@@ -11180,11 +11180,11 @@ async function openLegalForm(type, id) {
       <div class="legal-form-section">
         <div class="form-row">
           <div class="form-group" style="flex:2">
-            <label class="form-label">Title <span class="form-required">*</span></label>
-            <input id="lc_title" class="form-input" value="${escHtml(item?.title||'')}" placeholder="Contract name">
+            <label class="form-label">${t('col_title')} <span class="form-required">*</span></label>
+            <input id="lc_title" class="form-input" value="${escHtml(item?.title||'')}" placeholder="${t('legal_contractName')}">
           </div>
           <div class="form-group">
-            <label class="form-label">Type</label>
+            <label class="form-label">${t('col_type')}</label>
             <select id="lc_type" class="select">
               ${Object.entries(LEGAL_CONTRACT_TYPE_LABELS).map(([v,l])=>`<option value="${v}"${item?.contractType===v?' selected':''}>${l}</option>`).join('')}
             </select>
@@ -11192,36 +11192,36 @@ async function openLegalForm(type, id) {
         </div>
         <div class="form-row">
           <div class="form-group" style="flex:2">
-            <label class="form-label">Counterparty</label>
-            <input id="lc_party" class="form-input" value="${escHtml(item?.counterparty||'')}" placeholder="Company name">
+            <label class="form-label">${t('legal_counterparty')}</label>
+            <input id="lc_party" class="form-input" value="${escHtml(item?.counterparty||'')}" placeholder="${t('legal_companyName')}">
           </div>
           <div class="form-group">
-            <label class="form-label">Status</label>
+            <label class="form-label">${t('col_status')}</label>
             <select id="lc_status" class="select">
               ${Object.entries(LEGAL_CONTRACT_STATUS_LABELS).map(([v,l])=>`<option value="${v}"${item?.status===v?' selected':''}>${l}</option>`).join('')}
             </select>
           </div>
         </div>
         <div class="form-row">
-          <div class="form-group"><label class="form-label">Start</label><input id="lc_start" type="date" class="form-input" value="${item?.startDate||''}" style="color-scheme:dark"></div>
-          <div class="form-group"><label class="form-label">End</label><input id="lc_end" type="date" class="form-input" value="${item?.endDate||''}" style="color-scheme:dark"></div>
-          <div class="form-group"><label class="form-label">Notice Period (days)</label><input id="lc_notice" type="number" class="form-input" value="${item?.noticePeriodDays||''}" placeholder="e.g. 30"></div>
-          <div class="form-group"><label class="form-label">Contract Value</label><input id="lc_value" class="form-input" value="${escHtml(item?.value||'')}" placeholder="e.g. 12,000 EUR/year"></div>
+          <div class="form-group"><label class="form-label">${t('legal_start')}</label><input id="lc_start" type="date" class="form-input" value="${item?.startDate||''}" style="color-scheme:dark"></div>
+          <div class="form-group"><label class="form-label">${t('legal_end')}</label><input id="lc_end" type="date" class="form-input" value="${item?.endDate||''}" style="color-scheme:dark"></div>
+          <div class="form-group"><label class="form-label">${t('legal_noticePeriod')}</label><input id="lc_notice" type="number" class="form-input" value="${item?.noticePeriodDays||''}" placeholder="e.g. 30"></div>
+          <div class="form-group"><label class="form-label">${t('legal_contractValue')}</label><input id="lc_value" class="form-input" value="${escHtml(item?.value||'')}" placeholder="e.g. 12,000 EUR/year"></div>
         </div>
         <div class="form-row">
           <div class="form-group" style="flex:2">
-            <label class="form-label">Owner / Responsible</label>
-            <input id="lc_owner" class="form-input" value="${escHtml(item?.owner||'')}" placeholder="Name or department">
+            <label class="form-label">${t('ui_ownerResp')}</label>
+            <input id="lc_owner" class="form-input" value="${escHtml(item?.owner||'')}" placeholder="${t('ui_ownerRespPh')}">
           </div>
           <div class="form-group" style="display:flex;align-items:center;gap:.5rem;padding-top:1.5rem">
             <input type="checkbox" id="lc_autorenew" ${item?.autoRenew?'checked':''} style="width:16px;height:16px">
-            <label for="lc_autorenew" class="form-label" style="margin:0;cursor:pointer">Auto-Renewal</label>
+            <label for="lc_autorenew" class="form-label" style="margin:0;cursor:pointer">${t('legal_autoRenewal')}</label>
           </div>
         </div>
-        <div class="form-group"><label class="form-label">Description / Subject</label>
-          <textarea id="lc_desc" class="form-input" rows="4" placeholder="Service description, subject matter of the contract…">${escHtml(item?.description||'')}</textarea></div>
-        <div class="form-group"><label class="form-label">Internal Notes</label>
-          <textarea id="lc_notes" class="form-input" rows="3" placeholder="Notes for internal use…">${escHtml(item?.notes||'')}</textarea></div>
+        <div class="form-group"><label class="form-label">${t('legal_descSubject')}</label>
+          <textarea id="lc_desc" class="form-input" rows="4" placeholder="${t('legal_serviceDescPh')}">${escHtml(item?.description||'')}</textarea></div>
+        <div class="form-group"><label class="form-label">${t('ui_internalNotes')}</label>
+          <textarea id="lc_notes" class="form-input" rows="3" placeholder="${t('legal_notesPh')}">${escHtml(item?.notes||'')}</textarea></div>
         ${renderLinksBlock('lc', item?.linkedControls||[], item?.linkedPolicies||[])}
       </div>
       ${attachSection}`
@@ -11230,17 +11230,17 @@ async function openLegalForm(type, id) {
       <div class="legal-form-section">
         <div class="form-row">
           <div class="form-group" style="flex:2">
-            <label class="form-label">Title <span class="form-required">*</span></label>
-            <input id="ln_title" class="form-input" value="${escHtml(item?.title||'')}" placeholder="NDA name">
+            <label class="form-label">${t('col_title')} <span class="form-required">*</span></label>
+            <input id="ln_title" class="form-input" value="${escHtml(item?.title||'')}" placeholder="${t('legal_ndaName')}">
           </div>
           <div class="form-group">
-            <label class="form-label">Type</label>
+            <label class="form-label">${t('col_type')}</label>
             <select id="ln_type" class="select">
               ${Object.entries(LEGAL_NDA_TYPE_LABELS).map(([v,l])=>`<option value="${v}"${item?.ndaType===v?' selected':''}>${l}</option>`).join('')}
             </select>
           </div>
           <div class="form-group">
-            <label class="form-label">Status</label>
+            <label class="form-label">${t('col_status')}</label>
             <select id="ln_status" class="select">
               ${Object.entries(LEGAL_NDA_STATUS_LABELS).map(([v,l])=>`<option value="${v}"${item?.status===v?' selected':''}>${l}</option>`).join('')}
             </select>
@@ -11248,19 +11248,19 @@ async function openLegalForm(type, id) {
         </div>
         <div class="form-row">
           <div class="form-group" style="flex:2">
-            <label class="form-label">Counterparty</label>
-            <input id="ln_party" class="form-input" value="${escHtml(item?.counterparty||'')}" placeholder="Company / person name">
+            <label class="form-label">${t('legal_counterparty')}</label>
+            <input id="ln_party" class="form-input" value="${escHtml(item?.counterparty||'')}" placeholder="${t('legal_companyPersonPh')}">
           </div>
-          <div class="form-group"><label class="form-label">Signed On</label>
+          <div class="form-group"><label class="form-label">${t('legal_signedOn')}</label>
             <input id="ln_signed" type="date" class="form-input" value="${item?.signingDate||''}" style="color-scheme:dark"></div>
-          <div class="form-group"><label class="form-label">Expires On</label>
+          <div class="form-group"><label class="form-label">${t('legal_expiresOn')}</label>
             <input id="ln_expiry" type="date" class="form-input" value="${item?.expiryDate||''}" style="color-scheme:dark"></div>
         </div>
-        <div class="form-group"><label class="form-label">Owner / Responsible</label>
-          <input id="ln_owner" class="form-input" value="${escHtml(item?.owner||'')}" placeholder="Name or department"></div>
-        <div class="form-group"><label class="form-label">Scope / Subject of Confidentiality</label>
-          <textarea id="ln_scope" class="form-input" rows="4" placeholder="Which information is covered by the NDA?">${escHtml(item?.scope||'')}</textarea></div>
-        <div class="form-group"><label class="form-label">Internal Notes</label>
+        <div class="form-group"><label class="form-label">${t('ui_ownerResp')}</label>
+          <input id="ln_owner" class="form-input" value="${escHtml(item?.owner||'')}" placeholder="${t('ui_ownerRespPh')}"></div>
+        <div class="form-group"><label class="form-label">${t('legal_scopeSubject')}</label>
+          <textarea id="ln_scope" class="form-input" rows="4" placeholder="${t('legal_ndaScopePh')}">${escHtml(item?.scope||'')}</textarea></div>
+        <div class="form-group"><label class="form-label">${t('ui_internalNotes')}</label>
           <textarea id="ln_notes" class="form-input" rows="3">${escHtml(item?.notes||'')}</textarea></div>
         ${renderLinksBlock('ln', item?.linkedControls||[], item?.linkedPolicies||[])}
       </div>
@@ -11270,17 +11270,17 @@ async function openLegalForm(type, id) {
       <div class="legal-form-section">
         <div class="form-row">
           <div class="form-group" style="flex:2">
-            <label class="form-label">Title <span class="form-required">*</span></label>
-            <input id="lp_title" class="form-input" value="${escHtml(item?.title||'')}" placeholder="Policy name">
+            <label class="form-label">${t('col_title')} <span class="form-required">*</span></label>
+            <input id="lp_title" class="form-input" value="${escHtml(item?.title||'')}" placeholder="${t('legal_policyName')}">
           </div>
           <div class="form-group">
-            <label class="form-label">Type</label>
+            <label class="form-label">${t('col_type')}</label>
             <select id="lp_type" class="select">
               ${Object.entries(LEGAL_POLICY_TYPE_LABELS).map(([v,l])=>`<option value="${v}"${item?.policyType===v?' selected':''}>${l}</option>`).join('')}
             </select>
           </div>
           <div class="form-group">
-            <label class="form-label">Status</label>
+            <label class="form-label">${t('col_status')}</label>
             <select id="lp_status" class="select">
               ${Object.entries(LEGAL_POLICY_STATUS_LABELS).map(([v,l])=>`<option value="${v}"${item?.status===v?' selected':''}>${l}</option>`).join('')}
             </select>
@@ -11288,21 +11288,21 @@ async function openLegalForm(type, id) {
         </div>
         <div class="form-row">
           <div class="form-group" style="flex:2">
-            <label class="form-label">URL (public page)</label>
+            <label class="form-label">${t('legal_publicUrl')}</label>
             <input id="lp_url" class="form-input" value="${escHtml(item?.url||'')}" placeholder="https://…">
           </div>
-          <div class="form-group"><label class="form-label">Published On</label>
+          <div class="form-group"><label class="form-label">${t('legal_publishedOn')}</label>
             <input id="lp_pub" type="date" class="form-input" value="${item?.publishedAt||''}" style="color-scheme:dark"></div>
-          <div class="form-group"><label class="form-label">Next Review</label>
+          <div class="form-group"><label class="form-label">${t('legal_nextReview')}</label>
             <input id="lp_review" type="date" class="form-input" value="${item?.nextReviewDate||''}" style="color-scheme:dark"></div>
         </div>
-        <div class="form-group"><label class="form-label">Owner / Responsible</label>
-          <input id="lp_owner" class="form-input" value="${escHtml(item?.owner||'')}" placeholder="Name or department"></div>
-        <div class="form-group"><label class="form-label">Description</label>
-          <textarea id="lp_desc" class="form-input" rows="3" placeholder="Brief description and scope">${escHtml(item?.description||'')}</textarea></div>
-        <div class="form-group"><label class="form-label">Policy Content (Markdown)</label>
+        <div class="form-group"><label class="form-label">${t('ui_ownerResp')}</label>
+          <input id="lp_owner" class="form-input" value="${escHtml(item?.owner||'')}" placeholder="${t('ui_ownerRespPh')}"></div>
+        <div class="form-group"><label class="form-label">${t('legal_descSubject')}</label>
+          <textarea id="lp_desc" class="form-input" rows="3" placeholder="${t('legal_briefDescPh')}">${escHtml(item?.description||'')}</textarea></div>
+        <div class="form-group"><label class="form-label">${t('legal_policyContent')}</label>
           <textarea id="lp_content" class="form-input" rows="8" placeholder="## Privacy Policy&#10;&#10;We process your data pursuant to Art. 6 GDPR…">${escHtml(item?.content||'')}</textarea></div>
-        <div class="form-group"><label class="form-label">Internal Notes</label>
+        <div class="form-group"><label class="form-label">${t('ui_internalNotes')}</label>
           <textarea id="lp_notes" class="form-input" rows="3">${escHtml(item?.notes||'')}</textarea></div>
         ${renderLinksBlock('lp', item?.linkedControls||[], item?.linkedPolicies||[])}
       </div>
@@ -11321,7 +11321,7 @@ async function openLegalForm(type, id) {
       </div>
       <div class="training-form-body">${formBody}</div>
       <div class="training-form-footer">
-        <button class="btn btn-secondary" onclick="switchLegalTab('${LEGAL_BACK_TAB[type]}')">Cancel</button>
+        <button class="btn btn-secondary" onclick="switchLegalTab('${LEGAL_BACK_TAB[type]}')">${t('ui_cancel')}</button>
         <button class="btn btn-primary" onclick="saveLegalItem('${type}','${id||''}')">
           <i class="ph ph-floppy-disk"></i> Save
         </button>
