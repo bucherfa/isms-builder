@@ -8,7 +8,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-## [Unreleased]
+## [1.37.3] — 2026-08-12
 
 ### Fixed
 - **Doppelt definierte i18n-Schlüssel bereinigt.** `translations.js` enthielt 7 Schlüssel mit je zwei Definitionen (JS-Objektliteral: die zweite gewinnt stillschweigend). Bei `inc_reporterEmail`, `inc_cisoDecision`, `inc_setStatus`, `inc_assignTo`, `inc_cisoNotes` und `inc_saveDecision` (Incidents-Modul) waren beide Definitionen inhaltsgleich bis auf kleinere Wortlaut-Unterschiede — verwaiste erste Definition entfernt, keine Verhaltensänderung. Bei `search_noResultsFor` handelte es sich dagegen um eine echte Namenskollision zwischen zwei unabhängigen Funktionen mit unterschiedlicher Signatur (einmal ohne Parameter für die globale Suche, einmal mit `{query}`-Platzhalter für die Guidance-Volltextsuche) — dadurch zeigte die globale Suche bei keinem Treffer einen buchstäblichen, nicht ersetzten `{query}`-Platzhalter an. Die Guidance-Variante wurde in `guidance_searchNoResults` umbenannt, wodurch beide Aufrufstellen jetzt korrekt funktionieren.
