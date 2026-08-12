@@ -11,6 +11,23 @@ const app = express()
 const { requireAuth, authorize, signToken, getSessionFromReq } = require('./auth')
 const PORT = process.env.PORT || 3000
 
+// ── Reverse-Proxy-Vertrauen (aus, solange nicht bewusst aktiviert) ──────────
+// Ohne dies vertraut Express keinem X-Forwarded-*-Header — req.ip/req.protocol/
+// req.hostname spiegeln dann immer die tatsaechliche TCP-Verbindung wider, ein
+// Client kann sie nicht faelschen. Wer die App hinter einem Reverse-Proxy
+// betreibt (typisch in segmentierten Netzen/DMZ-Aufbauten), muss das bewusst
+// per TRUST_PROXY aktivieren, sonst koennte ein Client X-Forwarded-For selbst
+// mitschicken und damit die im Audit-Trail gespeicherte IP-Adresse einer
+// Richtlinien-Bestaetigung faelschen, oder per X-Forwarded-Host den Link in
+// Bestaetigungs-Mails auf eine falsche Domain umleiten.
+// TRUST_PROXY=1 fuer "genau ein Reverse-Proxy davor" (Standardfall), eine
+// hoehere Zahl fuer mehrere Hops, oder ein Express-kompatibler Wert
+// (z.B. eine IP/Subnetz-Liste) — siehe Express-Doku zu `trust proxy`.
+if (process.env.TRUST_PROXY) {
+  const hops = Number(process.env.TRUST_PROXY)
+  app.set('trust proxy', Number.isNaN(hops) ? process.env.TRUST_PROXY : hops)
+}
+
 app.use(express.json())
 
 // ── UI-Dateien: Login-Seite öffentlich, alles andere nur mit gültigem JWT ──

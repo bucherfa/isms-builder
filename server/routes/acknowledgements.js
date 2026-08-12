@@ -9,6 +9,8 @@ const orgSettings = require('../db/orgSettingsStore')
 const mailer      = require('../mailer')
 const storage     = require('../storage')
 
+const PORT = process.env.PORT || 3000
+
 // ── Helper ────────────────────────────────────────────────────────────────────
 
 async function getMode() {
@@ -17,9 +19,21 @@ async function getMode() {
 }
 
 function buildTokenUrl(req, token) {
-  const proto = req.headers['x-forwarded-proto'] || (req.secure ? 'https' : 'http')
-  const host  = req.headers['x-forwarded-host'] || req.headers.host || 'localhost'
-  return `${proto}://${host}/ack/${token}`
+  // PUBLIC_URL ist die zuverlaessigste Quelle (explizite Betreiber-Angabe,
+  // unabhaengig von Proxy-Konfiguration) — z.B. hinter einem Reverse-Proxy,
+  // dessen extern sichtbarer Host sich vom internen Verbindungs-Host
+  // unterscheidet. Ohne PUBLIC_URL: req.protocol/req.hostname respektieren
+  // 'trust proxy' (s. server/index.js) statt roher X-Forwarded-*-Header zu
+  // vertrauen — ein Client kann sonst den Link in Bestaetigungs-Mails auf
+  // eine fremde Domain umleiten. req.hostname liefert keinen Port; ohne
+  // aktives TRUST_PROXY (typischer Fall: direkter Zugriff ohne Proxy, z.B.
+  // lokale Tests/Demo auf einem Nicht-Standardport) wird er ergaenzt.
+  const base = process.env.PUBLIC_URL
+  if (base) return `${base.replace(/\/$/, '')}/ack/${token}`
+  const proto = req.protocol
+  const host  = req.hostname || 'localhost'
+  const port  = req.app.get('trust proxy') ? '' : `:${PORT}`
+  return `${proto}://${host}${port}/ack/${token}`
 }
 
 async function sendCampaignMails(dist, req) {

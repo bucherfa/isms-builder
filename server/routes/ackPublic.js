@@ -155,7 +155,10 @@ router.get('/ack/:token', async (req, res) => {
 
 // ── POST /ack/:token — Bestätigung speichern ──────────────────────────────────
 router.post('/ack/:token', express.urlencoded({ extended: false }), async (req, res) => {
-  const ip   = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.socket.remoteAddress || ''
+  // req.ip statt eines rohen X-Forwarded-For-Reads: respektiert 'trust proxy'
+  // (s. server/index.js) — ohne aktiviertes TRUST_PROXY koennte ein Client den
+  // Header sonst selbst mitschicken und die hier gespeicherte IP faelschen.
+  const ip   = req.ip || ''
   const name = (req.body.recipientName || '').trim().slice(0, 200)
 
   const ack = await ackStore.confirmByToken(req.params.token, { recipientName: name, ipAddress: ip })
