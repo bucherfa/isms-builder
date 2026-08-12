@@ -8,6 +8,19 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [Unreleased]
+
+### Fixed
+- **#42 — Absturz beim Start unter `STORAGE_BACKEND=sqlite/mariadb/pg` behoben.** Zwei Ursachen in `server/index.js`: (1) `runAutopurge()` rief die async `getDeleted()`-Methoden der Knex-Stores synchron auf und machte sofort `.filter()` auf das zurückgegebene Promise — daher die geloggten `.filter is not a function`-Fehler für jede Entität. (2) Die eigentliche Race: jeder Knex-Store startet seine Schema-Initialisierung fire-and-forget (`_knex.init().catch()`), ohne dass die Startsequenz je darauf wartet. Autopurge und die sechs Guidance-Seeds liefen bisher unbedingt bei jedem Modul-Import — traf eine Query `CREATE TABLE` zuvor, stirbt der Prozess mit einer unbehandelten Rejection (`SqliteError: no such table: templates`), zeitabhängig und daher inkonsistent zwischen Umgebungen (Docker vs. lokal).
+
+  Fix: einzige `bootstrap()`-Schranke vor jedem DB-Zugriff — `await knexDatabase.init()` (No-Op unter `json`), dann `await runAutopurge()` (jetzt async, jeder `getDeleted()`-Aufruf abgewartet), dann die Seeds. Läuft nur noch unter `require.main === module`, nicht mehr bei einem bloßen `require()` — `module.exports = app` bleibt synchron, Tests funktionieren unverändert; ein Test kann `app.bootstrap()` gezielt selbst aufrufen.
+
+  `knexDatabase.js` respektiert jetzt `DATA_DIR` für den SQLite-Dateipfad (vorher hart auf `<repo>/data/isms.db` verdrahtet) — nötig für isolierte Tests, sonst hätte ein SQLite-Testlauf die echte Projekt-Datenbank berührt.
+
+  Neuer Test `tests/dbBootstrapSqlite.test.js` (4 Tests, erste SQL-CI überhaupt): beweist nach `bootstrap()` (a) alle zentralen Tabellen existieren, (b) `getDeleted()` jedes Stores liefert ein Array statt einer rejected Promise, (c) kein `unhandledRejection` während des Starts, und (d) mehrere parallele `init()`-Aufrufe auf derselben DB-Datei (simuliert Pod-Neustart/Rolling-Update mitten in der Init-Phase) stürzen nicht ab — letzteres auf Wunsch von Muhammad Asadullah Zahid, der den Fix in seiner eigenen Kubernetes/PostgreSQL-Umgebung validieren wird. Eigener CI-Job `test-sqlite` in `ci.yml` (nicht Teil der Node-Version-Matrix, da jede bestehende Testdatei `STORAGE_BACKEND=json` selbst setzt und einen Matrix-Wert überschreiben würde).
+
+  PostgreSQL/MariaDB-CI bewusst nicht Teil dieser Änderung — die validieren pg/MariaDB in ihrer eigenen Umgebung, nicht hier. Die projektweite Standardempfehlung bleibt vorerst bei `json` (siehe #42-Diskussion); ob `sqlite` wieder empfohlen wird, ist eine separate Entscheidung.
+
 ## [1.37.3] — 2026-08-12
 
 ### Fixed

@@ -55,6 +55,34 @@ jobs:
       - name: Check for outdated packages
         run: npm outdated || true
 
+  test-sqlite:
+    name: Test (SQLite backend, #42 bootstrap gate)
+    runs-on: ubuntu-latest
+    # Eigener, schlanker Job statt Teil der Matrix: die Suite ist ganz
+    # überwiegend backend-neutral, jede Testdatei setzt STORAGE_BACKEND=json
+    # selbst und würde einen Matrix-Wert wieder überschreiben. Dieser Job
+    # deckt gezielt den Knex/SQLite-Bootstrap-Pfad ab (tests/dbBootstrapSqlite.test.js).
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22.x
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run SQLite bootstrap tests
+        run: npx jest tests/dbBootstrapSqlite.test.js --runInBand
+        env:
+          NODE_ENV: test
+          JWT_SECRET: ci-test-secret-do-not-use-in-production
+          STORAGE_BACKEND: sqlite
+
   security-scan:
     name: Dependency Security Scan
     runs-on: ubuntu-latest

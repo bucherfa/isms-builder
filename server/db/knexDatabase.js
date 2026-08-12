@@ -22,7 +22,7 @@ function _buildConfig() {
   const backend = (process.env.STORAGE_BACKEND || 'json').toLowerCase()
 
   if (backend === 'sqlite') {
-    const dbDir = path.join(__dirname, '../../data')
+    const dbDir = process.env.DATA_DIR || path.join(__dirname, '../../data')
     if (!fs.existsSync(dbDir)) fs.mkdirSync(dbDir, { recursive: true })
     return {
       client: 'better-sqlite3',

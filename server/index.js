@@ -149,26 +149,29 @@ try {
 }
 
 // ── Autopurge: Einträge nach 30 Tagen endgültig löschen ──────────────────────
-function runAutopurge() {
+// Async, weil die Knex-Backends (sqlite/mariadb/pg) async sind — muss vom
+// Aufrufer abgewartet werden, damit keine Query vor abgeschlossenem
+// Datenbank-Init laufen kann (siehe bootstrap()/#42).
+async function runAutopurge() {
   const CUTOFF = new Date(Date.now() - 30 * 86400000).toISOString()
   let total = 0
 
-  function purge(label, getDeleted, permanentDeleteFn) {
+  async function purge(label, getDeleted, permanentDeleteFn) {
     try {
-      const items = getDeleted() || []
-      items.filter(i => i.deletedAt && i.deletedAt < CUTOFF).forEach(i => {
-        permanentDeleteFn(i.id)
+      const items = (await getDeleted()) || []
+      for (const i of items.filter(i => i.deletedAt && i.deletedAt < CUTOFF)) {
+        await permanentDeleteFn(i.id)
         total++
-      })
+      }
     } catch(e) { console.warn(`[autopurge] ${label}: ${e.message}`) }
   }
 
   // Templates: need type parameter
   try {
-    const deletedTmpl = storage.getDeletedTemplates?.() || []
-    deletedTmpl.filter(t => t.deletedAt && t.deletedAt < CUTOFF).forEach(t => {
-      try { storage.permanentDeleteTemplate?.(t.type, t.id); total++ } catch {}
-    })
+    const deletedTmpl = (await storage.getDeletedTemplates?.()) || []
+    for (const t of deletedTmpl.filter(t => t.deletedAt && t.deletedAt < CUTOFF)) {
+      try { await storage.permanentDeleteTemplate?.(t.type, t.id); total++ } catch {}
+    }
   } catch(e) { console.warn(`[autopurge] Templates: ${e.message}`) }
 
   const riskStore     = require('./db/riskStore')
@@ -179,82 +182,90 @@ function runAutopurge() {
   const gdprStore     = require('./db/gdprStore')
   const pubStore      = require('./db/publicIncidentStore')
 
-  purge('Risks',              () => riskStore.getDeleted(),                     (id) => riskStore.permanentDelete(id))
-  purge('Goals',              () => goalsStore.getDeleted(),                    (id) => goalsStore.permanentDelete(id))
-  purge('Guidance',           () => guidanceStore.getDeleted(),                 (id) => guidanceStore.permanentDelete(id))
-  purge('Training',           () => trainingStore.getDeleted(),                 (id) => trainingStore.permanentDelete(id))
-  purge('Contracts',          () => legalStore.contracts.getDeleted(),          (id) => legalStore.contracts.permanentDelete(id))
-  purge('NDAs',               () => legalStore.ndas.getDeleted(),               (id) => legalStore.ndas.permanentDelete(id))
-  purge('Policies',           () => legalStore.privacyPolicies.getDeleted(),    (id) => legalStore.privacyPolicies.permanentDelete(id))
-  purge('GDPR VVT',           () => gdprStore.vvt.getDeleted(),                 (id) => gdprStore.vvt.permanentDelete(id))
-  purge('GDPR AV',            () => gdprStore.av.getDeleted(),                  (id) => gdprStore.av.permanentDelete(id))
-  purge('GDPR DSFA',          () => gdprStore.dsfa.getDeleted(),                (id) => gdprStore.dsfa.permanentDelete(id))
-  purge('GDPR Incidents',     () => gdprStore.incidents.getDeleted(),           (id) => gdprStore.incidents.permanentDelete(id))
-  purge('GDPR DSAR',          () => gdprStore.dsar.getDeleted(),                (id) => gdprStore.dsar.permanentDelete(id))
-  purge('GDPR TOMs',          () => gdprStore.toms.getDeleted(),                (id) => gdprStore.toms.permanentDelete(id))
-  purge('Public Incidents',   () => pubStore.getDeleted(),                      (id) => pubStore.permanentDelete(id))
+  await purge('Risks',              () => riskStore.getDeleted(),                     (id) => riskStore.permanentDelete(id))
+  await purge('Goals',              () => goalsStore.getDeleted(),                    (id) => goalsStore.permanentDelete(id))
+  await purge('Guidance',           () => guidanceStore.getDeleted(),                 (id) => guidanceStore.permanentDelete(id))
+  await purge('Training',           () => trainingStore.getDeleted(),                 (id) => trainingStore.permanentDelete(id))
+  await purge('Contracts',          () => legalStore.contracts.getDeleted(),          (id) => legalStore.contracts.permanentDelete(id))
+  await purge('NDAs',               () => legalStore.ndas.getDeleted(),               (id) => legalStore.ndas.permanentDelete(id))
+  await purge('Policies',           () => legalStore.privacyPolicies.getDeleted(),    (id) => legalStore.privacyPolicies.permanentDelete(id))
+  await purge('GDPR VVT',           () => gdprStore.vvt.getDeleted(),                 (id) => gdprStore.vvt.permanentDelete(id))
+  await purge('GDPR AV',            () => gdprStore.av.getDeleted(),                  (id) => gdprStore.av.permanentDelete(id))
+  await purge('GDPR DSFA',          () => gdprStore.dsfa.getDeleted(),                (id) => gdprStore.dsfa.permanentDelete(id))
+  await purge('GDPR Incidents',     () => gdprStore.incidents.getDeleted(),           (id) => gdprStore.incidents.permanentDelete(id))
+  await purge('GDPR DSAR',          () => gdprStore.dsar.getDeleted(),                (id) => gdprStore.dsar.permanentDelete(id))
+  await purge('GDPR TOMs',          () => gdprStore.toms.getDeleted(),                (id) => gdprStore.toms.permanentDelete(id))
+  await purge('Public Incidents',   () => pubStore.getDeleted(),                      (id) => pubStore.permanentDelete(id))
 
   const supplierStore = require('./db/supplierStore')
-  purge('Suppliers',          () => supplierStore.getDeleted(),                  (id) => supplierStore.permanentDelete(id))
+  await purge('Suppliers',          () => supplierStore.getDeleted(),                  (id) => supplierStore.permanentDelete(id))
 
   const findingStore  = require('./db/findingStore')
-  purge('Findings',           () => findingStore.getDeleted(),                   (id) => findingStore.permanentDelete(id))
+  await purge('Findings',           () => findingStore.getDeleted(),                   (id) => findingStore.permanentDelete(id))
 
   if (total > 0) console.log(`[autopurge] ${total} Einträge nach 30 Tagen endgültig gelöscht`)
 }
 
-// Autopurge beim Serverstart
-runAutopurge()
+// ── Idempotente Guidance-Seeds (Architekturdoku, Demo-Beitrag, Rollen-Guides, …) ──
+async function seedAll() {
+  const guidanceStore = require('./db/guidanceStore')
 
-// Architekturdokumentation in Guidance einspielen (idempotent)
-try {
-  require('./db/guidanceStore').seedArchitectureDocs()
-} catch (e) {
-  console.warn('[seed] Architekturdokumentation konnte nicht eingespeist werden:', e.message)
+  try {
+    await guidanceStore.seedArchitectureDocs()
+  } catch (e) {
+    console.warn('[seed] Architekturdokumentation konnte nicht eingespeist werden:', e.message)
+  }
+
+  try {
+    await guidanceStore.seedDemoDoc()
+  } catch (e) {
+    console.warn('[seed] Demo-Beitrag konnte nicht eingespeist werden:', e.message)
+  }
+
+  try {
+    await guidanceStore.seedRoleGuides()
+  } catch (e) {
+    console.warn('[seed] Rollen-Guides konnten nicht eingespeist werden:', e.message)
+  }
+
+  try {
+    await guidanceStore.seedSoaGuide()
+  } catch (e) {
+    console.warn('[seed] SoA-Guide konnte nicht eingespeist werden:', e.message)
+  }
+
+  try {
+    await guidanceStore.seedPolicyGuide()
+  } catch (e) {
+    console.warn('[seed] Policy-Guide konnte nicht eingespeist werden:', e.message)
+  }
+
+  try {
+    await guidanceStore.seedIsoNotice()
+  } catch (e) {
+    console.warn('[seed] ISO-Hinweis konnte nicht eingespeist werden:', e.message)
+  }
 }
 
-// Demo-Übersichts-Beitrag im Systemhandbuch (idempotent, verschwindet nach Demo-Reset)
-try {
-  require('./db/guidanceStore').seedDemoDoc()
-} catch (e) {
-  console.warn('[seed] Demo-Beitrag konnte nicht eingespeist werden:', e.message)
+// ── Bootstrap: einzige Schranke vor jedem DB-Zugriff (#42) ───────────────────
+// Unter STORAGE_BACKEND sqlite/mariadb/pg starten die Knex-Stores ihre
+// Schema-Initialisierung fire-and-forget (`_knex.init().catch()`), ohne dass
+// je jemand darauf wartet. Trifft eine Query (z.B. Autopurge) vor CREATE
+// TABLE, stirbt der Prozess mit einer unbehandelten Rejection — zeitabhängig,
+// daher inkonsistent zwischen Umgebungen. `knexDatabase.init()` ist bereits
+// idempotent/memoisiert; dieses einzige `await` davor reicht, weil jeder
+// Knex-Store (`server/db/stores/*.js`) über dasselbe Singleton initialisiert.
+// Unter STORAGE_BACKEND=json ist dieser Await ein No-Op.
+async function bootstrap() {
+  const backend = (process.env.STORAGE_BACKEND || 'json').toLowerCase()
+  if (backend !== 'json') {
+    await require('./db/knexDatabase').init()
+  }
+  await runAutopurge()
+  await seedAll()
 }
 
-// Rollen-Bedienungsanleitungen im Systemhandbuch (idempotent)
-try {
-  require('./db/guidanceStore').seedRoleGuides()
-} catch (e) {
-  console.warn('[seed] Rollen-Guides konnten nicht eingespeist werden:', e.message)
-}
-
-// SoA & Audit Leitfaden (idempotent)
-try {
-  require('./db/guidanceStore').seedSoaGuide()
-} catch (e) {
-  console.warn('[seed] SoA-Guide konnte nicht eingespeist werden:', e.message)
-}
-
-// Policy-Prozesse Leitfaden (idempotent)
-try {
-  require('./db/guidanceStore').seedPolicyGuide()
-} catch (e) {
-  console.warn('[seed] Policy-Guide konnte nicht eingespeist werden:', e.message)
-}
-
-// ISO-Controls Rechtlicher Hinweis (idempotent, immer sichtbar)
-try {
-  require('./db/guidanceStore').seedIsoNotice()
-} catch (e) {
-  console.warn('[seed] ISO-Hinweis konnte nicht eingespeist werden:', e.message)
-}
-
-// ── Export für Tests ──────────────────────────────────────────────────────────
-module.exports = app
-
-// ── SSL / HTTPS + Notifier (nur im Produktivbetrieb) ─────────────────────────
-if (require.main === module) {
-  require('./notifier').start()
-  require('./art23Watcher').start()
+function startListener() {
   const SSL_CERT = process.env.SSL_CERT_FILE
   const SSL_KEY  = process.env.SSL_KEY_FILE
 
@@ -280,4 +291,25 @@ if (require.main === module) {
       console.log(`ISMS Builder listening on http://localhost:${PORT}`)
     })
   }
+}
+
+// ── Export für Tests ──────────────────────────────────────────────────────────
+// module.exports muss synchron bleiben: Tests machen `require('../server/index.js')`
+// und supertest(app) sofort. bootstrap() wird deshalb nur hier angehängt, nicht
+// ausgeführt — ein Test kann `await app.bootstrap()` gezielt selbst aufrufen.
+module.exports = app
+module.exports.bootstrap = bootstrap
+
+// ── SSL / HTTPS + Notifier (nur im Produktivbetrieb) ─────────────────────────
+if (require.main === module) {
+  bootstrap()
+    .then(() => {
+      require('./notifier').start()
+      require('./art23Watcher').start()
+      startListener()
+    })
+    .catch(e => {
+      console.error('[bootstrap] Fataler Fehler beim Start:', e)
+      process.exit(1)
+    })
 }
