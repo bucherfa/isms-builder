@@ -29,6 +29,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
   Native Build von `better-sqlite3` musste dafür freigegeben werden (`npm install-scripts approve better-sqlite3`, mit Zustimmung) — `allowScripts`-Eintrag in `package.json`, wirkt identisch in CI (`npm ci`).
 
+- **Zusätzlich den vollen Docker-Weg getestet und dabei einen echten Fehler in der Guidance-Seed-Logik gefunden und behoben.** Auf Hinweis, dass "App im Container + DB im Container" (die eigentliche Zielumgebung, s. `docker-compose.yml`) noch gar nicht geprüft war — bisherige Tests liefen alle mit der App auf dem Host gegen einen auf `localhost` exponierten DB-Container. Jetzt zusätzlich: `isms-builder`-Image gebaut (`better-sqlite3` zieht dabei `prebuild-install` — kein Compiler im Alpine-Image nötig) und im selben Docker-Netzwerk wie MariaDB- und PostgreSQL-Container betrieben (Container-zu-Container-DNS statt `localhost`), inkl. SQLite mit Bind-Mount wie in `docker-compose.yml`. Alle drei booten sauber, Healthcheck grün, Login funktioniert.
+
+  Dabei mit `NODE_OPTIONS=--trace-deprecation` eine echte `DeprecationWarning: Passing invalid argument types to fs.existsSync` in `_knexSeedArchitectureDocs()` (`server/db/guidanceStore.js`) aufgefallen: die Funktion las nur `entry.srcFile`, nicht `entry.srcFiles` ({de,en,fr,nl} — u.a. bei allen elf Modul-Guides und dem Templates-Nutzung-Leitfaden). `fs.existsSync(undefined)` scheiterte still (nur eine Warnung, kein Fehler), die betroffenen Guidance-Dokumente wurden unter jedem SQL-Backend nie angelegt — die bereits existierende JSON-Variante (`seedArchitectureDocs`) löst `srcFiles` dagegen korrekt auf. Jetzt an die JSON-Variante angeglichen. Regressionstest in `tests/dbBootstrapSqlite.test.js` ergänzt (beweislich: schlägt ohne den Fix fehl, mit Fix grün).
+
+  **Wichtige Einschränkung beim Docker-Test entdeckt, nicht behoben:** Im schlanken Runtime-Image (`Dockerfile` kopiert nur `server/`, `ui/`, `package.json`, `docker-entrypoint.sh`) fehlen `docs/`, `README.md`, `CONTRIBUTING.md`, `CHANGELOG.md` und `THIRD-PARTY-LICENSES.md` vollständig — die Guidance-Seed-Dokumente, die aus diesen Dateien gespeist werden, bleiben im Docker-Image daher grundsätzlich leer, unabhängig vom Backend und unabhängig vom obigen Fix. Das ist kein neues Problem (betraf JSON-Backend im Docker-Image schon immer genauso) und keine Regression, aber ein bestehender Kompromiss zwischen schlankem Image und vollständiger Dokumentation, der hier nicht angetastet wurde.
+
 ## [1.37.3] — 2026-08-12
 
 ### Fixed

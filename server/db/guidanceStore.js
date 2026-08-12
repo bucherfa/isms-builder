@@ -4008,8 +4008,12 @@ if (STORAGE_BACKEND !== 'json') {
     const lang = _getDemoLang()
     for (const entry of ARCH_SEED) {
       const title = typeof entry.title === 'object' ? (entry.title[lang] || entry.title.en) : entry.title
-      if (!fs.existsSync(entry.srcFile)) continue
-      let content = fs.readFileSync(entry.srcFile, 'utf8')
+      // srcFiles: { de, en, fr, nl } — optional; falls back to srcFile (s. seedArchitectureDocs)
+      const srcFile = entry.srcFiles
+        ? (entry.srcFiles[lang] || entry.srcFiles.en || entry.srcFile)
+        : entry.srcFile
+      if (!srcFile || !fs.existsSync(srcFile)) continue
+      let content = fs.readFileSync(srcFile, 'utf8')
       if (entry.wrapCode) content = '```' + entry.wrapCode + '\n' + content + '\n```'
       await _knex.upsertSeed(entry.seedId, {
         id: 'guid_arch_' + entry.seedId, category: entry.category || 'admin-intern',

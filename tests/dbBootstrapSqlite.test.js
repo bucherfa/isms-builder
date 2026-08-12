@@ -88,6 +88,22 @@ describe('SQLite-Bootstrap-Gate (#42)', () => {
     await expect(storage.getDeletedTemplates()).resolves.toEqual(expect.any(Array))
   })
 
+  test('seedArchitectureDocs() seedet auch srcFiles-Eintraege (sprachabhaengige Quelldateien)', async () => {
+    // Regressionstest: _knexSeedArchitectureDocs() las bisher nur entry.srcFile
+    // und ignorierte entry.srcFiles ({de,en,fr,nl} — u.a. fuer alle Modul-Guides
+    // und den Templates-Nutzung-Leitfaden). fs.existsSync(undefined) schlug
+    // still fehl (DeprecationWarning, kein Fehler), die betroffenen ~11
+    // Guidance-Dokumente wurden unter jedem SQL-Backend nie angelegt.
+    // Aufgefallen erst beim Testen des echten Docker-Images mit
+    // --trace-deprecation, nicht bei reinen hasTable()/getDeleted()-Checks.
+    const guidanceStore = require('../server/db/guidanceStore')
+    const all = await guidanceStore.getAll()
+    const seedIds = all.map(d => d.seedId).filter(Boolean)
+    for (const id of ['seed_module_gdpr', 'seed_module_assets', 'seed_tmpl_usage', 'seed_module_bcm']) {
+      expect(seedIds).toContain(id)
+    }
+  })
+
   test('Neustart mitten in der Init-Phase: parallele init()-Aufrufe auf derselben DB-Datei stuerzen nicht ab', async () => {
     jest.resetModules()
     const freshKnexDatabase = require('../server/db/knexDatabase')
