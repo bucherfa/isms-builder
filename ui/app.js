@@ -11588,7 +11588,7 @@ async function renderAssets() {
 
   container.innerHTML = `
     <div class="training-header">
-      <h2 class="training-title"><i class="ph ph-buildings"></i> Asset Management</h2>
+      <h2 class="training-title"><i class="ph ph-buildings"></i> ${t('nav_assets')}</h2>
       <div class="training-tab-bar">
         ${tabs.map(t => `<button class="training-tab${t.id===_assetsTab?' active':''}" data-tab="${t.id}">
           <i class="ph ${t.icon}"></i> ${t.label}
@@ -11643,19 +11643,19 @@ async function renderAssetsList(el) {
   el.innerHTML = `
     <div class="asset-filter-bar">
       ${canEdit ? `<button class="btn btn-primary btn-sm" onclick="openAssetForm()"><i class="ph ph-plus"></i> ${t('assets_new')}</button>` : ''}
-      <select id="assetFilterCat" onchange="_filterAssets()" title="Category">
+      <select id="assetFilterCat" onchange="_filterAssets()" title="${t('ui_category')}">
         <option value="">${t('filter_allCats')}</option>
         ${Object.keys(ASSET_CAT_LABELS).map(v=>`<option value="${v}">${escHtml(assetCatLabel(v))}</option>`).join('')}
       </select>
-      <select id="assetFilterClass" onchange="_filterAssets()" title="Classification">
+      <select id="assetFilterClass" onchange="_filterAssets()" title="${t('assets_classification')}">
         <option value="">${t('assets_allClass')}</option>
         ${Object.entries(ASSET_CLASS).map(([v,c])=>`<option value="${v}">${c.label}</option>`).join('')}
       </select>
-      <select id="assetFilterCrit" onchange="_filterAssets()" title="Criticality">
+      <select id="assetFilterCrit" onchange="_filterAssets()" title="${t('assets_criticality')}">
         <option value="">${t('assets_allCrit')}</option>
         ${Object.entries(ASSET_CRIT).map(([v,c])=>`<option value="${v}">${c.label}</option>`).join('')}
       </select>
-      <select id="assetFilterStatus" onchange="_filterAssets()" title="Status">
+      <select id="assetFilterStatus" onchange="_filterAssets()" title="${t('col_status')}">
         <option value="">${t('filter_allStatuses')}</option>
         ${Object.entries(ASSET_STATUS_LABELS).map(([v,l])=>`<option value="${v}">${l}</option>`).join('')}
       </select>
@@ -11666,7 +11666,7 @@ async function renderAssetsList(el) {
         <option value="">${escHtml(t('assets_lvlNone'))}</option>
         ${[1,2,3,4].map(v=>`<option value="${v}">≥ ${v}</option>`).join('')}
       </select>
-      <input id="assetSearch" placeholder="Search…" oninput="_filterAssets()" style="flex:1;min-width:140px">
+      <input id="assetSearch" placeholder="${t('ui_searchPh')}" oninput="_filterAssets()" style="flex:1;min-width:140px">
     </div>
     <div id="assetsTableWrap"></div>
   `
@@ -11689,7 +11689,7 @@ function _renderAssetsTable(list, canEdit, isAdmin, entMap) {
   el.innerHTML = `
     <table class="asset-table">
       <thead><tr>
-        <th>Name</th><th>Type</th><th title="${escHtml(t('assets_inheritHint'))}">${escHtml(t('assets_protection'))}</th><th>Classification</th><th>Criticality</th><th>Owner</th><th>Status</th><th>EoL</th>${canEdit?'<th></th>':''}
+        <th>${t('ui_name')}</th><th>${t('col_type')}</th><th title="${escHtml(t('assets_inheritHint'))}">${escHtml(t('assets_protection'))}</th><th>${t('assets_classification')}</th><th>${t('assets_criticality')}</th><th>${t('ui_owner')}</th><th>${t('col_status')}</th><th>EoL</th>${canEdit?'<th></th>':''}
       </tr></thead>
       <tbody>
         ${list.map(a => {
@@ -11772,9 +11772,9 @@ async function renderAssetsByCategory(el) {
         <span class="asset-badge" style="color:#60a5fa;border-color:#60a5fa">${g.items.length}</span>
       </div>
       ${g.items.length === 0
-        ? '<p style="color:var(--text-subtle);font-size:.82rem;padding:4px 0">No assets in this category.</p>'
+        ? `<p style="color:var(--text-subtle);font-size:.82rem;padding:4px 0">${t('assets_noneInCategory')}</p>`
         : `<table class="asset-table">
-            <thead><tr><th>Name</th><th>Type</th><th>Classification</th><th>Criticality</th><th>Status</th></tr></thead>
+            <thead><tr><th>${t('ui_name')}</th><th>${t('col_type')}</th><th>${t('assets_classification')}</th><th>${t('assets_criticality')}</th><th>${t('col_status')}</th></tr></thead>
             <tbody>
               ${g.items.map(a => `<tr>
                 <td><strong>${escHtml(a.name)}</strong></td>
@@ -11809,11 +11809,11 @@ async function renderAssetsByClass(el) {
       `).join('')}
       <div class="asset-summary-card">
         <div class="assc-value" style="color:#f87171">${summary.criticalUnclassified || 0}</div>
-        <div class="assc-label">Critical unclassified</div>
+        <div class="assc-label">${t('assets_critUnclassified')}</div>
       </div>
       <div class="asset-summary-card">
         <div class="assc-value" style="color:#f0b429">${summary.endOfLifeSoon || 0}</div>
-        <div class="assc-label">EoL in 90 days</div>
+        <div class="assc-label">${t('assets_eol90d')}</div>
       </div>
     </div>
   `
@@ -11830,9 +11830,9 @@ async function renderAssetsByClass(el) {
         <span style="color:var(--text-subtle);font-size:.82rem">${g.items.length} Asset(s)</span>
       </div>
       ${g.items.length === 0
-        ? '<p style="color:var(--text-subtle);font-size:.82rem;padding:4px 0">No assets.</p>'
+        ? `<p style="color:var(--text-subtle);font-size:.82rem;padding:4px 0">${t('assets_none')}</p>`
         : `<table class="asset-table">
-            <thead><tr><th>Name</th><th>Category</th><th>Criticality</th><th>Owner</th><th>Status</th></tr></thead>
+            <thead><tr><th>${t('ui_name')}</th><th>${t('ui_category')}</th><th>${t('assets_criticality')}</th><th>${t('ui_owner')}</th><th>${t('col_status')}</th></tr></thead>
             <tbody>
               ${g.items.map(a => `<tr>
                 <td><strong>${escHtml(a.name)}</strong></td>
@@ -11948,7 +11948,7 @@ function _assetDepPicker(list) {
       </label>`).join('')
 
   return `<div class="asset-dep-picker">
-    <input id="asDepSearch" class="asset-dep-search" placeholder="Search…" oninput="_filterAssetDepList()">
+    <input id="asDepSearch" class="asset-dep-search" placeholder="${t('ui_searchPh')}" oninput="_filterAssetDepList()">
     <div id="asDepList" class="asset-dep-list">${items}</div>
   </div>`
 }
@@ -12047,7 +12047,7 @@ async function openAssetForm(id) {
     `<option value="${v}"${item?.status===v?' selected':''}>${l}</option>`
   ).join('')
 
-  const entityOptions = `<option value="">— No entity —</option>` +
+  const entityOptions = `<option value="">${t('ui_noEntity')}</option>` +
     entities.map(e => `<option value="${e.id}"${item?.entityId===e.id?' selected':''}>${escHtml(e.name)}</option>`).join('')
 
   const ouOptsAsset = await getOrgUnitOptions(item?.orgUnitId || '')
@@ -12056,56 +12056,56 @@ async function openAssetForm(id) {
     <div class="training-form-page">
       <div class="training-form-header">
         <button class="btn btn-secondary btn-sm" onclick="switchAssetsTab('list')">
-          <i class="ph ph-arrow-left"></i> Back to Overview
+          <i class="ph ph-arrow-left"></i> ${t('ui_backToOverview')}
         </button>
         <h3 class="training-form-title">
           <i class="ph ph-buildings"></i>
-          ${isEdit ? 'Edit Asset' : 'New Asset'}
+          ${isEdit ? t('assets_editAsset') : t('assets_newAsset')}
         </h3>
       </div>
       <div class="training-form-body">
 
         <div class="training-form-section">
-          <h4 class="training-form-section-title"><i class="ph ph-info"></i> Basic Information</h4>
+          <h4 class="training-form-section-title"><i class="ph ph-info"></i> ${t('asset_basicInfo')}</h4>
           <div class="form-group">
-            <label class="form-label">Name <span class="form-required">*</span></label>
-            <input id="asName" class="form-input" value="${escHtml(item?.name||'')}" placeholder="Asset name">
+            <label class="form-label">${t('ui_name')} <span class="form-required">*</span></label>
+            <input id="asName" class="form-input" value="${escHtml(item?.name||'')}" placeholder="${t('asset_namePh')}">
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Category</label>
+              <label class="form-label">${t('ui_category')}</label>
               <select id="asCat" class="select">${catOptions}</select>
             </div>
             <div class="form-group">
-              <label class="form-label">Type</label>
+              <label class="form-label">${t('col_type')}</label>
               <select id="asType" class="select">${typeOptions}</select>
             </div>
           </div>
           <div class="form-group">
-            <label class="form-label">Description</label>
-            <textarea id="asDesc" class="form-input" rows="3" placeholder="Brief description of the asset">${escHtml(item?.description||'')}</textarea>
+            <label class="form-label">${t('ui_description')}</label>
+            <textarea id="asDesc" class="form-input" rows="3" placeholder="${t('asset_descPh')}">${escHtml(item?.description||'')}</textarea>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Status</label>
+              <label class="form-label">${t('col_status')}</label>
               <select id="asStatus" class="select">${statusOptions}</select>
             </div>
             <div class="form-group">
-              <label class="form-label">Tags (comma-separated)</label>
-              <input id="asTags" class="form-input" value="${escHtml((item?.tags||[]).join(', '))}" placeholder="e.g. erp, production">
+              <label class="form-label">${t('ui_tagsCsv')}</label>
+              <input id="asTags" class="form-input" value="${escHtml((item?.tags||[]).join(', '))}" placeholder="${t('asset_tagsPh')}">
             </div>
           </div>
         </div>
 
         <div class="training-form-section">
-          <h4 class="training-form-section-title"><i class="ph ph-shield-check"></i> Classification &amp; Criticality <span style="font-size:.75rem;color:var(--text-subtle);font-weight:400">(ISO 27001 A.5.12)</span></h4>
+          <h4 class="training-form-section-title"><i class="ph ph-shield-check"></i> ${t('assets_classCritTitle')} <span style="font-size:.75rem;color:var(--text-subtle);font-weight:400">(ISO 27001 A.5.12)</span></h4>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Classification</label>
+              <label class="form-label">${t('assets_classification')}</label>
               <select id="asClass" class="select" onchange="_syncAssetConfidentiality('class')">${classOptions}</select>
             </div>
             <div class="form-group">
-              <label class="form-label">Criticality</label>
+              <label class="form-label">${t('assets_criticality')}</label>
               <select id="asCrit" class="select">${critOptions}</select>
             </div>
           </div>
@@ -12131,82 +12131,82 @@ async function openAssetForm(id) {
         </div>
 
         <div class="training-form-section">
-          <h4 class="training-form-section-title"><i class="ph ph-users"></i> Responsibilities</h4>
+          <h4 class="training-form-section-title"><i class="ph ph-users"></i> ${t('asset_responsibilities')}</h4>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Information Owner</label>
-              <input id="asOwner" class="form-input" value="${escHtml(item?.owner||'')}" placeholder="Information owner name">
+              <label class="form-label">${t('asset_infoOwner')}</label>
+              <input id="asOwner" class="form-input" value="${escHtml(item?.owner||'')}" placeholder="${t('asset_infoOwnerPh')}">
             </div>
             <div class="form-group">
-              <label class="form-label">Owner E-Mail</label>
-              <input id="asOwnerEmail" type="email" class="form-input" value="${escHtml(item?.ownerEmail||'')}" placeholder="owner@company.com">
+              <label class="form-label">${t('ui_ownerEmail')}</label>
+              <input id="asOwnerEmail" type="email" class="form-input" value="${escHtml(item?.ownerEmail||'')}" placeholder="${t('asset_ownerEmailPh')}">
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Technical Custodian</label>
-              <input id="asCustodian" class="form-input" value="${escHtml(item?.custodian||'')}" placeholder="Team or person">
+              <label class="form-label">${t('asset_technicalCustodian')}</label>
+              <input id="asCustodian" class="form-input" value="${escHtml(item?.custodian||'')}" placeholder="${t('asset_teamPersonPh')}">
             </div>
             <div class="form-group">
-              <label class="form-label">Responsible Unit (OE)</label>
+              <label class="form-label">${t('asset_responsibleUnit')}</label>
               <select id="asOrgUnit" class="select">${ouOptsAsset}</select>
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Entity</label>
+              <label class="form-label">${t('ui_entity')}</label>
               <select id="asEntity" class="select">${entityOptions}</select>
             </div>
           </div>
         </div>
 
         <div class="training-form-section">
-          <h4 class="training-form-section-title"><i class="ph ph-gear"></i> Technical Details</h4>
+          <h4 class="training-form-section-title"><i class="ph ph-gear"></i> ${t('asset_technicalDetails')}</h4>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Manufacturer / Vendor</label>
-              <input id="asVendor" class="form-input" value="${escHtml(item?.vendor||'')}" placeholder="e.g. SAP SE, Microsoft">
+              <label class="form-label">${t('asset_manufacturerVendor')}</label>
+              <input id="asVendor" class="form-input" value="${escHtml(item?.vendor||'')}" placeholder="${t('asset_vendorPh')}">
             </div>
             <div class="form-group">
-              <label class="form-label">Version</label>
-              <input id="asVersion" class="form-input" value="${escHtml(item?.version||'')}" placeholder="e.g. 2023, v2.9">
+              <label class="form-label">${t('ui_version')}</label>
+              <input id="asVersion" class="form-input" value="${escHtml(item?.version||'')}" placeholder="${t('asset_versionPh')}">
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Serial Number / Asset ID</label>
-              <input id="asSerial" class="form-input" value="${escHtml(item?.serialNumber||'')}" placeholder="Serial number or internal ID">
+              <label class="form-label">${t('asset_serialNumber')}</label>
+              <input id="asSerial" class="form-input" value="${escHtml(item?.serialNumber||'')}" placeholder="${t('asset_serialNumberPh')}">
             </div>
             <div class="form-group">
-              <label class="form-label">Location / Room</label>
-              <input id="asLocation" class="form-input" value="${escHtml(item?.location||'')}" placeholder="e.g. DC Frankfurt, Room A-03">
+              <label class="form-label">${t('ui_location')}</label>
+              <input id="asLocation" class="form-input" value="${escHtml(item?.location||'')}" placeholder="${t('asset_locationPh')}">
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Purchase Date</label>
+              <label class="form-label">${t('ui_purchaseDate')}</label>
               <input id="asPurchase" type="date" class="form-input" value="${item?.purchaseDate||''}" style="color-scheme:dark">
             </div>
             <div class="form-group">
-              <label class="form-label">End-of-Life Date</label>
+              <label class="form-label">${t('asset_eolDate')}</label>
               <input id="asEol" type="date" class="form-input" value="${item?.endOfLifeDate||''}" style="color-scheme:dark">
             </div>
           </div>
         </div>
 
         <div class="training-form-section">
-          <h4 class="training-form-section-title"><i class="ph ph-note-pencil"></i> Notes</h4>
+          <h4 class="training-form-section-title"><i class="ph ph-note-pencil"></i> ${t('ui_notes')}</h4>
           <div class="form-group">
-            <textarea id="asNotes" class="form-input" rows="4" placeholder="Internal remarks, maintenance notes, references to other documents…">${escHtml(item?.notes||'')}</textarea>
+            <textarea id="asNotes" class="form-input" rows="4" placeholder="${t('asset_notesPh')}">${escHtml(item?.notes||'')}</textarea>
           </div>
           ${renderLinksBlock('as', item?.linkedControls||[], item?.linkedPolicies||[])}
         </div>
 
       </div>
       <div class="training-form-footer">
-        <button class="btn btn-secondary" onclick="switchAssetsTab('list')">Cancel</button>
+        <button class="btn btn-secondary" onclick="switchAssetsTab('list')">${t('ui_cancel')}</button>
         <button class="btn btn-primary" onclick="saveAsset('${id||''}')">
-          <i class="ph ph-floppy-disk"></i> Save
+          <i class="ph ph-floppy-disk"></i> ${t('ui_save')}
         </button>
       </div>
     </div>
@@ -12484,7 +12484,7 @@ async function renderAssetsGraph(el) {
       </div>
       <div class="asset-summary-card">
         <div class="assc-value">${graph.edges.length}</div>
-        <div class="assc-label">Relations</div>
+        <div class="assc-label">${t('ui_relations')}</div>
       </div>
       <div class="asset-summary-card">
         <div class="assc-value" style="color:#f0b429">${graph.nodes.filter(n => n.inherited).length}</div>
@@ -14642,36 +14642,36 @@ async function openSupplierForm(id = null) {
     <div class="training-form-page">
       <div class="training-form-header">
         <button class="btn btn-secondary btn-sm" onclick="switchSuppliersTab('${_suppliersTab}')">
-          <i class="ph ph-arrow-left"></i> Back to List
+          <i class="ph ph-arrow-left"></i> ${t('sup_backToList')}
         </button>
         <h3 class="training-form-title">
           <i class="ph ph-truck"></i>
-          ${isEdit ? 'Edit Supplier' : 'New Supplier'}
+          ${isEdit ? t('sup_editSupplier') : t('sup_newSupplier')}
         </h3>
       </div>
       <div class="training-form-body">
 
         <div class="training-form-section">
-          <h4 class="training-form-section-title"><i class="ph ph-buildings"></i> Master Data</h4>
+          <h4 class="training-form-section-title"><i class="ph ph-buildings"></i> ${t('sup_masterData')}</h4>
           <div class="form-group">
-            <label class="form-label">Name <span class="form-required">*</span></label>
-            <input id="supName" class="form-input" value="${escHtml(item?.name || '')}" placeholder="Company name">
+            <label class="form-label">${t('ui_name')} <span class="form-required">*</span></label>
+            <input id="supName" class="form-input" value="${escHtml(item?.name || '')}" placeholder="${t('sup_companyNamePh')}">
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Type</label>
+              <label class="form-label">${t('col_type')}</label>
               <select id="supType" class="select">
                 ${Object.entries(SUP_TYPE_LABELS).map(([v, l]) => `<option value="${v}"${item?.type === v ? ' selected' : ''}>${l}</option>`).join('')}
               </select>
             </div>
             <div class="form-group">
-              <label class="form-label">Criticality</label>
+              <label class="form-label">${t('assets_criticality')}</label>
               <select id="supCrit" class="select">
                 ${Object.entries(SUP_CRIT_LABELS).map(([v, l]) => `<option value="${v}"${item?.criticality === v ? ' selected' : ''}>${l}</option>`).join('')}
               </select>
             </div>
             <div class="form-group">
-              <label class="form-label">Status</label>
+              <label class="form-label">${t('col_status')}</label>
               <select id="supStatus" class="select">
                 ${Object.entries(SUP_STATUS_LABELS).map(([v, l]) => `<option value="${v}"${item?.status === v ? ' selected' : ''}>${l}</option>`).join('')}
               </select>
@@ -14679,103 +14679,103 @@ async function openSupplierForm(id = null) {
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Country (ISO Code)</label>
-              <input id="supCountry" class="form-input" value="${escHtml(item?.country || '')}" placeholder="e.g. DE, LU, US">
+              <label class="form-label">${t('sup_countryIso')}</label>
+              <input id="supCountry" class="form-input" value="${escHtml(item?.country || '')}" placeholder="${t('sup_countryPh')}">
             </div>
             <div class="form-group">
-              <label class="form-label">Website</label>
-              <input id="supWebsite" class="form-input" value="${escHtml(item?.website || '')}" placeholder="https://…">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">Contact Person</label>
-              <input id="supContactName" class="form-input" value="${escHtml(item?.contactName || '')}" placeholder="Name">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Contact E-Mail</label>
-              <input id="supContactEmail" class="form-input" type="email" value="${escHtml(item?.contactEmail || '')}" placeholder="email@supplier.com">
+              <label class="form-label">${t('ui_website')}</label>
+              <input id="supWebsite" class="form-input" value="${escHtml(item?.website || '')}" placeholder="${t('ui_urlPh')}">
             </div>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Internal Responsible Unit (OE)</label>
+              <label class="form-label">${t('sup_contactPerson')}</label>
+              <input id="supContactName" class="form-input" value="${escHtml(item?.contactName || '')}" placeholder="${t('ui_namePh')}">
+            </div>
+            <div class="form-group">
+              <label class="form-label">${t('sup_contactEmail')}</label>
+              <input id="supContactEmail" class="form-input" type="email" value="${escHtml(item?.contactEmail || '')}" placeholder="${t('sup_contactEmailPh')}">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">${t('sup_internalOrgUnit')}</label>
               <select id="supOrgUnit" class="select">${ouOptsSup}</select>
             </div>
           </div>
           <div class="form-group">
-            <label class="form-label">Products / Services</label>
-            <textarea id="supProducts" class="form-input" rows="2" placeholder="Brief description of services provided">${escHtml(item?.products || '')}</textarea>
+            <label class="form-label">${t('sup_productsServices')}</label>
+            <textarea id="supProducts" class="form-input" rows="2" placeholder="${t('sup_productsPh')}">${escHtml(item?.products || '')}</textarea>
           </div>
           <div class="form-group">
-            <label class="form-label">Description</label>
-            <textarea id="supDescription" class="form-input" rows="2" placeholder="Further details about the supplier">${escHtml(item?.description || '')}</textarea>
+            <label class="form-label">${t('ui_description')}</label>
+            <textarea id="supDescription" class="form-input" rows="2" placeholder="${t('sup_descriptionPh')}">${escHtml(item?.description || '')}</textarea>
           </div>
         </div>
 
         <div class="training-form-section">
-          <h4 class="training-form-section-title"><i class="ph ph-database"></i> Data Access & Privacy</h4>
+          <h4 class="training-form-section-title"><i class="ph ph-database"></i> ${t('sup_dataAccessPrivacy')}</h4>
           <div class="form-group" style="display:flex;align-items:center;gap:10px">
             <label class="module-toggle">
               <input type="checkbox" id="supDataAccess" ${item?.dataAccess ? 'checked' : ''}>
               <span class="module-toggle-slider"></span>
             </label>
-            <span>Supplier has access to personal or confidential data</span>
+            <span>${t('sup_hasDataAccess')}</span>
           </div>
           <div class="form-group">
-            <label class="form-label">Data Categories (comma-separated)</label>
-            <textarea id="supDataCategories" class="form-input" rows="2" placeholder="e.g. HR data, financial data, customer data">${escHtml((item?.dataCategories || []).join(', '))}</textarea>
+            <label class="form-label">${t('sup_dataCategoriesCsv')}</label>
+            <textarea id="supDataCategories" class="form-input" rows="2" placeholder="${t('sup_dataCategoriesPh')}">${escHtml((item?.dataCategories || []).join(', '))}</textarea>
           </div>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Contract ID</label>
-              <input id="supContractId" class="form-input" value="${escHtml(item?.contractId || '')}" placeholder="Reference to contract">
+              <label class="form-label">${t('sup_contractId')}</label>
+              <input id="supContractId" class="form-input" value="${escHtml(item?.contractId || '')}" placeholder="${t('sup_contractIdPh')}">
             </div>
             <div class="form-group">
-              <label class="form-label">DPA Contract ID (GDPR Art. 28)</label>
-              <input id="supAvContractId" class="form-input" value="${escHtml(item?.avContractId || '')}" placeholder="Reference to DPA">
+              <label class="form-label">${t('sup_dpaContractId')}</label>
+              <input id="supAvContractId" class="form-input" value="${escHtml(item?.avContractId || '')}" placeholder="${t('sup_dpaContractIdPh')}">
             </div>
           </div>
         </div>
 
         <div class="training-form-section">
-          <h4 class="training-form-section-title"><i class="ph ph-clipboard-text"></i> Audit & Risk</h4>
+          <h4 class="training-form-section-title"><i class="ph ph-clipboard-text"></i> ${t('sup_auditRisk')}</h4>
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label">Last Audit</label>
+              <label class="form-label">${t('sup_lastAudit')}</label>
               <input id="supLastAudit" type="date" class="form-input" value="${item?.lastAuditDate || ''}" style="color-scheme:dark">
             </div>
             <div class="form-group">
-              <label class="form-label">Next Audit</label>
+              <label class="form-label">${t('sup_nextAudit')}</label>
               <input id="supNextAudit" type="date" class="form-input" value="${item?.nextAuditDate || ''}" style="color-scheme:dark">
             </div>
             <div class="form-group">
-              <label class="form-label">Audit Result</label>
+              <label class="form-label">${t('sup_auditResult')}</label>
               <select id="supAuditResult" class="select">
                 ${Object.entries(SUP_AUDIT_LABELS).map(([v, l]) => `<option value="${v}"${item?.auditResult === v ? ' selected' : ''}>${l}</option>`).join('')}
               </select>
             </div>
           </div>
           <div class="form-group">
-            <label class="form-label">Risk Score (0–25)</label>
+            <label class="form-label">${t('sup_riskScore')}</label>
             <input id="supRiskScore" type="number" min="0" max="25" class="form-input" value="${item?.riskScore ?? 0}" style="max-width:120px">
           </div>
           <div class="form-group">
-            <label class="form-label">Security Requirements (comma-separated)</label>
-            <textarea id="supSecReqs" class="form-input" rows="2" placeholder="e.g. ISO 27001, SOC 2, NDA, GDPR compliance">${escHtml((item?.securityRequirements || []).join(', '))}</textarea>
+            <label class="form-label">${t('sup_secReqsCsv')}</label>
+            <textarea id="supSecReqs" class="form-input" rows="2" placeholder="${t('sup_secReqsPh')}">${escHtml((item?.securityRequirements || []).join(', '))}</textarea>
           </div>
           <div class="form-group">
             <label class="form-label">${t('ui_notes')}</label>
-            <textarea id="supNotes" class="form-input" rows="3" placeholder="Additional remarks about the supplier">${escHtml(item?.notes || '')}</textarea>
+            <textarea id="supNotes" class="form-input" rows="3" placeholder="${t('sup_notesPh')}">${escHtml(item?.notes || '')}</textarea>
           </div>
           ${renderLinksBlock('sup', item?.linkedControls || [], item?.linkedPolicies || [])}
         </div>
 
       </div>
       <div class="training-form-footer">
-        <button class="btn btn-secondary" onclick="switchSuppliersTab('${_suppliersTab}')">Cancel</button>
+        <button class="btn btn-secondary" onclick="switchSuppliersTab('${_suppliersTab}')">${t('ui_cancel')}</button>
         <button class="btn btn-primary" onclick="saveSupplier('${id || ''}')">
-          <i class="ph ph-floppy-disk"></i> Save
+          <i class="ph ph-floppy-disk"></i> ${t('ui_save')}
         </button>
       </div>
     </div>
@@ -14869,11 +14869,11 @@ async function openSupplierAssessments(supplierId) {
   const list = listRes.ok ? await listRes.json() : []
 
   const STATUS_BADGE = {
-    pending:   '<span class="badge badge-warn">Pending</span>',
-    submitted: '<span class="badge badge-info">Submitted</span>',
-    reviewed:  '<span class="badge badge-success">Reviewed</span>',
-    accepted:  '<span class="badge badge-success">Accepted</span>',
-    rejected:  '<span class="badge badge-danger">Rejected</span>',
+    pending:   `<span class="badge badge-warn">${t('sup_statPending')}</span>`,
+    submitted: `<span class="badge badge-info">${t('sup_statSubmitted')}</span>`,
+    reviewed:  `<span class="badge badge-success">${t('sup_statReviewed')}</span>`,
+    accepted:  `<span class="badge badge-success">${t('sup_statAccepted')}</span>`,
+    rejected:  `<span class="badge badge-danger">${t('sup_statRejected')}</span>`,
   }
 
   const LANG_FLAG = { de: '🇩🇪', en: '🇬🇧', fr: '🇫🇷', nl: '🇳🇱' }
@@ -14890,8 +14890,8 @@ async function openSupplierAssessments(supplierId) {
       <td>${a.dueDate || '—'}</td>
       <td>${a.submittedAt ? new Date(a.submittedAt).toLocaleDateString('de-DE') : '—'}</td>
       <td style="white-space:nowrap">
-        ${a.status === 'pending' ? `<button class="btn btn-secondary btn-xs" title="Link kopieren" data-token="${a.token}" onclick="copyAssessmentLink(this)"><i class="ph ph-link"></i></button>` : ''}
-        ${(canEdit && a.status === 'submitted') ? `<button class="btn btn-primary btn-xs" onclick="openAssessmentReview('${a.id}')"><i class="ph ph-check-circle"></i> Review</button>` : ''}
+        ${a.status === 'pending' ? `<button class="btn btn-secondary btn-xs" title="${escHtml(t('sup_copyLink'))}" data-token="${a.token}" onclick="copyAssessmentLink(this)"><i class="ph ph-link"></i></button>` : ''}
+        ${(canEdit && a.status === 'submitted') ? `<button class="btn btn-primary btn-xs" onclick="openAssessmentReview('${a.id}')"><i class="ph ph-check-circle"></i> ${t('ui_review')}</button>` : ''}
         ${(canEdit && a.status !== 'pending') ? `<button class="btn btn-secondary btn-xs" onclick="openAssessmentDetail('${a.id}')"><i class="ph ph-eye"></i></button>` : ''}
         ${isAdmin ? `<button class="btn btn-danger btn-xs" onclick="deleteAssessment('${a.id}', '${supplierId}')"><i class="ph ph-trash"></i></button>` : ''}
       </td>
@@ -14902,22 +14902,22 @@ async function openSupplierAssessments(supplierId) {
     <div class="training-form-page">
       <div class="training-form-header">
         <button class="btn btn-secondary btn-sm" onclick="switchSuppliersTab('list')">
-          <i class="ph ph-arrow-left"></i> Back
+          <i class="ph ph-arrow-left"></i> ${t('ui_back')}
         </button>
-        <h3 style="margin:0">Self-Assessments: ${escHtml(supplierName)}</h3>
+        <h3 style="margin:0">${t('sup_selfAssessments')}: ${escHtml(supplierName)}</h3>
         ${canEdit ? `<button class="btn btn-primary btn-sm" onclick="openCreateAssessment('${supplierId}')">
-          <i class="ph ph-plus"></i> New Assessment Link
+          <i class="ph ph-plus"></i> ${t('sup_newAssessmentLink')}
         </button>` : ''}
       </div>
 
       ${list.length ? `
         <table class="bcm-table" style="margin-top:16px">
           <thead><tr>
-            <th>Title</th><th>Status</th><th>Score</th><th>Due Date</th><th>Submitted</th><th>Actions</th>
+            <th>${t('ui_title')}</th><th>${t('col_status')}</th><th>${t('ui_score')}</th><th>${t('ui_dueDate')}</th><th>${t('ui_submittedOn')}</th><th>${t('ui_actions')}</th>
           </tr></thead>
           <tbody>${rows}</tbody>
         </table>
-      ` : `<p class="dash-empty" style="margin-top:24px">No assessments yet. Create one to generate a link for the supplier.</p>`}
+      ` : `<p class="dash-empty" style="margin-top:24px">${t('sup_noAssessments')}</p>`}
     </div>`
 }
 
