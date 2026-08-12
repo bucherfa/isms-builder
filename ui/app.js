@@ -9327,12 +9327,12 @@ let _gdprEntities     = []
 let _gdprTomCategory  = ''
 
 const GDPR_LEGAL_BASES = [
-  { id: 'consent',              label: 'Consent (Art. 6(1)(a))' },
-  { id: 'contract',             label: 'Contract Performance (Art. 6(1)(b))' },
-  { id: 'legal_obligation',     label: 'Legal Obligation (Art. 6(1)(c))' },
-  { id: 'vital_interests',      label: 'Vital Interests (Art. 6(1)(d))' },
-  { id: 'public_task',          label: 'Public Interest (Art. 6(1)(e))' },
-  { id: 'legitimate_interest',  label: 'Legitimate Interests (Art. 6(1)(f))' },
+  { id: 'consent',              get label() { return t('gdprl_consent') } },
+  { id: 'contract',             get label() { return t('gdprl_contract') } },
+  { id: 'legal_obligation',     get label() { return t('gdprl_legalObligation') } },
+  { id: 'vital_interests',      get label() { return t('gdprl_vitalInterests') } },
+  { id: 'public_task',          get label() { return t('gdprl_publicTask') } },
+  { id: 'legitimate_interest',  get label() { return t('gdprl_legitimateInterest') } },
 ]
 let GDPR_DATA_CATS = ['name','email','phone','address','health','biometric','financial','location','other']
 let GDPR_SUBJECT_TYPES = [
@@ -9344,92 +9344,92 @@ let GDPR_SUBJECT_TYPES = [
 ]
 const GDPR_TRANSFER_MECHS = [
   { id:'', label:'—' },
-  { id:'adequacy', label:'Adequacy Decision' },
-  { id:'scc', label:'Standard Contractual Clauses (SCC)' },
-  { id:'bcr', label:'Binding Corporate Rules (BCR)' },
-  { id:'other', label:'Other Safeguards' },
+  { id:'adequacy', get label() { return t('gdprl_adequacy') } },
+  { id:'scc', get label() { return t('gdprl_scc') } },
+  { id:'bcr', get label() { return t('gdprl_bcr') } },
+  { id:'other', get label() { return t('gdprl_otherSafeguards') } },
 ]
 const GDPR_AV_STATUSES = [
-  { id:'draft',       label:'Draft' },
-  { id:'negotiation', label:'Negotiation' },
-  { id:'signed',      label:'Signed' },
-  { id:'active',      label:'Active' },
-  { id:'terminated',  label:'Terminated' },
+  { id:'draft',       get label() { return t('legl_stDraft') } },
+  { id:'negotiation', get label() { return t('gdprl_negotiation') } },
+  { id:'signed',      get label() { return t('legl_stSigned') } },
+  { id:'active',      get label() { return t('legl_stActive') } },
+  { id:'terminated',  get label() { return t('gdprl_terminated') } },
 ]
 const GDPR_VVT_STATUSES = [
-  { id:'draft',    label:'Draft' },
-  { id:'approved', label:'Approved' },
-  { id:'archived', label:'Archived' },
+  { id:'draft',    get label() { return t('legl_stDraft') } },
+  { id:'approved', get label() { return t('govl_statApproved') } },
+  { id:'archived', get label() { return t('legl_stArchived') } },
 ]
 const GDPR_DSFA_STATUSES = [
-  { id:'draft',    label:'Draft' },
-  { id:'review',   label:'Review' },
-  { id:'approved', label:'Approved' },
-  { id:'archived', label:'Archived' },
+  { id:'draft',    get label() { return t('legl_stDraft') } },
+  { id:'review',   get label() { return t('legl_stReview') } },
+  { id:'approved', get label() { return t('govl_statApproved') } },
+  { id:'archived', get label() { return t('legl_stArchived') } },
 ]
 const GDPR_INC_TYPES = [
-  { id:'unauthorized_access', label:'Unauthorized Access' },
-  { id:'loss',                label:'Data Loss' },
-  { id:'deletion',            label:'Unintentional Deletion' },
-  { id:'theft',               label:'Theft' },
-  { id:'ransomware',          label:'Ransomware' },
-  { id:'other',               label:'Other' },
+  { id:'unauthorized_access', get label() { return t('gdprl_unauthorizedAccess') } },
+  { id:'loss',                get label() { return t('gdprl_dataLoss') } },
+  { id:'deletion',            get label() { return t('gdprl_unintentionalDeletion') } },
+  { id:'theft',               get label() { return t('gdprl_theft') } },
+  { id:'ransomware',          get label() { return t('gdprl_ransomware') } },
+  { id:'other',               get label() { return t('ui_other') } },
 ]
 const GDPR_INC_STATUSES = [
-  { id:'detected',  label:'Detected' },
-  { id:'contained', label:'Contained' },
-  { id:'reported',  label:'Reported' },
-  { id:'closed',    label:'Closed' },
+  { id:'detected',  get label() { return t('gdprl_detected') } },
+  { id:'contained', get label() { return t('gdprl_contained') } },
+  { id:'reported',  get label() { return t('gdprl_reported') } },
+  { id:'closed',    get label() { return t('gdprl_closed') } },
 ]
 const GDPR_DSAR_TYPES = [
-  { id:'access',            label:'Access (Art. 15)' },
-  { id:'rectification',     label:'Rectification (Art. 16)' },
-  { id:'erasure',           label:'Erasure (Art. 17)' },
-  { id:'restriction',       label:'Restriction (Art. 18)' },
-  { id:'portability',       label:'Data Portability (Art. 20)' },
-  { id:'objection',         label:'Objection (Art. 21)' },
-  { id:'review_automated',  label:'Automated Decision Review (Art. 22)' },
+  { id:'access',            get label() { return t('gdprl_access') } },
+  { id:'rectification',     get label() { return t('gdprl_rectification') } },
+  { id:'erasure',           get label() { return t('gdprl_erasure') } },
+  { id:'restriction',       get label() { return t('gdprl_restriction') } },
+  { id:'portability',       get label() { return t('gdprl_portability') } },
+  { id:'objection',         get label() { return t('gdprl_objection') } },
+  { id:'review_automated',  get label() { return t('gdprl_reviewAutomated') } },
 ]
 const GDPR_DSAR_STATUSES = [
-  { id:'received',    label:'Received' },
-  { id:'in_progress', label:'In Progress' },
-  { id:'extended',    label:'Extended (+60 Days)' },
-  { id:'completed',   label:'Completed' },
-  { id:'refused',     label:'Refused' },
+  { id:'received',    get label() { return t('gdprl_received') } },
+  { id:'in_progress', get label() { return t('gdprl_inProgress') } },
+  { id:'extended',    get label() { return t('gdprl_extended60') } },
+  { id:'completed',   get label() { return t('govl_statCompleted') } },
+  { id:'refused',     get label() { return t('gdprl_refused') } },
 ]
 const GDPR_TOM_CATS = [
-  { id:'access',          label:'Access Control' },
-  { id:'encryption',      label:'Encryption' },
-  { id:'logging',         label:'Logging' },
-  { id:'network',         label:'Network Security' },
-  { id:'application',     label:'Application Security' },
-  { id:'backup',          label:'Backup & Recovery' },
-  { id:'organizational',  label:'Organizational' },
-  { id:'training',        label:'Training' },
-  { id:'retention',       label:'Data Retention' },
+  { id:'access',          get label() { return t('gdprl_accessControl') } },
+  { id:'encryption',      get label() { return t('gdprl_encryption') } },
+  { id:'logging',         get label() { return t('gdprl_logging') } },
+  { id:'network',         get label() { return t('gdprl_networkSecurity') } },
+  { id:'application',     get label() { return t('gdprl_appSecurity') } },
+  { id:'backup',          get label() { return t('gdprl_backupRecovery') } },
+  { id:'organizational',  get label() { return t('gdprl_organizational') } },
+  { id:'training',        get label() { return t('gdprl_training') } },
+  { id:'retention',       get label() { return t('gdprl_dataRetention') } },
 ]
 const GDPR_TOM_STATUSES = [
-  { id:'planned',     label:'Planned' },
-  { id:'in_progress', label:'In Progress' },
-  { id:'implemented', label:'Implemented' },
-  { id:'verified',    label:'Verified' },
+  { id:'planned',     get label() { return t('govl_statPlanned') } },
+  { id:'in_progress', get label() { return t('gdprl_inProgress') } },
+  { id:'implemented', get label() { return t('gdprl_tomImplemented') } },
+  { id:'verified',    get label() { return t('gdprl_tomVerified') } },
 ]
 const GDPR_RISK_LEVELS = [
-  { id:'low',      label:'Low' },
-  { id:'medium',   label:'Medium' },
-  { id:'high',     label:'High' },
-  { id:'critical', label:'Critical' },
+  { id:'low',      get label() { return t('riskl_low') } },
+  { id:'medium',   get label() { return t('riskl_medium') } },
+  { id:'high',     get label() { return t('riskl_high') } },
+  { id:'critical', get label() { return t('riskl_critical') } },
 ]
 
 const GDPR_ART28_ITEMS = [
-  { key:'instructionsOnly',     label:'Processing only on instruction (Art. 28(3)(a))' },
-  { key:'confidentiality',      label:'Confidentiality obligation (Art. 28(3)(b))' },
-  { key:'security',             label:'TOMs pursuant to Art. 32 (Art. 28(3)(c))' },
-  { key:'subProcessorApproval', label:'Sub-processor approval (Art. 28(3)(d))' },
-  { key:'assistanceRights',     label:'Assistance with data subject rights (Art. 28(3)(e))' },
-  { key:'deletionReturn',       label:'Deletion/return after contract end (Art. 28(3)(f))' },
-  { key:'auditRights',          label:'Accountability & audit rights (Art. 28(3)(h))' },
-  { key:'cooperation',          label:'Cooperation with supervisory authority (Art. 28(3)(h))' },
+  { key:'instructionsOnly',     get label() { return t('gdprl_art28a') } },
+  { key:'confidentiality',      get label() { return t('gdprl_art28b') } },
+  { key:'security',             get label() { return t('gdprl_art28c') } },
+  { key:'subProcessorApproval', get label() { return t('gdprl_art28d') } },
+  { key:'assistanceRights',     get label() { return t('gdprl_art28e') } },
+  { key:'deletionReturn',       get label() { return t('gdprl_art28f') } },
+  { key:'auditRights',          get label() { return t('gdprl_art28h1') } },
+  { key:'cooperation',          get label() { return t('gdprl_art28h2') } },
 ]
 
 function gdprCanEdit()  { return ROLE_RANK[getCurrentRole()] >= 2 }
@@ -9459,15 +9459,15 @@ async function renderGDPR() {
         </div>
       </div>
       <div class="gdpr-tab-bar">
-        <button class="gdpr-tab" data-tab="overview"   onclick="switchGdprTab('overview')"><i class="ph ph-gauge"></i> Overview</button>
-        <button class="gdpr-tab" data-tab="vvt"        onclick="switchGdprTab('vvt')"><i class="ph ph-list-bullets"></i> RoPA (Art. 30)</button>
-        <button class="gdpr-tab" data-tab="av"         onclick="switchGdprTab('av')"><i class="ph ph-handshake"></i> DPA Contracts (Art. 28)</button>
-        <button class="gdpr-tab" data-tab="dsfa"       onclick="switchGdprTab('dsfa')"><i class="ph ph-magnifying-glass"></i> DPIA (Art. 35)</button>
-        <button class="gdpr-tab" data-tab="incidents"  onclick="switchGdprTab('incidents')"><i class="ph ph-siren"></i> Data Breaches</button>
-        <button class="gdpr-tab" data-tab="dsar"       onclick="switchGdprTab('dsar')"><i class="ph ph-user-circle"></i> Data Subject Rights</button>
-        <button class="gdpr-tab" data-tab="toms"       onclick="switchGdprTab('toms')"><i class="ph ph-shield"></i> TOMs</button>
-        <button class="gdpr-tab" data-tab="deletion"   onclick="switchGdprTab('deletion')"><i class="ph ph-trash"></i> Deletion Log</button>
-        ${gdprCanOwn() ? `<button class="gdpr-tab" data-tab="dsb" onclick="switchGdprTab('dsb')"><i class="ph ph-identification-badge"></i> DPO</button>` : ''}
+        <button class="gdpr-tab" data-tab="overview"   onclick="switchGdprTab('overview')"><i class="ph ph-gauge"></i> ${t('gdprtab_overview')}</button>
+        <button class="gdpr-tab" data-tab="vvt"        onclick="switchGdprTab('vvt')"><i class="ph ph-list-bullets"></i> ${t('gdprtab_vvt')}</button>
+        <button class="gdpr-tab" data-tab="av"         onclick="switchGdprTab('av')"><i class="ph ph-handshake"></i> ${t('gdprtab_av')}</button>
+        <button class="gdpr-tab" data-tab="dsfa"       onclick="switchGdprTab('dsfa')"><i class="ph ph-magnifying-glass"></i> ${t('gdprtab_dsfa')}</button>
+        <button class="gdpr-tab" data-tab="incidents"  onclick="switchGdprTab('incidents')"><i class="ph ph-siren"></i> ${t('gdprtab_incidents')}</button>
+        <button class="gdpr-tab" data-tab="dsar"       onclick="switchGdprTab('dsar')"><i class="ph ph-user-circle"></i> ${t('gdprtab_dsar')}</button>
+        <button class="gdpr-tab" data-tab="toms"       onclick="switchGdprTab('toms')"><i class="ph ph-shield"></i> ${t('gdprtab_toms')}</button>
+        <button class="gdpr-tab" data-tab="deletion"   onclick="switchGdprTab('deletion')"><i class="ph ph-trash"></i> ${t('gdprtab_deletion')}</button>
+        ${gdprCanOwn() ? `<button class="gdpr-tab" data-tab="dsb" onclick="switchGdprTab('dsb')"><i class="ph ph-identification-badge"></i> ${t('gdprtab_dpo')}</button>` : ''}
       </div>
       <div class="gdpr-content" id="gdprTabContent"></div>
     </div>`
@@ -9523,7 +9523,7 @@ async function switchGdprTab(tab) {
 async function renderGdprOverview(el) {
   const r = await fetch('/gdpr/dashboard' + gdprEntityQ(), { headers: apiHeaders() })
   const s = r.ok ? await r.json() : null
-  if (!s) { el.innerHTML = '<p class="gdpr-empty">Error loading dashboard.</p>'; return }
+  if (!s) { el.innerHTML = `<p class="gdpr-empty">${t('ui_errLoadDashboard')}</p>`; return }
 
   const tomPct = s.toms.total > 0 ? Math.round((s.toms.implemented / s.toms.total) * 100) : 0
   const alerts = []
@@ -9535,16 +9535,16 @@ async function renderGdprOverview(el) {
   el.innerHTML = `
     ${alerts.length ? `<div class="gdpr-alerts">${alerts.join('')}</div>` : ''}
     <div class="gdpr-kpi-grid">
-      <div class="gdpr-kpi-card"><div class="kpi-value">${s.vvt.total}</div><div class="kpi-label">RoPA Entries</div></div>
-      <div class="gdpr-kpi-card ${s.vvt.highRisk > 0 ? 'kpi-warn' : ''}"><div class="kpi-value">${s.vvt.highRisk}</div><div class="kpi-label">High-Risk RoPA</div></div>
-      <div class="gdpr-kpi-card"><div class="kpi-value">${s.av.total}</div><div class="kpi-label">DPA Contracts</div></div>
-      <div class="gdpr-kpi-card ${s.av.active < s.av.total ? 'kpi-warn' : 'kpi-ok'}"><div class="kpi-value">${s.av.active}</div><div class="kpi-label">DPA active/signed</div></div>
-      <div class="gdpr-kpi-card ${s.dsar.open > 0 ? 'kpi-warn' : 'kpi-ok'}"><div class="kpi-value">${s.dsar.open}</div><div class="kpi-label">Open DSARs</div></div>
-      <div class="gdpr-kpi-card ${s.dsar.overdue > 0 ? 'kpi-danger' : ''}"><div class="kpi-value">${s.dsar.overdue}</div><div class="kpi-label">Overdue DSARs</div></div>
-      <div class="gdpr-kpi-card ${s.incidents.open > 0 ? 'kpi-warn' : ''}"><div class="kpi-value">${s.incidents.open}</div><div class="kpi-label">Open Data Breaches</div></div>
+      <div class="gdpr-kpi-card"><div class="kpi-value">${s.vvt.total}</div><div class="kpi-label">${t('gdpr_ropaEntries')}</div></div>
+      <div class="gdpr-kpi-card ${s.vvt.highRisk > 0 ? 'kpi-warn' : ''}"><div class="kpi-value">${s.vvt.highRisk}</div><div class="kpi-label">${t('gdpr_highRiskRopa')}</div></div>
+      <div class="gdpr-kpi-card"><div class="kpi-value">${s.av.total}</div><div class="kpi-label">${t('gdpr_dpaContracts')}</div></div>
+      <div class="gdpr-kpi-card ${s.av.active < s.av.total ? 'kpi-warn' : 'kpi-ok'}"><div class="kpi-value">${s.av.active}</div><div class="kpi-label">${t('gdpr_dpaActiveSigned')}</div></div>
+      <div class="gdpr-kpi-card ${s.dsar.open > 0 ? 'kpi-warn' : 'kpi-ok'}"><div class="kpi-value">${s.dsar.open}</div><div class="kpi-label">${t('gdpr_openDsars')}</div></div>
+      <div class="gdpr-kpi-card ${s.dsar.overdue > 0 ? 'kpi-danger' : ''}"><div class="kpi-value">${s.dsar.overdue}</div><div class="kpi-label">${t('gdpr_overdueDsars')}</div></div>
+      <div class="gdpr-kpi-card ${s.incidents.open > 0 ? 'kpi-warn' : ''}"><div class="kpi-value">${s.incidents.open}</div><div class="kpi-label">${t('gdpr_openBreaches')}</div></div>
       <div class="gdpr-kpi-card ${s.incidents.missed72h > 0 ? 'kpi-danger' : ''}"><div class="kpi-value">${s.incidents.missed72h}</div><div class="kpi-label">72h Deadline Missed</div></div>
-      <div class="gdpr-kpi-card ${tomPct >= 80 ? 'kpi-ok' : tomPct >= 50 ? 'kpi-warn' : 'kpi-danger'}"><div class="kpi-value">${tomPct}%</div><div class="kpi-label">TOMs Implemented</div></div>
-      <div class="gdpr-kpi-card ${s.dsbSet ? 'kpi-ok' : 'kpi-warn'}"><div class="kpi-value">${s.dsbSet ? '✓' : '—'}</div><div class="kpi-label">DPO Appointed</div></div>
+      <div class="gdpr-kpi-card ${tomPct >= 80 ? 'kpi-ok' : tomPct >= 50 ? 'kpi-warn' : 'kpi-danger'}"><div class="kpi-value">${tomPct}%</div><div class="kpi-label">${t('gdpr_tomsImplemented')}</div></div>
+      <div class="gdpr-kpi-card ${s.dsbSet ? 'kpi-ok' : 'kpi-warn'}"><div class="kpi-value">${s.dsbSet ? '✓' : '—'}</div><div class="kpi-label">${t('gdpr_dpoAppointed')}</div></div>
     </div>`
 }
 
@@ -9556,13 +9556,13 @@ async function renderGdprVvt(el) {
 
   el.innerHTML = `
     <div class="gdpr-filter-bar">
-      ${gdprCanEdit() ? `<button class="btn btn-primary btn-sm" onclick="openVvtForm()"><i class="ph ph-plus"></i> New Entry</button>` : ''}
+      ${gdprCanEdit() ? `<button class="btn btn-primary btn-sm" onclick="openVvtForm()"><i class="ph ph-plus"></i> ${t('ui_newEntry')}</button>` : ''}
       <span class="gdpr-filter-count">${list.length} entries</span>
     </div>
-    ${list.length === 0 ? '<p class="gdpr-empty">No RoPA entries found.</p>' : `
+    ${list.length === 0 ? `<p class="gdpr-empty">${t('gdpr_noRopaFound')}</p>` : `
     <table class="gdpr-table">
       <thead><tr>
-        <th>Title</th><th>Legal Basis</th><th>Data Categories</th><th>Risk</th><th>Status</th><th>Owner</th><th style="width:80px"></th>
+        <th>${t('col_title')}</th><th>${t('gdpr_legalBasis')}</th><th>${t('gdpr_dataCategories')}</th><th>${t('ui_risk')}</th><th>${t('col_status')}</th><th>${t('ui_owner')}</th><th style="width:80px"></th>
       </tr></thead>
       <tbody>
         ${list.map(v => {
@@ -9617,55 +9617,55 @@ async function openVvtForm(id = null) {
   document.getElementById('gdprTabContent').innerHTML = `
     <div class="training-form-page">
       <div class="training-form-header">
-        <button class="btn btn-secondary btn-sm" onclick="switchGdprTab('vvt')"><i class="ph ph-arrow-left"></i> Back</button>
-        <h2>${id ? 'Edit RoPA Entry' : 'New RoPA Entry'}</h2>
+        <button class="btn btn-secondary btn-sm" onclick="switchGdprTab('vvt')"><i class="ph ph-arrow-left"></i> ${t('ui_back')}</button>
+        <h2>${id ? t('gdpr_editRopaEntry') : t('gdpr_newRopaEntry')}</h2>
       </div>
       <div class="training-form-body">
-        <div class="form-group"><label class="form-label">Name *</label>
+        <div class="form-group"><label class="form-label">${t('ui_nameRequired')}</label>
           <input id="vvtTitle" class="form-input" value="${escHtml(v.title||'')}" placeholder="e.g. Customer Management CRM"></div>
-        <div class="form-group"><label class="form-label">Purpose of Processing</label>
+        <div class="form-group"><label class="form-label">${t('gdpr_purposeProcessing')}</label>
           <textarea id="vvtPurpose" class="form-input" rows="2">${escHtml(v.purpose||'')}</textarea></div>
-        <div class="form-group"><label class="form-label">Legal Basis</label>
+        <div class="form-group"><label class="form-label">${t('gdpr_legalBasis')}</label>
           <select id="vvtLegal" class="select">${lbOpts}</select></div>
-        <div class="form-group"><label class="form-label">Legal Basis Note</label>
+        <div class="form-group"><label class="form-label">${t('gdpr_legalBasisNote')}</label>
           <input id="vvtLegalNote" class="form-input" value="${escHtml(v.legalBasisNote||'')}" placeholder="e.g. Art. 6(1)(b) GDPR"></div>
-        <div class="form-group"><label class="form-label">Data Categories</label>
+        <div class="form-group"><label class="form-label">${t('gdpr_dataCategories')}</label>
           <div>${catChecks}</div></div>
-        <div class="form-group"><label class="form-label">Data Subjects</label>
+        <div class="form-group"><label class="form-label">${t('gdpr_dataSubjects')}</label>
           <div>${subChecks}</div></div>
-        <div class="form-group"><label class="form-label">Recipients (comma-separated)</label>
+        <div class="form-group"><label class="form-label">${t('gdpr_recipientsCsv')}</label>
           <input id="vvtRecipients" class="form-input" value="${escHtml((v.recipients||[]).join(', '))}" placeholder="e.g. Tax advisor, HR department"></div>
         <div class="form-group">
           <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
-            <input type="checkbox" id="vvtIntlTransfer" ${v.internationalTransfer?'checked':''}> International Data Transfer
+            <input type="checkbox" id="vvtIntlTransfer" ${v.internationalTransfer?'checked':''}> ${t('gdpr_intlTransfer')}
           </label></div>
-        <div class="form-group"><label class="form-label">Transfer Mechanism</label>
+        <div class="form-group"><label class="form-label">${t('gdpr_transferMechanism')}</label>
           <select id="vvtTransferMech" class="select">${tmOpts}</select></div>
-        <div class="form-group"><label class="form-label">Retention Period (text)</label>
+        <div class="form-group"><label class="form-label">${t('gdpr_retentionPeriodText')}</label>
           <input id="vvtRetention" class="form-input" value="${escHtml(v.retentionPeriod||'')}" placeholder="e.g. 7 years (§ 257 HGB)"></div>
-        <div class="form-group"><label class="form-label">Retention Period (months, for alerts)</label>
+        <div class="form-group"><label class="form-label">${t('gdpr_retentionPeriodMonths')}</label>
           <input id="vvtRetentionMonths" type="number" class="form-input" value="${v.retentionMonths||''}" placeholder="e.g. 84"></div>
-        <div class="form-group"><label class="form-label">Deletion Procedure</label>
+        <div class="form-group"><label class="form-label">${t('gdpr_deletionProcedure')}</label>
           <textarea id="vvtDeletion" class="form-input" rows="2">${escHtml(v.deletionProcedure||'')}</textarea></div>
         <div class="form-group" style="display:flex;gap:20px">
           <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
-            <input type="checkbox" id="vvtHighRisk" ${v.isHighRisk?'checked':''}> High Risk (DPIA required)
+            <input type="checkbox" id="vvtHighRisk" ${v.isHighRisk?'checked':''}> ${t('gdpr_highRiskDpia')}
           </label>
           <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
-            <input type="checkbox" id="vvtAutomated" ${v.automatedDecision?'checked':''}> Automated Decision
+            <input type="checkbox" id="vvtAutomated" ${v.automatedDecision?'checked':''}> ${t('gdpr_automatedDecision')}
           </label>
         </div>
-        <div class="form-group"><label class="form-label">Owner</label>
-          <input id="vvtOwner" class="form-input" value="${escHtml(v.owner||'')}" placeholder="Responsible person"></div>
-        <div class="form-group"><label class="form-label">Status</label>
+        <div class="form-group"><label class="form-label">${t('ui_owner')}</label>
+          <input id="vvtOwner" class="form-input" value="${escHtml(v.owner||'')}" placeholder="${t('ui_responsiblePersonPh')}"></div>
+        <div class="form-group"><label class="form-label">${t('col_status')}</label>
           <select id="vvtStatus" class="select">${stOpts}</select></div>
-        ${_gdprEntities.length ? `<div class="form-group"><label class="form-label">Applicable Entities</label>
+        ${_gdprEntities.length ? `<div class="form-group"><label class="form-label">${t('ui_applicableEntities')}</label>
           <div>${entityChecks}</div></div>` : ''}
         ${renderLinksBlock('vvt', v.linkedControls||[], v.linkedPolicies||[])}
       </div>
       <div class="training-form-footer">
-        <button class="btn btn-secondary" onclick="switchGdprTab('vvt')">Cancel</button>
-        <button class="btn btn-primary" onclick="saveVvt(${id ? `'${id}'` : 'null'})">Save</button>
+        <button class="btn btn-secondary" onclick="switchGdprTab('vvt')">${t('ui_cancel')}</button>
+        <button class="btn btn-primary" onclick="saveVvt(${id ? `'${id}'` : 'null'})">${t('ui_save')}</button>
       </div>
     </div>
   `
@@ -9718,13 +9718,13 @@ async function renderGdprAv(el) {
 
   el.innerHTML = `
     <div class="gdpr-filter-bar">
-      ${gdprCanOwn() ? `<button class="btn btn-primary btn-sm" onclick="openAvForm()"><i class="ph ph-plus"></i> New DPA Contract</button>` : ''}
+      ${gdprCanOwn() ? `<button class="btn btn-primary btn-sm" onclick="openAvForm()"><i class="ph ph-plus"></i> ${t('gdpr_newDpaContract')}</button>` : ''}
       <span class="gdpr-filter-count">${list.length} contracts</span>
     </div>
-    ${list.length === 0 ? '<p class="gdpr-empty">No DPA contracts found.</p>' : `
+    ${list.length === 0 ? `<p class="gdpr-empty">${t('gdpr_noDpaFound')}</p>` : `
     <table class="gdpr-table">
       <thead><tr>
-        <th>Processor</th><th>Status</th><th>Signed On</th><th>Art.28 Checklist</th><th>Valid Until</th><th style="width:80px"></th>
+        <th>${t('gdpr_processor')}</th><th>${t('col_status')}</th><th>${t('ui_signedOn')}</th><th>${t('gdpr_art28Checklist')}</th><th>${t('ui_validUntil')}</th><th style="width:80px"></th>
       </tr></thead>
       <tbody>
         ${list.map(a => {
@@ -9772,41 +9772,41 @@ async function openAvForm(id = null) {
   document.getElementById('gdprTabContent').innerHTML = `
     <div class="training-form-page">
       <div class="training-form-header">
-        <button class="btn btn-secondary btn-sm" onclick="switchGdprTab('av')"><i class="ph ph-arrow-left"></i> Back</button>
+        <button class="btn btn-secondary btn-sm" onclick="switchGdprTab('av')"><i class="ph ph-arrow-left"></i> ${t('ui_back')}</button>
         <h2>${id ? 'Edit DPA Contract' : 'New DPA Contract'}</h2>
       </div>
       <div class="training-form-body">
-        <div class="form-group"><label class="form-label">Name *</label>
+        <div class="form-group"><label class="form-label">${t('ui_nameRequired')}</label>
           <input id="avTitle" class="form-input" value="${escHtml(a.title||'')}"></div>
-        <div class="form-group"><label class="form-label">Processor Name *</label>
+        <div class="form-group"><label class="form-label">${t('gdpr_processorNameReq')}</label>
           <input id="avProcessorName" class="form-input" value="${escHtml(a.processorName||'')}"></div>
-        <div class="form-group"><label class="form-label">Country</label>
+        <div class="form-group"><label class="form-label">${t('ui_country')}</label>
           <input id="avCountry" class="form-input" value="${escHtml(a.processorCountry||'')}" placeholder="e.g. DE, IE, US"></div>
-        <div class="form-group"><label class="form-label">Contact E-Mail</label>
+        <div class="form-group"><label class="form-label">${t('ui_contactEmail')}</label>
           <input id="avEmail" class="form-input" value="${escHtml(a.processorContactEmail||'')}"></div>
-        <div class="form-group"><label class="form-label">Processing Scope</label>
+        <div class="form-group"><label class="form-label">${t('gdpr_processingScope')}</label>
           <textarea id="avScope" class="form-input" rows="2">${escHtml(a.processingScope||'')}</textarea></div>
-        <div class="form-group"><label class="form-label">Transfer Mechanism</label>
+        <div class="form-group"><label class="form-label">${t('gdpr_transferMechanism')}</label>
           <select id="avTransferMech" class="select">${tmOpts}</select></div>
-        <div class="form-group"><label class="form-label">Status</label>
+        <div class="form-group"><label class="form-label">${t('col_status')}</label>
           <select id="avStatus" class="select">${stOpts}</select></div>
-        <div class="form-group"><label class="form-label">Signed On</label>
+        <div class="form-group"><label class="form-label">${t('ui_signedOn')}</label>
           <input id="avSignDate" type="date" class="form-input" value="${a.signatureDate||''}"></div>
-        <div class="form-group"><label class="form-label">Valid Until</label>
+        <div class="form-group"><label class="form-label">${t('ui_validUntil')}</label>
           <input id="avEffUntil" type="date" class="form-input" value="${a.effectiveUntil||''}"></div>
-        <div class="form-group"><label class="form-label">Art. 28 Para. 3 Checklist</label>
+        <div class="form-group"><label class="form-label">${t('gdpr_art28Para3Checklist')}</label>
           <div class="gdpr-checklist">${checklistHtml}</div></div>
         <div class="form-group"><label class="form-label">${t('ui_notes')}</label>
           <textarea id="avNotes" class="form-input" rows="2">${escHtml(a.notes||'')}</textarea></div>
-        ${_gdprEntities.length ? `<div class="form-group"><label class="form-label">Applicable Entities</label>
+        ${_gdprEntities.length ? `<div class="form-group"><label class="form-label">${t('ui_applicableEntities')}</label>
           <div>${entityChecks}</div></div>` : ''}
-        <div class="form-group"><label class="form-label">Upload PDF (optional)</label>
+        <div class="form-group"><label class="form-label">${t('gdpr_uploadPdf')}</label>
           <input type="file" id="avFile" accept=".pdf,.docx,.doc"></div>
         ${renderLinksBlock('avf', a.linkedControls||[], a.linkedPolicies||[])}
       </div>
       <div class="training-form-footer">
-        <button class="btn btn-secondary" onclick="switchGdprTab('av')">Cancel</button>
-        <button class="btn btn-primary" onclick="saveAv(${id ? `'${id}'` : 'null'})">Save</button>
+        <button class="btn btn-secondary" onclick="switchGdprTab('av')">${t('ui_cancel')}</button>
+        <button class="btn btn-primary" onclick="saveAv(${id ? `'${id}'` : 'null'})">${t('ui_save')}</button>
       </div>
     </div>
   `
@@ -9867,13 +9867,13 @@ async function renderGdprDsfa(el) {
 
   el.innerHTML = `
     <div class="gdpr-filter-bar">
-      ${gdprCanOwn() ? `<button class="btn btn-primary btn-sm" onclick="openDsfaForm()"><i class="ph ph-plus"></i> New DPIA</button>` : ''}
-      <span class="gdpr-filter-count">${list.length} DPIA(s)</span>
+      ${gdprCanOwn() ? `<button class="btn btn-primary btn-sm" onclick="openDsfaForm()"><i class="ph ph-plus"></i> ${t('gdpr_newDpia')}</button>` : ''}
+      <span class="gdpr-filter-count">${list.length} ${t('gdpr_dpiaCount')}</span>
     </div>
-    ${list.length === 0 ? '<p class="gdpr-empty">No DPIAs found.</p>' : `
+    ${list.length === 0 ? `<p class="gdpr-empty">${t('gdpr_noDpiaFound')}</p>` : `
     <table class="gdpr-table">
       <thead><tr>
-        <th>Title</th><th>RoPA Link</th><th>Residual Risk</th><th>DPO Consulted</th><th>Status</th><th style="width:80px"></th>
+        <th>${t('col_title')}</th><th>${t('gdpr_ropaLink')}</th><th>${t('gdpr_residualRisk')}</th><th>${t('gdpr_dpoConsulted')}</th><th>${t('col_status')}</th><th style="width:80px"></th>
       </tr></thead>
       <tbody>
         ${list.map(d => {
@@ -9921,52 +9921,52 @@ async function openDsfaForm(id = null) {
   document.getElementById('gdprTabContent').innerHTML = `
     <div class="training-form-page">
       <div class="training-form-header">
-        <button class="btn btn-secondary btn-sm" onclick="switchGdprTab('dsfa')"><i class="ph ph-arrow-left"></i> Back</button>
+        <button class="btn btn-secondary btn-sm" onclick="switchGdprTab('dsfa')"><i class="ph ph-arrow-left"></i> ${t('ui_back')}</button>
         <h2>${id ? 'Edit DPIA' : 'New DPIA'}</h2>
       </div>
       <div class="training-form-body">
-        <div class="form-group"><label class="form-label">Name *</label>
+        <div class="form-group"><label class="form-label">${t('ui_nameRequired')}</label>
           <input id="dsfaTitle" class="form-input" value="${escHtml(d.title||'')}"></div>
-        <div class="form-group"><label class="form-label">Linked RoPA ID</label>
+        <div class="form-group"><label class="form-label">${t('gdpr_linkedRopaId')}</label>
           <input id="dsfaVvtId" class="form-input" value="${escHtml(d.linkedVvtId||'')}" placeholder="vvt_seed_001"></div>
-        <div class="form-group"><label class="form-label">Processing Description</label>
+        <div class="form-group"><label class="form-label">${t('gdpr_processingDesc')}</label>
           <textarea id="dsfaDesc" class="form-input" rows="3">${escHtml(d.processingDescription||'')}</textarea></div>
-        <div class="form-group"><label class="form-label">Necessity and Proportionality Assessment</label>
+        <div class="form-group"><label class="form-label">${t('gdpr_necessityAssessment')}</label>
           <textarea id="dsfaNecessity" class="form-input" rows="3">${escHtml(d.necessityAssessment||'')}</textarea></div>
-        <div class="form-group"><label class="form-label">Existing Controls / TOMs</label>
+        <div class="form-group"><label class="form-label">${t('gdpr_existingControls')}</label>
           <textarea id="dsfaControls" class="form-input" rows="2">${escHtml(d.existingControls||'')}</textarea></div>
 
-        <h4 style="margin:16px 0 8px;font-size:.9rem">Identified Risks</h4>
+        <h4 style="margin:16px 0 8px;font-size:.9rem">${t('gdpr_identifiedRisks')}</h4>
         <div id="dsfaRisksContainer">${risksHtml}</div>
-        <button class="btn btn-secondary btn-sm" onclick="addDsfaRisk()" style="margin-top:6px"><i class="ph ph-plus"></i> Add Risk</button>
+        <button class="btn btn-secondary btn-sm" onclick="addDsfaRisk()" style="margin-top:6px"><i class="ph ph-plus"></i> ${t('gdpr_addRisk')}</button>
 
-        <div class="form-group" style="margin-top:16px"><label class="form-label">Residual Risk</label>
+        <div class="form-group" style="margin-top:16px"><label class="form-label">${t('gdpr_residualRisk')}</label>
           <select id="dsfaResidual" class="select">${rrOpts}</select></div>
         <div class="form-group">
           <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
-            <input type="checkbox" id="dsfaDpoConsulted" ${d.dpoConsulted?'checked':''}> DPO Consulted
+            <input type="checkbox" id="dsfaDpoConsulted" ${d.dpoConsulted?'checked':''}> ${t('gdpr_dpoConsulted')}
           </label></div>
-        <div class="form-group"><label class="form-label">DPO Opinion</label>
+        <div class="form-group"><label class="form-label">${t('gdpr_dpoOpinion')}</label>
           <textarea id="dsfaDpoOpinion" class="form-input" rows="2">${escHtml(d.dpoOpinion||'')}</textarea></div>
         <div class="form-group">
           <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
-            <input type="checkbox" id="dsfaSaRequired" ${d.saConsultationRequired?'checked':''}> Prior consultation with supervisory authority required (Art. 36)
+            <input type="checkbox" id="dsfaSaRequired" ${d.saConsultationRequired?'checked':''}> ${t('gdpr_priorConsultRequired')}
           </label></div>
-        <div class="form-group"><label class="form-label">Decision</label>
+        <div class="form-group"><label class="form-label">${t('gdpr_decision')}</label>
           <select id="dsfaDecision" class="select">${decOpts}</select></div>
-        <div class="form-group"><label class="form-label">Decision Justification</label>
+        <div class="form-group"><label class="form-label">${t('gdpr_decisionJustification')}</label>
           <textarea id="dsfaDecJustify" class="form-input" rows="2">${escHtml(d.decisionJustification||'')}</textarea></div>
-        <div class="form-group"><label class="form-label">Owner</label>
+        <div class="form-group"><label class="form-label">${t('ui_owner')}</label>
           <input id="dsfaOwner" class="form-input" value="${escHtml(d.owner||'')}"></div>
-        <div class="form-group"><label class="form-label">Status</label>
+        <div class="form-group"><label class="form-label">${t('col_status')}</label>
           <select id="dsfaStatus" class="select">${stOpts}</select></div>
-        ${_gdprEntities.length ? `<div class="form-group"><label class="form-label">Applicable Entities</label>
+        ${_gdprEntities.length ? `<div class="form-group"><label class="form-label">${t('ui_applicableEntities')}</label>
           <div>${entityChecks}</div></div>` : ''}
         ${renderLinksBlock('dsfa', d.linkedControls||[], d.linkedPolicies||[])}
       </div>
       <div class="training-form-footer">
-        <button class="btn btn-secondary" onclick="switchGdprTab('dsfa')">Cancel</button>
-        <button class="btn btn-primary" onclick="saveDsfa(${id ? `'${id}'` : 'null'})">Save</button>
+        <button class="btn btn-secondary" onclick="switchGdprTab('dsfa')">${t('ui_cancel')}</button>
+        <button class="btn btn-primary" onclick="saveDsfa(${id ? `'${id}'` : 'null'})">${t('ui_save')}</button>
       </div>
     </div>
   `
@@ -10061,13 +10061,13 @@ async function renderGdprIncidents(el) {
 
   el.innerHTML = `
     <div class="gdpr-filter-bar">
-      ${gdprCanAudit() ? `<button class="btn btn-primary btn-sm" onclick="openIncidentForm()"><i class="ph ph-plus"></i> New Data Breach</button>` : ''}
+      ${gdprCanAudit() ? `<button class="btn btn-primary btn-sm" onclick="openIncidentForm()"><i class="ph ph-plus"></i> ${t('gdpr_newBreach')}</button>` : ''}
       <span class="gdpr-filter-count">${list.length} data breach(es)</span>
     </div>
-    ${list.length === 0 ? '<p class="gdpr-empty">No data breaches recorded.</p>' : `
+    ${list.length === 0 ? `<p class="gdpr-empty">${t('gdpr_noBreachesFound')}</p>` : `
     <table class="gdpr-table">
       <thead><tr>
-        <th>Title</th><th>Type</th><th>Discovered</th><th>72h Timer</th><th>Risk</th><th>SA Notified</th><th>Status</th><th style="width:80px"></th>
+        <th>${t('col_title')}</th><th>${t('col_type')}</th><th>${t('gdpr_discovered')}</th><th>72h Timer</th><th>${t('ui_risk')}</th><th>${t('gdpr_saNotified')}</th><th>${t('col_status')}</th><th style="width:80px"></th>
       </tr></thead>
       <tbody>
         ${list.map(i => {
@@ -10115,48 +10115,48 @@ async function openIncidentForm(id = null) {
   document.getElementById('gdprTabContent').innerHTML = `
     <div class="training-form-page">
       <div class="training-form-header">
-        <button class="btn btn-secondary btn-sm" onclick="switchGdprTab('incidents')"><i class="ph ph-arrow-left"></i> Back</button>
+        <button class="btn btn-secondary btn-sm" onclick="switchGdprTab('incidents')"><i class="ph ph-arrow-left"></i> ${t('ui_back')}</button>
         <h2>${id ? 'Edit Data Breach' : 'Record New Data Breach'}</h2>
       </div>
       <div class="training-form-body">
-        <div class="form-group"><label class="form-label">Name *</label>
+        <div class="form-group"><label class="form-label">${t('ui_nameRequired')}</label>
           <input id="incTitle" class="form-input" value="${escHtml(inc.title||'')}"></div>
-        <div class="form-group"><label class="form-label">Breach Type</label>
+        <div class="form-group"><label class="form-label">${t('gdpr_breachType')}</label>
           <select id="incType" class="select">${typeOpts}</select></div>
-        <div class="form-group"><label class="form-label">Discovered On</label>
+        <div class="form-group"><label class="form-label">${t('gdpr_discoveredOn')}</label>
           <input id="incDiscovered" type="datetime-local" class="form-input" value="${inc.discoveredAt ? inc.discoveredAt.slice(0,16) : ''}"></div>
-        <div class="form-group"><label class="form-label">Affected Data Categories</label>
+        <div class="form-group"><label class="form-label">${t('gdpr_affectedDataCategories')}</label>
           <div>${catChecks}</div></div>
-        <div class="form-group"><label class="form-label">Estimated Number of Data Subjects Affected</label>
+        <div class="form-group"><label class="form-label">${t('gdpr_estimatedSubjects')}</label>
           <input id="incAffected" type="number" class="form-input" value="${inc.estimatedAffected||''}"></div>
-        <div class="form-group"><label class="form-label">Risk Assessment</label>
+        <div class="form-group"><label class="form-label">${t('gdpr_riskAssessment')}</label>
           <select id="incRiskLevel" class="select">${rlOpts}</select></div>
         <div class="form-group">
           <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
-            <input type="checkbox" id="incSaRequired" ${inc.saNotificationRequired?'checked':''}> Notification obligation to supervisory authority (Art. 33) — within 72 hours
+            <input type="checkbox" id="incSaRequired" ${inc.saNotificationRequired?'checked':''}> ${t('gdpr_saNotifyRequired72h')}
           </label></div>
-        <div class="form-group"><label class="form-label">SA Reference Number</label>
+        <div class="form-group"><label class="form-label">${t('gdpr_saRefNumber')}</label>
           <input id="incSaRef" class="form-input" value="${escHtml(inc.saReference||'')}" placeholder="if notified"></div>
-        <div class="form-group"><label class="form-label">SA Notified On</label>
+        <div class="form-group"><label class="form-label">${t('gdpr_saNotifiedOn')}</label>
           <input id="incSaNotified" type="datetime-local" class="form-input" value="${inc.saNotifiedAt ? inc.saNotifiedAt.slice(0,16) : ''}"></div>
         <div class="form-group">
           <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
-            <input type="checkbox" id="incDsRequired" ${inc.dsNotificationRequired?'checked':''}> Notification obligation to data subjects (Art. 34)
+            <input type="checkbox" id="incDsRequired" ${inc.dsNotificationRequired?'checked':''}> ${t('gdpr_dsNotifyRequired')}
           </label></div>
-        <div class="form-group"><label class="form-label">Containment Measures</label>
+        <div class="form-group"><label class="form-label">${t('gdpr_containmentMeasures')}</label>
           <textarea id="incContainment" class="form-input" rows="2">${escHtml(inc.containmentMeasures||'')}</textarea></div>
-        <div class="form-group"><label class="form-label">Root Cause Analysis</label>
+        <div class="form-group"><label class="form-label">${t('gdpr_rootCauseAnalysis')}</label>
           <textarea id="incRootCause" class="form-input" rows="2">${escHtml(inc.rootCause||'')}</textarea></div>
-        <div class="form-group"><label class="form-label">Remediation Measures</label>
+        <div class="form-group"><label class="form-label">${t('gdpr_remediationMeasures')}</label>
           <textarea id="incRemediation" class="form-input" rows="2">${escHtml(inc.remediationMeasures||'')}</textarea></div>
-        <div class="form-group"><label class="form-label">Status</label>
+        <div class="form-group"><label class="form-label">${t('col_status')}</label>
           <select id="incStatus" class="select">${stOpts}</select></div>
-        ${_gdprEntities.length ? `<div class="form-group"><label class="form-label">Applicable Entities</label>
+        ${_gdprEntities.length ? `<div class="form-group"><label class="form-label">${t('ui_applicableEntities')}</label>
           <div>${entityChecks}</div></div>` : ''}
       </div>
       <div class="training-form-footer">
-        <button class="btn btn-secondary" onclick="switchGdprTab('incidents')">Cancel</button>
-        <button class="btn btn-primary" onclick="saveIncident(${id ? `'${id}'` : 'null'})">Save</button>
+        <button class="btn btn-secondary" onclick="switchGdprTab('incidents')">${t('ui_cancel')}</button>
+        <button class="btn btn-primary" onclick="saveIncident(${id ? `'${id}'` : 'null'})">${t('ui_save')}</button>
       </div>
     </div>
   `
@@ -10206,13 +10206,13 @@ async function renderGdprDsar(el) {
 
   el.innerHTML = `
     <div class="gdpr-filter-bar">
-      ${gdprCanEdit() ? `<button class="btn btn-primary btn-sm" onclick="openDsarForm()"><i class="ph ph-plus"></i> New Request</button>` : ''}
+      ${gdprCanEdit() ? `<button class="btn btn-primary btn-sm" onclick="openDsarForm()"><i class="ph ph-plus"></i> ${t('gdpr_newRequest')}</button>` : ''}
       <span class="gdpr-filter-count">${list.length} requests</span>
     </div>
-    ${list.length === 0 ? '<p class="gdpr-empty">No data subject requests found.</p>' : `
+    ${list.length === 0 ? `<p class="gdpr-empty">${t('gdpr_noDsarFound')}</p>` : `
     <table class="gdpr-table">
       <thead><tr>
-        <th>Type</th><th>Data Subject</th><th>Received</th><th>Deadline</th><th>Status</th><th style="width:80px"></th>
+        <th>${t('col_type')}</th><th>${t('gdpr_dataSubject')}</th><th>${t('gdpr_received')}</th><th>${t('gdpr_deadline')}</th><th>${t('col_status')}</th><th style="width:80px"></th>
       </tr></thead>
       <tbody>
         ${list.map(d => {
@@ -10255,36 +10255,36 @@ async function openDsarForm(id = null) {
   document.getElementById('gdprTabContent').innerHTML = `
     <div class="training-form-page">
       <div class="training-form-header">
-        <button class="btn btn-secondary btn-sm" onclick="switchGdprTab('dsar')"><i class="ph ph-arrow-left"></i> Back</button>
+        <button class="btn btn-secondary btn-sm" onclick="switchGdprTab('dsar')"><i class="ph ph-arrow-left"></i> ${t('ui_back')}</button>
         <h2>${id ? 'Edit DSAR' : 'New Data Subject Request'}</h2>
       </div>
       <div class="training-form-body">
-        <div class="form-group"><label class="form-label">Request Type</label>
+        <div class="form-group"><label class="form-label">${t('gdpr_requestType')}</label>
           <select id="dsarType" class="select">${typeOpts}</select></div>
-        <div class="form-group"><label class="form-label">Data Subject Name</label>
+        <div class="form-group"><label class="form-label">${t('gdpr_dataSubjectName')}</label>
           <input id="dsarName" class="form-input" value="${escHtml(d.dataSubjectName||'')}"></div>
-        <div class="form-group"><label class="form-label">Data Subject E-Mail</label>
+        <div class="form-group"><label class="form-label">${t('gdpr_dataSubjectEmail')}</label>
           <input id="dsarEmail" class="form-input" value="${escHtml(d.dataSubjectEmail||'')}"></div>
-        <div class="form-group"><label class="form-label">Received On (deadline: +30 days)</label>
+        <div class="form-group"><label class="form-label">${t('gdpr_receivedOnDeadline')}</label>
           <input id="dsarReceived" type="date" class="form-input" value="${d.receivedAt ? d.receivedAt.slice(0,10) : new Date().toISOString().slice(0,10)}"></div>
         <div class="form-group">
           <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
-            <input type="checkbox" id="dsarVerified" ${d.identityVerified?'checked':''}> Identity verified
+            <input type="checkbox" id="dsarVerified" ${d.identityVerified?'checked':''}> ${t('gdpr_identityVerified')}
           </label></div>
-        <div class="form-group"><label class="form-label">Response / Justification</label>
+        <div class="form-group"><label class="form-label">${t('gdpr_responseJustification')}</label>
           <textarea id="dsarResponse" class="form-input" rows="3">${escHtml(d.response||'')}</textarea></div>
-        <div class="form-group"><label class="form-label">Refusal Reason (if status: Refused)</label>
+        <div class="form-group"><label class="form-label">${t('gdpr_refusalReason')}</label>
           <input id="dsarRefusal" class="form-input" value="${escHtml(d.refusalReason||'')}"></div>
-        <div class="form-group"><label class="form-label">Handled By</label>
-          <input id="dsarHandler" class="form-input" value="${escHtml(d.handledBy||'')}" placeholder="Responsible person"></div>
-        <div class="form-group"><label class="form-label">Status</label>
+        <div class="form-group"><label class="form-label">${t('gdpr_handledBy')}</label>
+          <input id="dsarHandler" class="form-input" value="${escHtml(d.handledBy||'')}" placeholder="${t('ui_responsiblePersonPh')}"></div>
+        <div class="form-group"><label class="form-label">${t('col_status')}</label>
           <select id="dsarStatus" class="select">${stOpts}</select></div>
-        ${_gdprEntities.length ? `<div class="form-group"><label class="form-label">Applicable Entities</label>
+        ${_gdprEntities.length ? `<div class="form-group"><label class="form-label">${t('ui_applicableEntities')}</label>
           <div>${entityChecks}</div></div>` : ''}
       </div>
       <div class="training-form-footer">
-        <button class="btn btn-secondary" onclick="switchGdprTab('dsar')">Cancel</button>
-        <button class="btn btn-primary" onclick="saveDsar(${id ? `'${id}'` : 'null'})">Save</button>
+        <button class="btn btn-secondary" onclick="switchGdprTab('dsar')">${t('ui_cancel')}</button>
+        <button class="btn btn-primary" onclick="saveDsar(${id ? `'${id}'` : 'null'})">${t('ui_save')}</button>
       </div>
     </div>
   `
@@ -10327,14 +10327,14 @@ async function renderGdprToms(el) {
 
   el.innerHTML = `
     <div class="gdpr-filter-bar">
-      ${gdprCanOwn() ? `<button class="btn btn-primary btn-sm" onclick="openTomForm()"><i class="ph ph-plus"></i> New TOM</button>` : ''}
+      ${gdprCanOwn() ? `<button class="btn btn-primary btn-sm" onclick="openTomForm()"><i class="ph ph-plus"></i> ${t('gdpr_newTom')}</button>` : ''}
       <select class="select" style="font-size:.82rem" onchange="_gdprTomCategory=this.value;switchGdprTab('toms')">${catOpts}</select>
       <span class="gdpr-filter-count">${list.length} TOMs</span>
     </div>
-    ${list.length === 0 ? '<p class="gdpr-empty">No TOMs found.</p>' : `
+    ${list.length === 0 ? `<p class="gdpr-empty">${t('gdpr_noTomsFound')}</p>` : `
     <table class="gdpr-table">
       <thead><tr>
-        <th>Title</th><th>Category</th><th>Status</th><th>Owner</th><th>Review</th><th style="width:80px"></th>
+        <th>${t('col_title')}</th><th>${t('ui_category')}</th><th>${t('col_status')}</th><th>${t('ui_owner')}</th><th>${t('ui_reviewDate')}</th><th style="width:80px"></th>
       </tr></thead>
       <tbody>
         ${list.map(t => {
@@ -10363,50 +10363,50 @@ async function openTomForm(id = null) {
     const r = await fetch(`/gdpr/toms/${id}`, { headers: apiHeaders() })
     if (r.ok) item = await r.json()
   }
-  const t = item || {}
+  const tom = item || {}
 
-  const catOpts = GDPR_TOM_CATS.map(c => `<option value="${c.id}" ${t.category === c.id ? 'selected':''}>${c.label}</option>`).join('')
-  const stOpts  = GDPR_TOM_STATUSES.map(s => `<option value="${s.id}" ${t.status === s.id ? 'selected':''}>${s.label}</option>`).join('')
-  const rlOpts  = GDPR_RISK_LEVELS.map(l => `<option value="${l.id}" ${t.riskLevel === l.id ? 'selected':''}>${l.label}</option>`).join('')
+  const catOpts = GDPR_TOM_CATS.map(c => `<option value="${c.id}" ${tom.category === c.id ? 'selected':''}>${c.label}</option>`).join('')
+  const stOpts  = GDPR_TOM_STATUSES.map(s => `<option value="${s.id}" ${tom.status === s.id ? 'selected':''}>${s.label}</option>`).join('')
+  const rlOpts  = GDPR_RISK_LEVELS.map(l => `<option value="${l.id}" ${tom.riskLevel === l.id ? 'selected':''}>${l.label}</option>`).join('')
   const entityChecks = _gdprEntities.map(e =>
     `<label style="display:inline-flex;align-items:center;gap:4px;margin-right:10px;font-size:.8rem">
-       <input type="checkbox" value="${e.id}" class="tom-entity-cb" ${(t.applicableEntities||[]).includes(e.id)?'checked':''}> ${escHtml(e.name)}
+       <input type="checkbox" value="${e.id}" class="tom-entity-cb" ${(tom.applicableEntities||[]).includes(e.id)?'checked':''}> ${escHtml(e.name)}
      </label>`).join('')
 
   document.getElementById('gdprTabContent').innerHTML = `
     <div class="training-form-page">
       <div class="training-form-header">
-        <button class="btn btn-secondary btn-sm" onclick="switchGdprTab('toms')"><i class="ph ph-arrow-left"></i> Back</button>
+        <button class="btn btn-secondary btn-sm" onclick="switchGdprTab('toms')"><i class="ph ph-arrow-left"></i> ${t('ui_back')}</button>
         <h2>${id ? 'Edit TOM' : 'New TOM'}</h2>
       </div>
       <div class="training-form-body">
-        <div class="form-group"><label class="form-label">Name *</label>
-          <input id="tomTitle" class="form-input" value="${escHtml(t.title||'')}"></div>
-        <div class="form-group"><label class="form-label">Category</label>
+        <div class="form-group"><label class="form-label">${t('ui_nameRequired')}</label>
+          <input id="tomTitle" class="form-input" value="${escHtml(tom.title||'')}"></div>
+        <div class="form-group"><label class="form-label">${t('ui_category')}</label>
           <select id="tomCategory" class="select">${catOpts}</select></div>
-        <div class="form-group"><label class="form-label">Description</label>
-          <textarea id="tomDesc" class="form-input" rows="2">${escHtml(t.description||'')}</textarea></div>
-        <div class="form-group"><label class="form-label">Implementation / Details</label>
-          <textarea id="tomImpl" class="form-input" rows="2">${escHtml(t.implementation||'')}</textarea></div>
-        <div class="form-group"><label class="form-label">Status</label>
+        <div class="form-group"><label class="form-label">${t('ui_description')}</label>
+          <textarea id="tomDesc" class="form-input" rows="2">${escHtml(tom.description||'')}</textarea></div>
+        <div class="form-group"><label class="form-label">${t('gdpr_implementationDetails')}</label>
+          <textarea id="tomImpl" class="form-input" rows="2">${escHtml(tom.implementation||'')}</textarea></div>
+        <div class="form-group"><label class="form-label">${t('col_status')}</label>
           <select id="tomStatus" class="select">${stOpts}</select></div>
-        <div class="form-group"><label class="form-label">Owner</label>
-          <input id="tomOwner" class="form-input" value="${escHtml(t.owner||'')}"></div>
-        <div class="form-group"><label class="form-label">Risk Level</label>
+        <div class="form-group"><label class="form-label">${t('ui_owner')}</label>
+          <input id="tomOwner" class="form-input" value="${escHtml(tom.owner||'')}"></div>
+        <div class="form-group"><label class="form-label">${t('ui_riskLevel')}</label>
           <select id="tomRisk" class="select">${rlOpts}</select></div>
-        <div class="form-group"><label class="form-label">Evidence / Proof</label>
-          <input id="tomEvidence" class="form-input" value="${escHtml(t.evidenceNote||'')}" placeholder="e.g. Audit report, screenshot"></div>
-        <div class="form-group"><label class="form-label">Retention Rule</label>
-          <input id="tomRetention" class="form-input" value="${escHtml(t.retentionRule||'')}" placeholder="e.g. Logs 3 years"></div>
-        <div class="form-group"><label class="form-label">Review Date</label>
-          <input id="tomReview" type="date" class="form-input" value="${t.reviewDate||''}"></div>
-        ${_gdprEntities.length ? `<div class="form-group"><label class="form-label">Applicable Entities</label>
+        <div class="form-group"><label class="form-label">${t('gdpr_evidenceProof')}</label>
+          <input id="tomEvidence" class="form-input" value="${escHtml(tom.evidenceNote||'')}" placeholder="e.g. Audit report, screenshot"></div>
+        <div class="form-group"><label class="form-label">${t('gdpr_retentionRule')}</label>
+          <input id="tomRetention" class="form-input" value="${escHtml(tom.retentionRule||'')}" placeholder="e.g. Logs 3 years"></div>
+        <div class="form-group"><label class="form-label">${t('ui_reviewDate')}</label>
+          <input id="tomReview" type="date" class="form-input" value="${tom.reviewDate||''}"></div>
+        ${_gdprEntities.length ? `<div class="form-group"><label class="form-label">${t('ui_applicableEntities')}</label>
           <div>${entityChecks}</div></div>` : ''}
-        ${renderLinksBlock('tom', t.linkedControls||[], t.linkedPolicies||[])}
+        ${renderLinksBlock('tom', tom.linkedControls||[], tom.linkedPolicies||[])}
       </div>
       <div class="training-form-footer">
-        <button class="btn btn-secondary" onclick="switchGdprTab('toms')">Cancel</button>
-        <button class="btn btn-primary" onclick="saveTom(${id ? `'${id}'` : 'null'})">Save</button>
+        <button class="btn btn-secondary" onclick="switchGdprTab('toms')">${t('ui_cancel')}</button>
+        <button class="btn btn-primary" onclick="saveTom(${id ? `'${id}'` : 'null'})">${t('ui_save')}</button>
       </div>
     </div>
   `
@@ -10458,7 +10458,7 @@ async function renderGdprDeletion(el) {
 
   el.innerHTML = `
     <div class="gdpr-filter-bar">
-      <h3 style="margin:0"><i class="ph ph-trash"></i> Deletion Log (Art. 17 GDPR)</h3>
+      <h3 style="margin:0"><i class="ph ph-trash"></i> ${t('gdpr_deletionLogTitle')}</h3>
     </div>
 
     ${due.length > 0 ? `
@@ -10467,13 +10467,13 @@ async function renderGdprDeletion(el) {
     </div>
     <h4 style="color:var(--color-danger)">Deletion Due (${due.length})</h4>
     <table class="gdpr-table">
-      <thead><tr><th>RoPA Title</th><th>Due Since</th><th>Period (Months)</th>${canOwn ? '<th>Action</th>' : ''}</tr></thead>
+      <thead><tr><th>${t('gdpr_ropaTitle')}</th><th>${t('gdpr_dueSince')}</th><th>${t('gdpr_periodMonths')}</th>${canOwn ? `<th>${t('ui_action')}</th>` : ''}</tr></thead>
       <tbody>${due.map(v => `
         <tr>
           <td>${escHtml(v.title)}</td>
           <td style="color:var(--color-danger)">${fmtDate(v.deletionDue)}</td>
           <td>${v.retentionMonths} months</td>
-          ${canOwn ? `<td><button class="btn btn-sm btn-danger" onclick="confirmDeletion('${v.id}','${escHtml(v.title).replace(/'/g,"\\'")}')"><i class="ph ph-check"></i> Confirm Deletion</button></td>` : ''}
+          ${canOwn ? `<td><button class="btn btn-sm btn-danger" onclick="confirmDeletion('${v.id}','${escHtml(v.title).replace(/'/g,"\\'")}')"><i class="ph ph-check"></i> ${t('gdpr_confirmDeletion')}</button></td>` : ''}
         </tr>`).join('')}
       </tbody>
     </table>` : `<p class="gdpr-empty" style="color:var(--color-success)"><i class="ph ph-check-circle"></i> No deletion deadlines due.</p>`}
@@ -10481,7 +10481,7 @@ async function renderGdprDeletion(el) {
     ${upcoming.length > 0 ? `
     <h4 style="color:var(--color-warning);margin-top:1.5rem">Due Soon – next 90 days (${upcoming.length})</h4>
     <table class="gdpr-table">
-      <thead><tr><th>RoPA Title</th><th>Due On</th><th>Period (Months)</th></tr></thead>
+      <thead><tr><th>${t('gdpr_ropaTitle')}</th><th>${t('gdpr_dueOn')}</th><th>${t('gdpr_periodMonths')}</th></tr></thead>
       <tbody>${upcoming.map(v => `
         <tr>
           <td>${escHtml(v.title)}</td>
@@ -10492,9 +10492,9 @@ async function renderGdprDeletion(el) {
     </table>` : ''}
 
     <h4 style="margin-top:1.5rem">Log of Confirmed Deletions (${log.length})</h4>
-    ${log.length === 0 ? '<p class="gdpr-empty">No deletions recorded yet.</p>' : `
+    ${log.length === 0 ? `<p class="gdpr-empty">${t('gdpr_noDeletionsYet')}</p>` : `
     <table class="gdpr-table">
-      <thead><tr><th>RoPA Title</th><th>Confirmed On</th><th>By</th><th>Method</th><th>Note</th></tr></thead>
+      <thead><tr><th>${t('gdpr_ropaTitle')}</th><th>${t('gdpr_confirmedOn')}</th><th>${t('gdpr_confirmedBy')}</th><th>${t('ui_method')}</th><th>${t('ui_note')}</th></tr></thead>
       <tbody>${[...log].reverse().map(e => `
         <tr>
           <td>${escHtml(e.vvtTitle)}</td>
@@ -10530,38 +10530,38 @@ async function renderGdprDsb(el) {
 
   el.innerHTML = `
     <div class="gdpr-dsb-form">
-      <h3 style="font-size:1rem;margin-bottom:4px">Data Protection Officer (DPO)</h3>
-      <p style="font-size:.8rem;color:var(--text-subtle);margin-bottom:16px">Art. 37 GDPR – Designation of a DPO</p>
-      <div class="form-group"><label class="form-label">Type</label>
+      <h3 style="font-size:1rem;margin-bottom:4px">${t('gdpr_dpoTitle')}</h3>
+      <p style="font-size:.8rem;color:var(--text-subtle);margin-bottom:16px">${t('gdpr_art37Designation')}</p>
+      <div class="form-group"><label class="form-label">${t('col_type')}</label>
         <select id="dsbType" class="select">
-          <option value="internal" ${d.type==='internal'?'selected':''}>Internal</option>
-          <option value="external" ${d.type==='external'?'selected':''}>External</option>
+          <option value="internal" ${d.type==='internal'?'selected':''}>${t('ui_internal')}</option>
+          <option value="external" ${d.type==='external'?'selected':''}>${t('ui_external')}</option>
         </select></div>
       <div class="form-row">
-        <div class="form-group"><label class="form-label">Name</label>
+        <div class="form-group"><label class="form-label">${t('ui_name')}</label>
           <input id="dsbName" class="form-input" value="${escHtml(d.name||'')}"></div>
         <div class="form-group"><label class="form-label">${t('ui_email')}</label>
           <input id="dsbEmail" class="form-input" value="${escHtml(d.email||'')}"></div>
       </div>
       <div class="form-row">
-        <div class="form-group"><label class="form-label">Phone</label>
+        <div class="form-group"><label class="form-label">${t('ui_phone')}</label>
           <input id="dsbPhone" class="form-input" value="${escHtml(d.phone||'')}"></div>
-        <div class="form-group"><label class="form-label">Appointed On</label>
+        <div class="form-group"><label class="form-label">${t('gdpr_appointedOn')}</label>
           <input id="dsbApptDate" type="date" class="form-input" value="${d.appointmentDate||''}"></div>
       </div>
-      <div class="form-group"><label class="form-label">Contract Until (for external DPO)</label>
+      <div class="form-group"><label class="form-label">${t('gdpr_contractUntilExternal')}</label>
         <input id="dsbContractEnd" type="date" class="form-input" value="${d.contractEnd||''}"></div>
       <div class="form-group"><label class="form-label">${t('ui_notes')}</label>
         <textarea id="dsbNotes" class="form-input" rows="3">${escHtml(d.notes||'')}</textarea></div>
 
       <div class="form-group">
-        <label class="form-label">Appointment Certificate (PDF/DOCX)</label>
+        <label class="form-label">${t('gdpr_appointmentCert')}</label>
         ${d.filePath ? `<div style="margin-bottom:8px"><a href="/gdpr/dsb/file" target="_blank" class="btn btn-secondary btn-sm"><i class="ph ph-file-pdf"></i> ${escHtml(d.filename || 'Open document')}</a></div>` : ''}
         <input type="file" id="dsbFile" accept=".pdf,.docx,.doc">
       </div>
 
       <div style="display:flex;gap:8px;margin-top:8px">
-        <button class="btn btn-primary" onclick="saveDsb()"><i class="ph ph-floppy-disk"></i> Save</button>
+        <button class="btn btn-primary" onclick="saveDsb()"><i class="ph ph-floppy-disk"></i> ${t('ui_save')}</button>
       </div>
       ${d.updatedAt ? `<p style="font-size:.72rem;color:var(--text-subtle);margin-top:8px">Last updated: ${new Date(d.updatedAt).toLocaleString('en-GB')}</p>` : ''}
     </div>
