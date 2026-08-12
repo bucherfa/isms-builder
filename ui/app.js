@@ -7824,7 +7824,7 @@ function renderGuidanceSearchResults(results, query) {
   const ul = dom('guidanceDocList')
   if (!ul) return
   if (results.length === 0) {
-    ul.innerHTML = `<li style="padding:12px;color:var(--text-subtle);font-size:13px;">${t('search_noResultsFor', { query: escHtml(query) })}</li>`
+    ul.innerHTML = `<li style="padding:12px;color:var(--text-subtle);font-size:13px;">${t('guidance_searchNoResults', { query: escHtml(query) })}</li>`
     renderGuidanceEmpty()
     return
   }
