@@ -9015,7 +9015,7 @@ async function openRiskModal(id) {
             <h3 class="risk-form-section-title"><i class="ph ph-text-align-left"></i> Basic Information</h3>
             <div class="risk-form-row">
               <div class="risk-form-field risk-form-wide">
-                <label class="form-label">Title *</label>
+                <label class="form-label">${t('col_title')} *</label>
                 <input id="rModalTitle" class="form-input" value="${escHtml(risk?.title||'')}" placeholder="Short, concise risk title…" />
               </div>
               <div class="risk-form-field">
@@ -9244,7 +9244,7 @@ async function openTreatmentModal(riskId, tpOrId) {
         </div>
         <div class="modal-body" style="display:flex;flex-direction:column;gap:12px;">
           <div>
-            <label class="form-label">Title *</label>
+            <label class="form-label">${t('col_title')} *</label>
             <input id="tpTitle" class="form-input" value="${escHtml(tp?.title||'')}" placeholder="Measure title…" />
           </div>
           <div>
@@ -9796,7 +9796,7 @@ async function openAvForm(id = null) {
           <input id="avEffUntil" type="date" class="form-input" value="${a.effectiveUntil||''}"></div>
         <div class="form-group"><label class="form-label">Art. 28 Para. 3 Checklist</label>
           <div class="gdpr-checklist">${checklistHtml}</div></div>
-        <div class="form-group"><label class="form-label">Notes</label>
+        <div class="form-group"><label class="form-label">${t('ui_notes')}</label>
           <textarea id="avNotes" class="form-input" rows="2">${escHtml(a.notes||'')}</textarea></div>
         ${_gdprEntities.length ? `<div class="form-group"><label class="form-label">Applicable Entities</label>
           <div>${entityChecks}</div></div>` : ''}
@@ -10540,7 +10540,7 @@ async function renderGdprDsb(el) {
       <div class="form-row">
         <div class="form-group"><label class="form-label">Name</label>
           <input id="dsbName" class="form-input" value="${escHtml(d.name||'')}"></div>
-        <div class="form-group"><label class="form-label">E-Mail</label>
+        <div class="form-group"><label class="form-label">${t('ui_email')}</label>
           <input id="dsbEmail" class="form-input" value="${escHtml(d.email||'')}"></div>
       </div>
       <div class="form-row">
@@ -10551,7 +10551,7 @@ async function renderGdprDsb(el) {
       </div>
       <div class="form-group"><label class="form-label">Contract Until (for external DPO)</label>
         <input id="dsbContractEnd" type="date" class="form-input" value="${d.contractEnd||''}"></div>
-      <div class="form-group"><label class="form-label">Notes</label>
+      <div class="form-group"><label class="form-label">${t('ui_notes')}</label>
         <textarea id="dsbNotes" class="form-input" rows="3">${escHtml(d.notes||'')}</textarea></div>
 
       <div class="form-group">
@@ -10682,7 +10682,7 @@ async function switchTrainingTab(tab) {
   _trainingTab = tab
   const el = dom('trainingTabContent')
   if (!el) return
-  el.innerHTML = '<p style="color:var(--text-subtle);padding:24px">Loading…</p>'
+  el.innerHTML = `<p style="color:var(--text-subtle);padding:24px">${t('ui_loading')}</p>`
   try {
     if (tab === 'overview')  await renderTrainingOverview(el)
     if (tab === 'plan')      await renderTrainingPlan(el)
@@ -11611,7 +11611,7 @@ async function switchAssetsTab(tab) {
   _assetsTab = tab
   const el = dom('assetsTabContent')
   if (!el) return
-  el.innerHTML = '<p style="color:var(--text-subtle);padding:24px">Loading…</p>'
+  el.innerHTML = `<p style="color:var(--text-subtle);padding:24px">${t('ui_loading')}</p>`
   try {
     if (tab === 'list')         await renderAssetsList(el)
     if (tab === 'by-category')  await renderAssetsByCategory(el)
@@ -12617,7 +12617,7 @@ async function switchNis2Tab(tab) {
 
   const el = dom('nis2TabContent')
   if (!el) return
-  el.innerHTML = '<p style="color:var(--text-subtle);padding:24px">Loading…</p>'
+  el.innerHTML = `<p style="color:var(--text-subtle);padding:24px">${t('ui_loading')}</p>`
   try {
     if (tab === 'governance') await renderNis2Governance(el)
     if (tab === 'deadlines')  await renderNis2Deadlines(el)
@@ -13152,7 +13152,7 @@ async function switchGovTab(tab) {
   _govTab = tab
   const el = dom('govTabContent')
   if (!el) return
-  el.innerHTML = '<p style="color:var(--text-subtle);padding:24px">Loading…</p>'
+  el.innerHTML = `<p style="color:var(--text-subtle);padding:24px">${t('ui_loading')}</p>`
   try {
     if (tab === 'reviews')  await renderGovReviews(el)
     if (tab === 'actions')  await renderGovActions(el)
@@ -13338,7 +13338,7 @@ async function renderGovMeetings(el) {
 async function openGovReviewForm(id = null) {
   const el = dom('govTabContent')
   if (!el) return
-  el.innerHTML = '<p style="color:var(--text-subtle);padding:24px">Loading…</p>'
+  el.innerHTML = `<p style="color:var(--text-subtle);padding:24px">${t('ui_loading')}</p>`
 
   let review = {}
   if (id) {
@@ -13349,77 +13349,77 @@ async function openGovReviewForm(id = null) {
   el.innerHTML = `
     <div class="training-form-page">
       <div class="training-form-header">
-        <h3>${id ? 'Edit Management Review' : 'Create New Management Review'}</h3>
+        <h3>${id ? t('gov_editReview') : t('gov_newReview')}</h3>
       </div>
       <div class="training-form-body">
-        <div class="gov-section-title">Basic Data</div>
-        <label class="form-label">Title *</label>
+        <div class="gov-section-title">${t('ui_basicData')}</div>
+        <label class="form-label">${t('col_title')} *</label>
         <input id="grTitle" class="input" value="${escHtml(review.title||'')}" placeholder="e.g. Management Review 2025">
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:8px">
           <div>
-            <label class="form-label">Type</label>
+            <label class="form-label">${t('col_type')}</label>
             <select id="grType" class="select">
-              <option value="annual" ${review.type==='annual'?'selected':''}>Annual</option>
-              <option value="interim" ${review.type==='interim'?'selected':''}>Interim Review</option>
-              <option value="extraordinary" ${review.type==='extraordinary'?'selected':''}>Extraordinary</option>
+              <option value="annual" ${review.type==='annual'?'selected':''}>${t('govl_typeAnnual')}</option>
+              <option value="interim" ${review.type==='interim'?'selected':''}>${t('govl_typeInterim')}</option>
+              <option value="extraordinary" ${review.type==='extraordinary'?'selected':''}>${t('govl_typeExtra')}</option>
             </select>
           </div>
           <div>
-            <label class="form-label">Date</label>
+            <label class="form-label">${t('ui_date')}</label>
             <input id="grDate" type="date" class="input" value="${review.date||''}">
           </div>
           <div>
-            <label class="form-label">Next Review</label>
+            <label class="form-label">${t('gov_nextReview')}</label>
             <input id="grNextDate" type="date" class="input" value="${review.nextReviewDate||''}">
           </div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px">
           <div>
-            <label class="form-label">Status</label>
+            <label class="form-label">${t('col_status')}</label>
             <select id="grStatus" class="select">
-              <option value="planned" ${review.status==='planned'?'selected':''}>Planned</option>
-              <option value="completed" ${review.status==='completed'?'selected':''}>Completed</option>
-              <option value="approved" ${review.status==='approved'?'selected':''}>Approved</option>
+              <option value="planned" ${review.status==='planned'?'selected':''}>${t('govl_statPlanned')}</option>
+              <option value="completed" ${review.status==='completed'?'selected':''}>${t('govl_statCompleted')}</option>
+              <option value="approved" ${review.status==='approved'?'selected':''}>${t('govl_statApproved')}</option>
             </select>
           </div>
           <div>
-            <label class="form-label">Chair</label>
+            <label class="form-label">${t('ui_chair')}</label>
             <input id="grChair" class="input" value="${escHtml(review.chair||'')}" placeholder="e.g. Dr. Smith (CEO)">
           </div>
         </div>
-        <label class="form-label" style="margin-top:8px">Participants (comma-separated)</label>
+        <label class="form-label" style="margin-top:8px">${t('ui_participantsCsv')}</label>
         <textarea id="grParticipants" class="input" rows="2">${escHtml(review.participants||'')}</textarea>
 
-        <div class="gov-section-title">Inputs (ISO 27001 Cl. 9.3.2)</div>
+        <div class="gov-section-title">${t('gov_inputsIso')}</div>
         <div class="gov-inputs-grid">
-          <div><label>Audit results</label><textarea id="grInputAudit" class="input" rows="3">${escHtml(review.inputAuditResults||'')}</textarea></div>
-          <div><label>Stakeholder feedback</label><textarea id="grInputStakeholder" class="input" rows="3">${escHtml(review.inputStakeholderFeedback||'')}</textarea></div>
-          <div><label>Performance / KPI status</label><textarea id="grInputPerf" class="input" rows="3">${escHtml(review.inputPerformance||'')}</textarea></div>
-          <div><label>Nonconformities</label><textarea id="grInputNc" class="input" rows="3">${escHtml(review.inputNonconformities||'')}</textarea></div>
-          <div><label>Status of previous actions</label><textarea id="grInputPrev" class="input" rows="3">${escHtml(review.inputPreviousActions||'')}</textarea></div>
-          <div><label>Risks and opportunities</label><textarea id="grInputRisks" class="input" rows="3">${escHtml(review.inputRisksOpportunities||'')}</textarea></div>
-          <div><label>External changes</label><textarea id="grInputExt" class="input" rows="3">${escHtml(review.inputExternalChanges||'')}</textarea></div>
+          <div><label>${t('gov_auditResults')}</label><textarea id="grInputAudit" class="input" rows="3">${escHtml(review.inputAuditResults||'')}</textarea></div>
+          <div><label>${t('gov_stakeholderFeedback')}</label><textarea id="grInputStakeholder" class="input" rows="3">${escHtml(review.inputStakeholderFeedback||'')}</textarea></div>
+          <div><label>${t('gov_kpiStatus')}</label><textarea id="grInputPerf" class="input" rows="3">${escHtml(review.inputPerformance||'')}</textarea></div>
+          <div><label>${t('gov_nonconformities')}</label><textarea id="grInputNc" class="input" rows="3">${escHtml(review.inputNonconformities||'')}</textarea></div>
+          <div><label>${t('gov_prevActionsStatus')}</label><textarea id="grInputPrev" class="input" rows="3">${escHtml(review.inputPreviousActions||'')}</textarea></div>
+          <div><label>${t('gov_risksOpportunities')}</label><textarea id="grInputRisks" class="input" rows="3">${escHtml(review.inputRisksOpportunities||'')}</textarea></div>
+          <div><label>${t('gov_externalChanges')}</label><textarea id="grInputExt" class="input" rows="3">${escHtml(review.inputExternalChanges||'')}</textarea></div>
         </div>
 
-        <div class="gov-section-title">Outputs / Decisions (ISO 27001 Cl. 9.3.3)</div>
-        <label class="form-label">Decisions</label>
+        <div class="gov-section-title">${t('gov_outputsIso')}</div>
+        <label class="form-label">${t('gov_decisions')}</label>
         <textarea id="grDecisions" class="input" rows="4">${escHtml(review.decisions||'')}</textarea>
-        <label class="form-label" style="margin-top:8px">Improvement actions</label>
+        <label class="form-label" style="margin-top:8px">${t('gov_improvementActions')}</label>
         <textarea id="grImprovements" class="input" rows="3">${escHtml(review.improvements||'')}</textarea>
-        <label class="form-label" style="margin-top:8px">Resource needs</label>
+        <label class="form-label" style="margin-top:8px">${t('gov_resourceNeeds')}</label>
         <textarea id="grResourceNeeds" class="input" rows="2">${escHtml(review.resourceNeeds||'')}</textarea>
 
-        <div class="gov-section-title">Notes</div>
+        <div class="gov-section-title">${t('ui_notes')}</div>
         <textarea id="grNotes" class="input" rows="3">${escHtml(review.notes||'')}</textarea>
 
         ${renderLinksBlock('gr', review.linkedControls||[], review.linkedPolicies||[])}
 
-        ${id ? `<div class="gov-section-title" style="margin-top:16px">Documents &amp; Attachments</div>
+        ${id ? `<div class="gov-section-title" style="margin-top:16px">${t('ui_docsAttachments')}</div>
         <div id="govReviewAttachPanel"></div>` : ''}
 
         <div style="display:flex;gap:8px;margin-top:16px">
-          <button class="btn btn-primary" onclick="saveGovReview(${id?`'${id}'`:'null'})"><i class="ph ph-floppy-disk"></i> Save</button>
-          <button class="btn btn-secondary" onclick="switchGovTab('reviews')">Cancel</button>
+          <button class="btn btn-primary" onclick="saveGovReview(${id?`'${id}'`:'null'})"><i class="ph ph-floppy-disk"></i> ${t('ui_save')}</button>
+          <button class="btn btn-secondary" onclick="switchGovTab('reviews')">${t('ui_cancel')}</button>
         </div>
       </div>
     </div>
@@ -13472,7 +13472,7 @@ async function deleteGovReview(id) {
 async function openGovActionForm(id = null) {
   const el = dom('govTabContent')
   if (!el) return
-  el.innerHTML = '<p style="color:var(--text-subtle);padding:24px">Loading…</p>'
+  el.innerHTML = `<p style="color:var(--text-subtle);padding:24px">${t('ui_loading')}</p>`
 
   let action = {}
   if (id) {
@@ -13483,70 +13483,70 @@ async function openGovActionForm(id = null) {
   el.innerHTML = `
     <div class="training-form-page">
       <div class="training-form-header">
-        <h3>${id ? 'Edit Action' : 'Create New Action'}</h3>
+        <h3>${id ? t('gov_editAction') : t('gov_newAction')}</h3>
       </div>
       <div class="training-form-body">
-        <div class="gov-section-title">Basic Data</div>
-        <label class="form-label">Title *</label>
+        <div class="gov-section-title">${t('ui_basicData')}</div>
+        <label class="form-label">${t('col_title')} *</label>
         <input id="gaTitle" class="input" value="${escHtml(action.title||'')}" placeholder="e.g. Penetration test production network">
-        <label class="form-label" style="margin-top:8px">Description</label>
+        <label class="form-label" style="margin-top:8px">${t('ui_description')}</label>
         <textarea id="gaDesc" class="input" rows="3">${escHtml(action.description||'')}</textarea>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:8px">
           <div>
-            <label class="form-label">Source</label>
+            <label class="form-label">${t('ui_source')}</label>
             <select id="gaSource" class="select">
               ${Object.entries(GOV_SOURCE_LABELS).map(([v,l])=>`<option value="${v}" ${action.source===v?'selected':''}>${l}</option>`).join('')}
             </select>
           </div>
           <div>
-            <label class="form-label">Priority</label>
+            <label class="form-label">${t('ui_priority')}</label>
             <select id="gaPrio" class="select">
               ${Object.entries(GOV_PRIORITY_LABELS).map(([v,l])=>`<option value="${v}" ${action.priority===v?'selected':''}>${l}</option>`).join('')}
             </select>
           </div>
           <div>
-            <label class="form-label">Status</label>
+            <label class="form-label">${t('col_status')}</label>
             <select id="gaStatus" class="select">
               ${Object.entries(GOV_ACTION_STATUS_LABELS).map(([v,l])=>`<option value="${v}" ${action.status===v?'selected':''}>${l}</option>`).join('')}
             </select>
           </div>
         </div>
-        <label class="form-label" style="margin-top:8px">Source reference (audit finding, incident ID etc.)</label>
+        <label class="form-label" style="margin-top:8px">${t('gov_sourceRefPh')}</label>
         <input id="gaSourceRef" class="input" value="${escHtml(action.sourceRef||'')}" placeholder="e.g. Finding A-2024-007">
 
-        <div class="gov-section-title">Responsibility</div>
+        <div class="gov-section-title">${t('gov_responsibility')}</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
           <div>
-            <label class="form-label">Owner</label>
-            <input id="gaOwner" class="input" value="${escHtml(action.owner||'')}" placeholder="Name">
+            <label class="form-label">${t('ui_owner')}</label>
+            <input id="gaOwner" class="input" value="${escHtml(action.owner||'')}" placeholder="${t('ui_namePh')}">
           </div>
           <div>
-            <label class="form-label">E-Mail</label>
+            <label class="form-label">${t('ui_email')}</label>
             <input id="gaOwnerEmail" type="email" class="input" value="${escHtml(action.ownerEmail||'')}" placeholder="name@example.com">
           </div>
           <div>
-            <label class="form-label">Due date</label>
+            <label class="form-label">${t('ui_dueDate')}</label>
             <input id="gaDue" type="date" class="input" value="${action.dueDate||''}">
           </div>
           <div>
-            <label class="form-label">Completed on</label>
+            <label class="form-label">${t('ui_completedOn')}</label>
             <input id="gaCompleted" type="date" class="input" value="${action.completedDate||''}">
           </div>
         </div>
-        <label class="form-label" style="margin-top:8px">Progress (0–100 %)</label>
+        <label class="form-label" style="margin-top:8px">${t('gov_progress')}</label>
         <input id="gaProgress" type="number" min="0" max="100" class="input" value="${action.progress||0}" style="width:120px">
 
-        <div class="gov-section-title">Notes</div>
+        <div class="gov-section-title">${t('ui_notes')}</div>
         <textarea id="gaNotes" class="input" rows="3">${escHtml(action.notes||'')}</textarea>
 
         ${renderLinksBlock('ga', action.linkedControls||[], action.linkedPolicies||[])}
 
-        ${id ? `<div class="gov-section-title" style="margin-top:16px">Documents &amp; Attachments</div>
+        ${id ? `<div class="gov-section-title" style="margin-top:16px">${t('ui_docsAttachments')}</div>
         <div id="govActionAttachPanel"></div>` : ''}
 
         <div style="display:flex;gap:8px;margin-top:16px">
-          <button class="btn btn-primary" onclick="saveGovAction(${id?`'${id}'`:'null'})"><i class="ph ph-floppy-disk"></i> Save</button>
-          <button class="btn btn-secondary" onclick="switchGovTab('actions')">Cancel</button>
+          <button class="btn btn-primary" onclick="saveGovAction(${id?`'${id}'`:'null'})"><i class="ph ph-floppy-disk"></i> ${t('ui_save')}</button>
+          <button class="btn btn-secondary" onclick="switchGovTab('actions')">${t('ui_cancel')}</button>
         </div>
       </div>
     </div>
@@ -13593,7 +13593,7 @@ async function deleteGovAction(id) {
 async function openGovMeetingForm(id = null) {
   const el = dom('govTabContent')
   if (!el) return
-  el.innerHTML = '<p style="color:var(--text-subtle);padding:24px">Loading…</p>'
+  el.innerHTML = `<p style="color:var(--text-subtle);padding:24px">${t('ui_loading')}</p>`
 
   let meeting = {}
   if (id) {
@@ -13604,72 +13604,72 @@ async function openGovMeetingForm(id = null) {
   el.innerHTML = `
     <div class="training-form-page">
       <div class="training-form-header">
-        <h3>${id ? 'Edit Meeting Minutes' : 'Create New Meeting Minutes'}</h3>
+        <h3>${id ? t('gov_editMeeting') : t('gov_newMeeting')}</h3>
       </div>
       <div class="training-form-body">
-        <div class="gov-section-title">Basic Data</div>
-        <label class="form-label">Title *</label>
+        <div class="gov-section-title">${t('ui_basicData')}</div>
+        <label class="form-label">${t('col_title')} *</label>
         <input id="gmTitle" class="input" value="${escHtml(meeting.title||'')}" placeholder="e.g. ISMS Committee Q1/2025">
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:8px">
           <div>
-            <label class="form-label">Committee</label>
+            <label class="form-label">${t('gov_committee')}</label>
             <select id="gmCommittee" class="select">
               ${Object.entries(GOV_COMMITTEE_LABELS).map(([v,l])=>`<option value="${v}" ${meeting.committee===v?'selected':''}>${l}</option>`).join('')}
             </select>
           </div>
           <div>
-            <label class="form-label">Date</label>
+            <label class="form-label">${t('ui_date')}</label>
             <input id="gmDate" type="date" class="input" value="${meeting.date||''}">
           </div>
           <div>
-            <label class="form-label">Next meeting</label>
+            <label class="form-label">${t('gov_nextMeeting')}</label>
             <input id="gmNextDate" type="date" class="input" value="${meeting.nextMeetingDate||''}">
           </div>
         </div>
-        <label class="form-label" style="margin-top:8px">Location / Room</label>
+        <label class="form-label" style="margin-top:8px">${t('ui_location')}</label>
         <input id="gmLocation" class="input" value="${escHtml(meeting.location||'')}" placeholder="e.g. Conference room 1">
 
-        <div class="gov-section-title">Participants</div>
+        <div class="gov-section-title">${t('ui_participants')}</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
           <div>
-            <label class="form-label">Chair</label>
-            <input id="gmChair" class="input" value="${escHtml(meeting.chair||'')}" placeholder="Name (Role)">
+            <label class="form-label">${t('ui_chair')}</label>
+            <input id="gmChair" class="input" value="${escHtml(meeting.chair||'')}" placeholder="${t('gov_chairRolePh')}">
           </div>
           <div>
-            <label class="form-label">Secretary</label>
-            <input id="gmSecretary" class="input" value="${escHtml(meeting.secretary||'')}" placeholder="Name">
+            <label class="form-label">${t('gov_secretary')}</label>
+            <input id="gmSecretary" class="input" value="${escHtml(meeting.secretary||'')}" placeholder="${t('ui_namePh')}">
           </div>
         </div>
-        <label class="form-label" style="margin-top:8px">Participants (comma-separated)</label>
+        <label class="form-label" style="margin-top:8px">${t('ui_participantsCsv')}</label>
         <textarea id="gmParticipants" class="input" rows="2">${escHtml(meeting.participants||'')}</textarea>
 
-        <div class="gov-section-title">Minutes</div>
-        <label class="form-label">Agenda (one item per line)</label>
+        <div class="gov-section-title">${t('gov_minutes')}</div>
+        <label class="form-label">${t('gov_agendaPh')}</label>
         <textarea id="gmAgenda" class="input" rows="5">${escHtml(meeting.agenda||'')}</textarea>
-        <label class="form-label" style="margin-top:8px">Decisions / Outcomes</label>
+        <label class="form-label" style="margin-top:8px">${t('gov_decisionsOutcomes')}</label>
         <textarea id="gmDecisions" class="input" rows="5">${escHtml(meeting.decisions||'')}</textarea>
 
-        <div class="gov-section-title">Approval</div>
+        <div class="gov-section-title">${t('gov_approval')}</div>
         <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
           <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
             <input id="gmApproved" type="checkbox" ${meeting.approved?'checked':''}>
-            <span>Minutes approved</span>
+            <span>${t('gov_minutesApproved')}</span>
           </label>
         </div>
-        <label class="form-label">Approved by</label>
-        <input id="gmApprovedBy" class="input" value="${escHtml(meeting.approvedBy||'')}" placeholder="Name">
+        <label class="form-label">${t('ui_approvedBy')}</label>
+        <input id="gmApprovedBy" class="input" value="${escHtml(meeting.approvedBy||'')}" placeholder="${t('ui_namePh')}">
 
-        <div class="gov-section-title">Notes</div>
+        <div class="gov-section-title">${t('ui_notes')}</div>
         <textarea id="gmNotes" class="input" rows="3">${escHtml(meeting.notes||'')}</textarea>
 
         ${renderLinksBlock('gm', meeting.linkedControls||[], meeting.linkedPolicies||[])}
 
-        ${id ? `<div class="gov-section-title" style="margin-top:16px">Documents &amp; Attachments</div>
+        ${id ? `<div class="gov-section-title" style="margin-top:16px">${t('ui_docsAttachments')}</div>
         <div id="govMeetingAttachPanel"></div>` : ''}
 
         <div style="display:flex;gap:8px;margin-top:16px">
-          <button class="btn btn-primary" onclick="saveGovMeeting(${id?`'${id}'`:'null'})"><i class="ph ph-floppy-disk"></i> Save</button>
-          <button class="btn btn-secondary" onclick="switchGovTab('meetings')">Cancel</button>
+          <button class="btn btn-primary" onclick="saveGovMeeting(${id?`'${id}'`:'null'})"><i class="ph ph-floppy-disk"></i> ${t('ui_save')}</button>
+          <button class="btn btn-secondary" onclick="switchGovTab('meetings')">${t('ui_cancel')}</button>
         </div>
       </div>
     </div>
@@ -14354,7 +14354,7 @@ async function openExerciseForm(id = null) {
             </div>
           </div>
           <div class="form-group">
-            <label class="form-label">Participants (comma-separated)</label>
+            <label class="form-label">${t('ui_participantsCsv')}</label>
             <textarea id="exParticipants" class="form-input" rows="2" placeholder="e.g. CISO, CIO, HR Manager">${escHtml((item?.participants||[]).join(', '))}</textarea>
           </div>
         </div>
@@ -14765,7 +14765,7 @@ async function openSupplierForm(id = null) {
             <textarea id="supSecReqs" class="form-input" rows="2" placeholder="e.g. ISO 27001, SOC 2, NDA, GDPR compliance">${escHtml((item?.securityRequirements || []).join(', '))}</textarea>
           </div>
           <div class="form-group">
-            <label class="form-label">Notes</label>
+            <label class="form-label">${t('ui_notes')}</label>
             <textarea id="supNotes" class="form-input" rows="3" placeholder="Additional remarks about the supplier">${escHtml(item?.notes || '')}</textarea>
           </div>
           ${renderLinksBlock('sup', item?.linkedControls || [], item?.linkedPolicies || [])}
@@ -15356,7 +15356,7 @@ async function openDistributionDetail(id) {
       <h4 style="margin-bottom:12px"><i class="ph ph-plus"></i> ${t('ack_addManual')}</h4>
       <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:end">
         <div>
-          <label class="form-label">E-Mail</label>
+          <label class="form-label">${t('ui_email')}</label>
           <input type="email" id="manAckEmail" class="form-input" placeholder="alice@firma.de"/>
         </div>
         <div>
