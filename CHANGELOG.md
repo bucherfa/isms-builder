@@ -8,7 +8,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-## [Unreleased]
+## [1.37.5] — 2026-08-16
 
 ### Fixed
 - **`X-Forwarded-*`-Header waren ungeprüft vertrauenswürdig — Host-Header-Injection und fälschbare Audit-IP.** Bei der Prüfung, ob die App mit segmentierten Unternehmensnetzen (DMZ/DB-Netz/Server-Netz, ggf. mit intern genutzten offiziellen IP-Bereichen) zurechtkommt, stellte sich heraus: Die DB-Anbindung selbst ist unkritisch (reines TCP über `DB_HOST:DB_PORT`, keine IP-Range-Annahmen im Code), aber zwei Stellen lasen `X-Forwarded-For`/`-Host`/`-Proto` direkt und ungeprüft — ein Client konnte diese Header selbst mitschicken, unabhängig davon, ob überhaupt ein Reverse-Proxy davorstand:
