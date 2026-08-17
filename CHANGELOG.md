@@ -8,6 +8,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [Unreleased]
+
+### Fixed
+- **GDPR-Modul: Seiten ließen sich nicht bis zum Ende scrollen** ([#67](https://github.com/coolstartnow/isms-builder/issues/67), gemeldet von @VistaMaster). Betraf alle acht GDPR-Tabs (VVT, AV, DSFA, Datenpannen, Betroffenenrechte, TOMs, Löschprotokoll, DSB) — bei Inhalt, der die Fensterhöhe überstieg, war der Save-Button unerreichbar, nur durch Herauszoomen sichtbar. Ursache: `.gdpr-fullpage`/`.gdpr-content` bildeten anders als alle anderen Module (Risk, Admin, Calendar, Incident, Training) keine eigene Scroll-Region — der äußere `#gdprContainer` hat `overflow: hidden`, aber kein Nachfahre hat das mit `flex: 1; overflow-y: auto` aufgefangen, Inhalt lief einfach über den harten Rand hinaus. `.gdpr-fullpage` bekommt jetzt `height: 100%; overflow: hidden`, `.gdpr-content` `flex: 1; overflow-y: auto` — exakt das Muster, das die anderen Module bereits nutzen. Live verifiziert: Bug reproduziert (Save-Button 850px unterhalb des sichtbaren Bereichs, `overflow-y: visible`, nicht scrollbar) und nach dem Fix aufgelöst (Button nach Scrollen vollständig sichtbar).
+
 ## [1.37.5] — 2026-08-16
 
 ### Fixed
