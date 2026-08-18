@@ -165,8 +165,64 @@ async function applyStatusTransition(template, newStatus) {
   updateStatusBadge(data.status)
   dom('ownerInfo').textContent = data.owner ? `Owner: ${data.owner}` : ''
   renderLifecycleActions(data)
+  renderWebdavPublishBar(data)
   // Liste aktualisieren
   selectType(currentType, true)
+}
+
+// ── WebDAV-Publish-Status im Template-Editor (#66) ────────────────────────────
+// Wird nur fuer freigegebene Templates gezeigt: nur dort ist ein Publish
+// ueberhaupt relevant. Der Re-Sync-Button ruft den Server-Endpoint auf, der
+// wiederum nie wirft — bei fehlender/deaktivierter Konfiguration kommt eine
+// verstaendliche Fehlermeldung zurueck statt eines kaputten UI-Zustands.
+function renderWebdavPublishBar(tmpl) {
+  const bar = dom('webdavPublishBar')
+  if (!bar) return
+  if (!tmpl || tmpl.status !== 'approved' || !templateCanEdit()) { bar.style.display = 'none'; return }
+
+  const pub = tmpl.webdavPublish || null
+  let statusHtml
+  if (!pub) {
+    statusHtml = `<span class="tmpl-review-hint">${t('tmpl_webdavNeverPublished')}</span>`
+  } else if (pub.ok) {
+    const when = pub.publishedAt ? new Date(pub.publishedAt).toLocaleString('de-DE') : ''
+    const linkHtml = pub.shareLink
+      ? ` <a href="${escHtml(pub.shareLink)}" target="_blank" rel="noopener noreferrer">${t('tmpl_webdavOpenLink')}</a>`
+      : ''
+    statusHtml = `<span class="tmpl-review-hint" style="color:var(--success,#4ade80)"><i class="ph ph-check-circle"></i> ${t('tmpl_webdavPublished')} ${when}</span>${linkHtml}`
+  } else {
+    statusHtml = `<span class="tmpl-review-hint" style="color:var(--danger-text,#f87171)"><i class="ph ph-warning-circle"></i> ${t('tmpl_webdavError')}: ${escHtml(pub.error || '')}</span>`
+  }
+
+  bar.style.display = 'flex'
+  bar.innerHTML = `
+    <i class="ph ph-cloud-arrow-up"></i>
+    <span class="tmpl-review-label">${t('tmpl_webdavPublish')}:</span>
+    ${statusHtml}
+    <span class="toolbar-spacer"></span>
+    <button class="btn btn-secondary btn-sm" id="btnWebdavResync" onclick="resyncWebdavPublish()">
+      <i class="ph ph-arrows-clockwise"></i> ${t('tmpl_webdavResync')}
+    </button>
+  `
+}
+
+async function resyncWebdavPublish() {
+  if (!currentTemplate) return
+  const btn = dom('btnWebdavResync')
+  if (btn) { btn.disabled = true; btn.innerHTML = `<i class="ph ph-spinner"></i> ${t('tmpl_webdavResyncing')}` }
+  try {
+    const res = await fetch(`/template/${currentTemplate.type}/${currentTemplate.id}/publish-webdav`, {
+      method: 'POST',
+      headers: apiHeaders(),
+    })
+    const data = await res.json().catch(() => ({}))
+    if (data.template) currentTemplate = data.template
+    else if (currentTemplate) currentTemplate.webdavPublish = { ok: data.ok, error: data.error, publishedAt: data.publishedAt }
+    renderWebdavPublishBar(currentTemplate)
+  } catch (e) {
+    if (currentTemplate) currentTemplate.webdavPublish = { ok: false, error: e.message }
+    renderWebdavPublishBar(currentTemplate)
+  }
 }
 
 function dom(id) { return document.getElementById(id) }
@@ -3834,6 +3890,7 @@ async function renderAdminOrgTab() {
   const _ouTypeLabel = { cio: t('org_typeCio'), group: t('org_typeGroup'), local: t('org_typeLocal'), external: t('org_typeExternal') }
   const en   = s.emailNotifications || {}
   const smtp = s.smtpSettings || {}
+  const webdav = s.webdavSettings || {}
   const nav  = Array.isArray(s.navOrder) && s.navOrder.length ? s.navOrder : _NAV_ORDER_DEFAULT.slice()
 
   container.innerHTML = `
@@ -4011,6 +4068,43 @@ async function renderAdminOrgTab() {
         </div>
         <div style="margin-top:10px;font-size:.8rem;color:var(--text-subtle)">
           ${t('org_testMailDesc').replace('{email}', escHtml(s.cisoEmail || '-'))}
+        </div>
+      </div>
+
+      <div class="org-section" style="margin-top:20px;border-top:1px solid var(--border);padding-top:16px">
+        <h4 class="org-section-title"><i class="ph ph-cloud-arrow-up"></i> ${t('org_webdavConfig')}</h4>
+        <p style="font-size:.85rem;color:var(--text-muted);margin:0 0 12px">${t('org_webdavDesc')}</p>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+          <label class="module-toggle" style="flex-shrink:0">
+            <input type="checkbox" id="webdavEnabled" ${webdav.enabled ? 'checked' : ''}>
+            <span class="module-toggle-slider"></span>
+          </label>
+          <div>
+            <div style="font-weight:600;font-size:.9rem">${t('org_webdavEnable')}</div>
+            <div style="font-size:.8rem;color:var(--text-subtle)">${t('org_webdavEnableDesc')}</div>
+          </div>
+        </div>
+        <div class="org-grid">
+          <label class="org-label">${t('org_webdavBaseUrl')}</label>
+          <input class="input" id="webdavBaseUrl" value="${escHtml(webdav.baseUrl||'')}" placeholder="https://cloud.example.com/remote.php/dav/files/isms">
+          <label class="org-label">${t('org_webdavUsername')}</label>
+          <input class="input" id="webdavUsername" value="${escHtml(webdav.username||'')}" autocomplete="off">
+          <label class="org-label">${t('org_webdavAppPassword')}</label>
+          <input class="input" id="webdavAppPassword" type="password" value="${escHtml(webdav.appPassword||'')}" placeholder="••••••••" autocomplete="new-password">
+          <label class="org-label">${t('org_webdavFolder')}</label>
+          <input class="input" id="webdavFolder" value="${escHtml(webdav.folder||'ISMS-Richtlinien')}">
+        </div>
+        <div class="settings-notice" style="margin-top:12px">
+          <i class="ph ph-warning"></i> ${t('org_webdavAppPasswordNotice')}
+        </div>
+        <div style="display:flex;gap:10px;margin-top:14px;align-items:center">
+          <button class="btn btn-primary btn-sm" onclick="saveWebdavSettings()">
+            <i class="ph ph-floppy-disk"></i> ${t('org_webdavSave')}
+          </button>
+          <button class="btn btn-secondary btn-sm" onclick="testWebdavConnection()">
+            <i class="ph ph-plugs"></i> ${t('org_webdavTestConnection')}
+          </button>
+          <span id="webdavSaveMsg" style="font-size:13px;display:none"></span>
         </div>
       </div>
 
@@ -4339,6 +4433,59 @@ async function sendTestMail() {
   } else {
     const e = await res.json().catch(() => ({}))
     msg.textContent = `${t('error')}: ${e.error || t('org_smtpConnectionFailed')}`
+    msg.style.color = 'var(--danger-text,#f87171)'
+  }
+  setTimeout(() => { msg.style.display = 'none' }, 5000)
+}
+
+// ── WebDAV-Publish (Nextcloud/ownCloud, #66) ──────────────────────────────────
+
+function _webdavSettingsFromForm() {
+  return {
+    enabled:     document.getElementById('webdavEnabled')?.checked || false,
+    baseUrl:     document.getElementById('webdavBaseUrl')?.value.trim() || '',
+    username:    document.getElementById('webdavUsername')?.value.trim() || '',
+    appPassword: document.getElementById('webdavAppPassword')?.value || '',
+    folder:      document.getElementById('webdavFolder')?.value.trim() || 'ISMS-Richtlinien',
+  }
+}
+
+async function saveWebdavSettings() {
+  const patch = { webdavSettings: _webdavSettingsFromForm() }
+  const res = await fetch('/admin/org-settings', {
+    method: 'PUT',
+    headers: { ...apiHeaders('admin'), 'Content-Type': 'application/json' },
+    body: JSON.stringify(patch),
+  })
+  const msg = document.getElementById('webdavSaveMsg')
+  msg.style.display = ''
+  if (res.ok) {
+    msg.textContent = t('org_webdavSaved')
+    msg.style.color = 'var(--success,#4ade80)'
+  } else {
+    msg.textContent = t('err_saveFailed')
+    msg.style.color = 'var(--danger-text,#f87171)'
+  }
+  setTimeout(() => { msg.style.display = 'none' }, 3000)
+}
+
+async function testWebdavConnection() {
+  const msg = document.getElementById('webdavSaveMsg')
+  msg.style.display = ''
+  msg.textContent = t('org_webdavTesting')
+  msg.style.color = 'var(--text-subtle)'
+
+  const res = await fetch('/admin/webdav/test', {
+    method: 'POST',
+    headers: { ...apiHeaders('admin'), 'Content-Type': 'application/json' },
+    body: JSON.stringify(_webdavSettingsFromForm()),
+  })
+  const result = await res.json().catch(() => ({}))
+  if (res.ok && result.ok) {
+    msg.textContent = t('org_webdavTestSuccess')
+    msg.style.color = 'var(--success,#4ade80)'
+  } else {
+    msg.textContent = `${t('org_webdavTestFailed')}${result.error ? ': ' + result.error : ''}`
     msg.style.color = 'var(--danger-text,#f87171)'
   }
   setTimeout(() => { msg.style.display = 'none' }, 5000)
@@ -6736,6 +6883,7 @@ function loadTemplate(t) {
     updateReviewHint(t.nextReviewDate)
   }
   renderLifecycleActions(t)
+  renderWebdavPublishBar(t)
   renderTmplControlsBar(t)
   renderTmplEntityBar(t)
   renderAttachmentsBar(t)

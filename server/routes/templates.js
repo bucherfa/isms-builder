@@ -120,7 +120,38 @@ router.patch('/template/:type/:id/status', requireAuth, authorize('editor'), asy
   const result = await storage.setStatus?.(type, id, { status, changedBy: req.user, role: req.role })
   if (!result) return res.status(500).json({ error: 'Storage error' })
   if (!result.ok) return res.status(400).json({ error: result.error })
+  if (result.template?.status === 'approved') _autoPublishWebdav(type, id)
   res.json(result.template)
+})
+
+// Nextcloud/ownCloud-Publish (#66): Ausfall des Remote-Systems darf die
+// Freigabe nie beeinflussen — deshalb fire-and-forget, ohne die Response
+// abzuwarten oder bei Fehlern etwas anderes als eine Konsolenmeldung zu tun.
+// Das Ergebnis landet im webdav_publish-Feld und ist ueber GET sichtbar;
+// bei Bedarf laesst sich der Publish ueber den Re-Sync-Endpoint wiederholen.
+function _autoPublishWebdav(type, id) {
+  Promise.resolve()
+    .then(async () => {
+      const webdav = require('../webdav')
+      const cfg = await webdav.getConfig()
+      if (!cfg) return
+      const doc = await storage.getTemplate?.(type, id)
+      if (!doc) return
+      const result = await webdav.publishDocument(doc)
+      await storage.setWebdavPublish?.(type, id, result)
+    })
+    .catch(e => console.error('[webdav] Auto-Publish fehlgeschlagen:', e.message))
+}
+
+router.post('/template/:type/:id/publish-webdav', requireAuth, authorize('editor'), async (req, res) => {
+  const { type, id } = req.params
+  const doc = await storage.getTemplate?.(type, id)
+  if (!doc) return res.status(404).json({ error: 'Not found' })
+  const webdav = require('../webdav')
+  const result = await webdav.publishDocument(doc)
+  const updated = await storage.setWebdavPublish?.(type, id, result)
+  require('../db/auditStore').append({ user: req.user, action: 'publish_webdav', resource: 'template', resourceId: id, detail: result.ok ? 'ok' : `error: ${result.error}` })
+  res.json({ ...result, template: updated })
 })
 
 // ── Template-Anhänge ──

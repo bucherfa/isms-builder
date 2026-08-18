@@ -53,6 +53,9 @@ const DEFAULTS = {
   smtpSettings: {
     host: '', port: 587, secure: false, user: '', pass: '', from: '',
   },
+  webdavSettings: {
+    enabled: false, baseUrl: '', username: '', appPassword: '', folder: 'ISMS-Richtlinien',
+  },
   splashScreen: {
     enabled: true, duration: 7,
   },
@@ -75,7 +78,7 @@ const DEFAULTS = {
 
 const DEEP_KEYS = [
   'modules', 'soaFrameworks', 'cisoSettings', 'gdpoSettings', 'icsSettings',
-  'revisionSettings', 'qmSettings', 'emailNotifications', 'smtpSettings',
+  'revisionSettings', 'qmSettings', 'emailNotifications', 'smtpSettings', 'webdavSettings',
 ]
 
 function _deepMerge(current, patch) {

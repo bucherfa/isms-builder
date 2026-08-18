@@ -302,6 +302,18 @@ router.get('/admin/email/status', requireAuth, authorize('admin'), (req, res) =>
   })
 })
 
+// ── WebDAV-Verbindungstest (Nextcloud/ownCloud-Publish, #66) ──
+router.post('/admin/webdav/test', requireAuth, authorize('admin'), async (req, res) => {
+  const webdav = require('../webdav')
+  const { baseUrl, username, appPassword, folder } = req.body || {}
+  const cfg = { baseUrl, username, appPassword, folder: folder || 'ISMS-Richtlinien' }
+  const result = await webdav.testConnection(cfg)
+  if (result.ok) {
+    await auditStore.append({ user: req.user, action: 'settings', resource: 'org', detail: 'WebDAV-Verbindungstest erfolgreich' })
+  }
+  res.json(result)
+})
+
 // ── Storage-Backend-Info (für Wartungs-Tab) ──
 router.get('/api/storage-info', requireAuth, authorize('admin'), (req, res) => {
   const backend = (process.env.STORAGE_BACKEND || 'json').toLowerCase()

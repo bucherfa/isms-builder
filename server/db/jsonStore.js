@@ -310,6 +310,14 @@ module.exports = {
     return { template: t, attachment: att || null }
   },
 
+  setWebdavPublish: (type, id, publishState) => {
+    const idx = findIndex(type, id)
+    if (idx < 0) return null
+    store[idx].webdavPublish = publishState
+    saveAll(store)
+    return store[idx]
+  },
+
   TRANSITIONS,
   VALID_STATUSES
 }

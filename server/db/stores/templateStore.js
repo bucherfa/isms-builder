@@ -40,6 +40,7 @@ function rowToTemplate(row) {
     attachments:        _json(row.attachments, []),
     history:            _json(row.history, []),
     statusHistory:      _json(row.status_history, []),
+    webdavPublish:      _json(row.webdav_publish, null),
   }
 }
 
@@ -333,6 +334,16 @@ module.exports = {
       updated_at: t.updatedAt,
     })
     return { template: t, attachment: att }
+  },
+
+  setWebdavPublish: async (type, id, publishState) => {
+    const row = await getDb()('templates')
+      .where('type', type).where('id', id).whereNull('deleted_at').first()
+    if (!row) return null
+    await getDb()('templates').where('type', type).where('id', id).update({
+      webdav_publish: JSON.stringify(publishState),
+    })
+    return rowToTemplate({ ...row, webdav_publish: JSON.stringify(publishState) })
   },
 
   TRANSITIONS,

@@ -117,6 +117,15 @@ const DEFAULTS = {
     from:   '',      // z.B. "ISMS Builder <isms@example.com>"
   },
 
+  // WebDAV-Publish (Nextcloud/ownCloud) fuer freigegebene Richtlinien (#66)
+  webdavSettings: {
+    enabled:     false,   // Auto-Publish bei Freigabe aktivieren
+    baseUrl:     '',      // z.B. https://cloud.example.com/remote.php/dav/files/isms
+    username:    '',
+    appPassword: '',      // App-Passwort, NICHT das Hauptkonto-Passwort (Achtung: im Klartext gespeichert, wie smtpSettings.pass)
+    folder:      'ISMS-Richtlinien',
+  },
+
   // Login-Splash-Bildschirm
   splashScreen: {
     enabled:  true,   // Splash nach Login anzeigen
@@ -180,6 +189,7 @@ function load() {
         qmSettings:         { ...DEFAULTS.qmSettings,         ...(stored.qmSettings         || {}) },
         emailNotifications: { ...DEFAULTS.emailNotifications, ...(stored.emailNotifications || {}) },
         smtpSettings:       { ...DEFAULTS.smtpSettings,       ...(stored.smtpSettings       || {}) },
+        webdavSettings:     { ...DEFAULTS.webdavSettings,     ...(stored.webdavSettings     || {}) },
         navOrder:           Array.isArray(stored.navOrder) ? stored.navOrder : DEFAULTS.navOrder.slice(),
         languageConfig:     { ...DEFAULTS.languageConfig, ...(stored.languageConfig || {}), available: Array.isArray(stored.languageConfig?.available) ? stored.languageConfig.available : DEFAULTS.languageConfig.available },
       }
@@ -187,7 +197,7 @@ function load() {
   } catch (e) {
     console.error('[orgSettingsStore] load error:', e.message)
   }
-  return { ...DEFAULTS, modules: { ...DEFAULTS.modules }, soaFrameworks: { ...DEFAULTS.soaFrameworks }, cisoSettings: { ...DEFAULTS.cisoSettings }, gdpoSettings: { ...DEFAULTS.gdpoSettings }, icsSettings: { ...DEFAULTS.icsSettings }, revisionSettings: { ...DEFAULTS.revisionSettings }, qmSettings: { ...DEFAULTS.qmSettings }, emailNotifications: { ...DEFAULTS.emailNotifications }, smtpSettings: { ...DEFAULTS.smtpSettings }, navOrder: DEFAULTS.navOrder.slice() }
+  return { ...DEFAULTS, modules: { ...DEFAULTS.modules }, soaFrameworks: { ...DEFAULTS.soaFrameworks }, cisoSettings: { ...DEFAULTS.cisoSettings }, gdpoSettings: { ...DEFAULTS.gdpoSettings }, icsSettings: { ...DEFAULTS.icsSettings }, revisionSettings: { ...DEFAULTS.revisionSettings }, qmSettings: { ...DEFAULTS.qmSettings }, emailNotifications: { ...DEFAULTS.emailNotifications }, smtpSettings: { ...DEFAULTS.smtpSettings }, webdavSettings: { ...DEFAULTS.webdavSettings }, navOrder: DEFAULTS.navOrder.slice() }
 }
 
 function save(data) {
@@ -212,6 +222,7 @@ function update(patch) {
     qmSettings:         { ...current.qmSettings,         ...(patch.qmSettings         || {}) },
     emailNotifications: { ...current.emailNotifications, ...(patch.emailNotifications || {}) },
     smtpSettings:       { ...current.smtpSettings,       ...(patch.smtpSettings       || {}) },
+    webdavSettings:     { ...current.webdavSettings,     ...(patch.webdavSettings     || {}) },
     navOrder:           Array.isArray(patch.navOrder) ? patch.navOrder : current.navOrder,
   }
   save(updated)

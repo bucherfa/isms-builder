@@ -94,6 +94,7 @@ const TABLES = {
     t.text('status_history').notNullable().defaultTo('[]')
     t.string('deleted_at', 30).nullable()
     t.string('deleted_by', 120).nullable()
+    t.text('webdav_publish').nullable()
     t.index('type', 'idx_template_type')
     t.index('status', 'idx_template_status')
     t.index('parent_id', 'idx_template_parent')
@@ -444,6 +445,7 @@ async function ensureColumns(k) {
     { table: 'goals',       col: 'data',           fn: (t) => t.text('data').notNullable().defaultTo('{}') },
     { table: 'suppliers',   col: 'data',           fn: (t) => t.text('data').notNullable().defaultTo('{}') },
     { table: 'risks',       col: 'deleted_by',     fn: (t) => t.string('deleted_by', 120).nullable() },
+    { table: 'templates',   col: 'webdav_publish', fn: (t) => t.text('webdav_publish').nullable() },
   ]
 
   for (const { table, col, fn } of patches) {
