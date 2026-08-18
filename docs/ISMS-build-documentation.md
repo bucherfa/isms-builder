@@ -54,7 +54,7 @@ Stand: 2026-03-09 | Version: V 1.28 (Lieferkettenmodul + Risikomanagement Multi-
 Der ISMS Builder ist eine eigenständige Node.js/Express-Anwendung mit Vanilla-JS-SPA zur Erstellung, Verwaltung und Versionierung von ISMS-Dokumenten. Unterstützt werden mehrere Compliance-Frameworks sowie GDPR, Risikomanagement, Training und Reporting.
 
 **Tech-Stack:** Node.js ≥18, Express, JWT, bcryptjs, multer, better-sqlite3
-**Persistenz:** JSON-Dateien (Standard, aktuell empfohlen), SQLite (`STORAGE_BACKEND=sqlite`, siehe Hinweis in Abschnitt 31), MariaDB/MySQL (`STORAGE_BACKEND=mariadb`), PostgreSQL-Stub (`STORAGE_BACKEND=pg`)
+**Persistenz:** JSON-Dateien (Standard, aktuell empfohlen), SQLite (`STORAGE_BACKEND=sqlite`, siehe Hinweis in Abschnitt 31), MariaDB/MySQL (`STORAGE_BACKEND=mariadb`), PostgreSQL (`STORAGE_BACKEND=pg`)
 **Auth:** JWT-Cookie (`sm_session`), bcrypt-Passwörter, optionale TOTP-2FA
 **RBAC:** `reader`/`revision`(1) < `editor`/`dept_head`/`qmb`(2) < `contentowner`/`auditor`(3) < `admin`(4)
 **UI-Schutz:** Alle UI-Seiten außer `login.html` und ihren Abhängigkeiten sind serverseitig durch JWT-Prüfung geschützt. Unauthentifizierte Anfragen werden mit `302 → /ui/login.html` umgeleitet — unabhängig vom Client-seitigen `logincheck.js`.
@@ -829,7 +829,7 @@ POST /gdpr/deletion-log           – Löschung bestätigen (contentowner+)
 **Empfehlung:** JSON, solange die SQL-Backend-Migration nicht abgeschlossen ist (siehe Hinweis in
 Abschnitt 31 und [Issue #42](https://github.com/coolstartnow/isms-builder/issues/42)). SQLite ist
 nutzbar, hat aber aktuell ein bekanntes, ungefixtes Startup-Race-Condition-Problem.
-Ausführliche Migrations-Anleitung inkl. PostgreSQL-Roadmap: **→ Abschnitt 31**.
+Ausführliche Migrations-Anleitung inkl. PostgreSQL: **→ Abschnitt 31**.
 
 **Schnellübersicht JSON → SQLite:**
 ```bash
@@ -1449,7 +1449,7 @@ SMTP_USER=isms@yourcompany.com
 | **JSON** | `STORAGE_BACKEND=json` | **Aktuell empfohlen** — Entwicklung, Tests, Quick-Start, Produktivbetrieb |
 | **SQLite** | `STORAGE_BACKEND=sqlite` | Verfügbar, aktuell **nicht empfohlen** (siehe Hinweis unten) |
 | **MariaDB/MySQL** | `STORAGE_BACKEND=mariadb` | Kleines Team, vorhandene MySQL-Infra |
-| **PostgreSQL** | `STORAGE_BACKEND=pg` | Multi-Instanz, hohe Last (Stub) |
+| **PostgreSQL** | `STORAGE_BACKEND=pg` | Multi-Instanz, hohe Last |
 
 > **⚠️ Hinweis zu SQLite:** SQLite ist konzeptionell für einen selbst gehosteten ISMS-Dienst mit
 > einer bis wenigen gleichzeitigen Nutzern ideal (keine Serverinfrastruktur, ACID-Transaktionen,
@@ -1533,14 +1533,32 @@ mysql -u isms -p isms_builder -e "SELECT COUNT(*) FROM templates;"
 
 **Status:** `server/db/mariadbStore.js` und `server/db/mariadbDatabase.js` sind vollständig implementiert. Das Migrationsskript überträgt: Templates, Training, Entities, Risks, Guidance, Goals, Assets, Suppliers, GDPR (VVT/AV/DSFA/Incidents/DSAR/TOMs).
 
-### Migration SQLite → PostgreSQL (geplant)
+### Migration JSON/SQLite → PostgreSQL
 
 PostgreSQL wird benötigt wenn:
 - Mehrere ISMS-Instanzen auf denselben Datensatz zugreifen
 - Hochverfügbarkeit / Replikation erforderlich ist
 - Lastspitzen durch viele gleichzeitige Nutzer entstehen
 
-**Status:** `server/db/pgStore.js` ist als Stub angelegt. Die vollständige Implementierung folgt in einer späteren Version. Die API-Schnittstelle ist bereits via `server/storage.js` (Façade) abstrahiert — der restliche Code muss nicht geändert werden.
+**Umstellung:**
+
+```bash
+# 1. Verbindungsparameter in .env eintragen
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=isms
+DB_PASS=yourpass
+DB_NAME=isms_builder
+STORAGE_BACKEND=pg
+
+# 2. Migrationsskript ausführen (idempotent)
+node tools/migrate-json-to-knex.js
+
+# 3. Server neu starten
+npm start
+```
+
+**Status:** Vollständig implementiert über denselben Knex-Store-Layer wie MariaDB (`server/db/knexDatabase.js` + `server/db/stores/*.js`), kein separater Code-Pfad. Gegen echtes PostgreSQL 17 verifiziert — alle 23 Tabellen, CRUD-Roundtrips für alle 20 Stores, sowie der vollständige `docker compose`-Weg (App-Container + PostgreSQL-Container im selben Docker-Netzwerk, siehe `docker-compose.yml`, Profil `postgres`). Das ältere `server/db/pgStore.js` ist ein Scaffold aus einer früheren Entwicklungsphase und wird von `server/storage.js` in der Praxis nicht mehr erreicht (der Knex-Pfad wird für jedes Nicht-JSON-Backend zuerst versucht).
 
 ### Backup-Strategien je Backend
 
@@ -1804,7 +1822,6 @@ Die Präsentation ist eine selbst-enthaltene HTML-Datei — kein Internet, kein 
 
 ### Geplante Features (V 1.x)
 
-- **PostgreSQL-Backend** (`pgStore.js` vervollständigen) — für Multi-Instanz / Hochverfügbarkeit
 - **EN-Spiegelstruktur** — Mehrsprachigkeit (DE/EN) für Templates und UI
 - **CSV-Export Legal-Modul** — Verträge, NDAs und Datenschutzrichtlinien als CSV-Export
 - **Datei-Upload für Verträge** — PDF/DOCX-Anhänge direkt im Legal-Modul
