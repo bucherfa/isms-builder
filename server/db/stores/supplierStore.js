@@ -1,6 +1,7 @@
 'use strict'
 
 const { getDb, init: initDb } = require('../knexDatabase')
+const triage = require('../supplierTriage')
 
 function nowISO() { return new Date().toISOString() }
 function makeId() { return `sup_${require('crypto').randomBytes(4).toString('hex')}` }
@@ -30,7 +31,13 @@ function rowToSupplier(row) {
     deletedBy: d.deletedBy || '', updatedBy: d.updatedBy || '',
     createdBy: row.created_by, createdAt: row.created_at,
     updatedAt: row.updated_at, deletedAt: row.deleted_at || null,
+    triage: triage.normalizeTriage(d.triage),
   }
+}
+
+function _withTriageResult(item) {
+  if (!item) return item
+  return { ...item, triageResult: triage.computeTriageResult(item.triage) }
 }
 
 function packData(s) {
@@ -44,24 +51,26 @@ function packData(s) {
     contractId: s.contractId, avContractId: s.avContractId,
     riskScore: s.riskScore, linkedPolicies: s.linkedPolicies || [],
     deletedBy: s.deletedBy || '', updatedBy: s.updatedBy || '',
+    triage: s.triage,
   })
 }
 
 module.exports = {
   init: async () => { await initDb() },
 
-  getAll: async ({ status, criticality, type } = {}) => {
+  getAll: async ({ status, criticality, type, triage: triageFilter } = {}) => {
     const q = getDb()('suppliers').whereNull('deleted_at')
     if (status) q.where('status', status)
     if (criticality) q.where('risk_level', criticality)
-    let list = (await q).map(rowToSupplier)
+    let list = (await q).map(rowToSupplier).map(_withTriageResult)
     if (type) list = list.filter(i => i.type === type)
+    if (triageFilter) list = list.filter(i => i.triageResult.level === triageFilter)
     return list
   },
 
   getById: async (id) => {
     const row = await getDb()('suppliers').where('id', id).whereNull('deleted_at').first()
-    return rowToSupplier(row)
+    return _withTriageResult(rowToSupplier(row))
   },
 
   create: async (fields, { createdBy } = {}) => {
@@ -86,6 +95,7 @@ module.exports = {
       applicableEntities: Array.isArray(fields.applicableEntities) ? fields.applicableEntities : [],
       contractEnd: fields.contractEnd || '',
       createdBy: createdBy || 'system',
+      triage: triage.normalizeTriage(fields.triage),
     }
     await getDb()('suppliers').insert({
       id, name: item.name, category: item.type,
@@ -97,7 +107,7 @@ module.exports = {
       data: packData(item), created_by: item.createdBy,
       created_at: now, updated_at: now,
     })
-    return { ...item, createdAt: now, updatedAt: now, deletedAt: null }
+    return _withTriageResult({ ...item, createdAt: now, updatedAt: now, deletedAt: null })
   },
 
   update: async (id, patch, { changedBy } = {}) => {
@@ -111,6 +121,9 @@ module.exports = {
     for (const k of allowed) {
       if (patch[k] !== undefined) s[k] = patch[k]
     }
+    if (patch.triage !== undefined) {
+      s.triage = triage.normalizeTriage({ ...s.triage, ...patch.triage })
+    }
     s.updatedAt = nowISO()
     if (changedBy) s.updatedBy = changedBy
     await getDb()('suppliers').where('id', id).update({
@@ -122,7 +135,7 @@ module.exports = {
       linked_controls: JSON.stringify(s.linkedControls || []),
       data: packData(s), updated_at: s.updatedAt,
     })
-    return s
+    return _withTriageResult(s)
   },
 
   remove: async (id, { deletedBy } = {}) => {
@@ -174,6 +187,15 @@ module.exports = {
       withDataAccess: list.filter(i => i.dataAccess).length,
       upcomingAudits: list.filter(i => i.nextAuditDate && i.nextAuditDate >= today && i.nextAuditDate <= in30).length,
       overdueAudits: list.filter(i => i.nextAuditDate && i.nextAuditDate < today).length,
+      byTriageLevel: (() => {
+        const levels = list.map(i => triage.computeTriageResult(i.triage).level)
+        return {
+          low: levels.filter(l => l === 'low').length,
+          medium: levels.filter(l => l === 'medium').length,
+          high: levels.filter(l => l === 'high').length,
+        }
+      })(),
+      triageUnassessed: list.map(i => triage.computeTriageResult(i.triage).level).filter(l => l === 'unassessed').length,
     }
   },
 

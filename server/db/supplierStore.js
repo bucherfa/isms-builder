@@ -7,6 +7,13 @@ const path = require('path')
 const _BASE = process.env.DATA_DIR || path.join(__dirname, '../../data')
 const FILE  = path.join(_BASE, 'suppliers.json')
 
+const triage = require('./supplierTriage')
+
+function _withTriageResult(item) {
+  if (!item) return item
+  return { ...item, triageResult: triage.computeTriageResult(item.triage) }
+}
+
 function makeId() {
   return `sup_${require('crypto').randomBytes(4).toString('hex')}`
 }
@@ -19,16 +26,17 @@ function save(list) {
   fs.writeFileSync(FILE, JSON.stringify(list, null, 2))
 }
 
-function getAll({ status, criticality, type } = {}) {
-  let list = load().filter(i => !i.deletedAt)
+function getAll({ status, criticality, type, triage: triageFilter } = {}) {
+  let list = load().filter(i => !i.deletedAt).map(_withTriageResult)
   if (status)      list = list.filter(i => i.status      === status)
   if (criticality) list = list.filter(i => i.criticality === criticality)
   if (type)        list = list.filter(i => i.type        === type)
+  if (triageFilter) list = list.filter(i => i.triageResult.level === triageFilter)
   return list
 }
 
 function getById(id) {
-  return load().find(i => i.id === id && !i.deletedAt) || null
+  return _withTriageResult(load().find(i => i.id === id && !i.deletedAt) || null)
 }
 
 function create(fields, { createdBy } = {}) {
@@ -57,6 +65,7 @@ function create(fields, { createdBy } = {}) {
     notes:                fields.notes                || '',
     linkedControls:       Array.isArray(fields.linkedControls) ? fields.linkedControls : [],
     linkedPolicies:       Array.isArray(fields.linkedPolicies) ? fields.linkedPolicies : [],
+    triage:               triage.normalizeTriage(fields.triage),
     createdAt:            nowISO(),
     updatedAt:            nowISO(),
     createdBy:            createdBy || 'system',
@@ -64,7 +73,7 @@ function create(fields, { createdBy } = {}) {
   }
   list.push(item)
   save(list)
-  return item
+  return _withTriageResult(item)
 }
 
 function update(id, patch, { changedBy } = {}) {
@@ -80,10 +89,13 @@ function update(id, patch, { changedBy } = {}) {
   for (const k of allowed) {
     if (patch[k] !== undefined) list[idx][k] = patch[k]
   }
+  if (patch.triage !== undefined) {
+    list[idx].triage = triage.normalizeTriage({ ...list[idx].triage, ...patch.triage })
+  }
   list[idx].updatedAt = nowISO()
   if (changedBy) list[idx].updatedBy = changedBy
   save(list)
-  return list[idx]
+  return _withTriageResult(list[idx])
 }
 
 function remove(id, { deletedBy } = {}) {
@@ -139,7 +151,15 @@ function getSummary() {
   const overdueAudits  = list.filter(i => i.nextAuditDate && i.nextAuditDate < today).length
   const upcomingAudits = list.filter(i => i.nextAuditDate && i.nextAuditDate >= today && i.nextAuditDate <= in30).length
 
-  return { total, critical, byStatus, withDataAccess, upcomingAudits, overdueAudits }
+  const triageLevels = list.map(i => triage.computeTriageResult(i.triage).level)
+  const byTriageLevel = {
+    low:    triageLevels.filter(l => l === 'low').length,
+    medium: triageLevels.filter(l => l === 'medium').length,
+    high:   triageLevels.filter(l => l === 'high').length,
+  }
+  const triageUnassessed = triageLevels.filter(l => l === 'unassessed').length
+
+  return { total, critical, byStatus, withDataAccess, upcomingAudits, overdueAudits, byTriageLevel, triageUnassessed }
 }
 
 function getUpcomingAudits(days = 30) {

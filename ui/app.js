@@ -476,6 +476,12 @@ function renderFunctionBadges(functions) {
 async function init() {
   if (!(await ensureLoginState())) return
 
+  // ── Versionsanzeige im Sidebar-Footer ──
+  fetch('/api/version').then(r => r.ok ? r.json() : null).then(d => {
+    const el = dom('sidebarVersion')
+    if (el && d?.version) el.textContent = `V ${d.version} · `
+  }).catch(() => {})
+
   // ── Modul-Konfiguration + Nav-Reihenfolge laden ──
   try {
     const [modRes, fwRes, orgRes] = await Promise.all([
@@ -4676,6 +4682,17 @@ async function renderAdminMaintenanceTab() {
       </div>
 
       <div class="maintenance-section">
+        <h4 class="org-section-title"><i class="ph ph-arrow-circle-up"></i> ${t('maint_updateCheck')}</h4>
+        <p class="settings-desc">${t('maint_updateCheckDesc')}</p>
+        <div id="updateCheckResult" style="font-size:13px;padding:10px 14px;background:var(--bg-card);border-radius:6px;border:1px solid var(--border);margin-bottom:10px">
+          ${t('maint_updateCheckNever')}
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="runUpdateCheck()" id="btnUpdateCheck">
+          <i class="ph ph-magnifying-glass"></i> ${t('maint_updateCheckButton')}
+        </button>
+      </div>
+
+      <div class="maintenance-section">
         <h4 class="org-section-title"><i class="ph ph-database"></i> ${t('maint_backend')}</h4>
         <div id="storageBackendInfo" style="font-size:13px;padding:10px 14px;background:var(--bg-card);border-radius:6px;border:1px solid var(--border);margin-bottom:6px;">
           ${t('loading')}
@@ -4862,6 +4879,29 @@ function triggerExport() {
   document.body.appendChild(a)
   a.click()
   a.remove()
+}
+
+async function runUpdateCheck(force = true) {
+  const btn = document.getElementById('btnUpdateCheck')
+  const box = document.getElementById('updateCheckResult')
+  if (!box) return
+  if (btn) { btn.disabled = true; btn.innerHTML = `<i class="ph ph-spinner"></i> ${t('maint_updateChecking')}` }
+  box.textContent = t('maint_updateChecking')
+
+  try {
+    const res = await fetch(`/admin/update-check?force=${force}`, { headers: apiHeaders('admin') })
+    const data = await res.json()
+    if (!res.ok || !data.ok) {
+      box.innerHTML = `<span style="color:var(--danger-text,#f87171)"><i class="ph ph-warning-circle"></i> ${t('maint_updateCheckFailed')}${data.error ? ': ' + escHtml(data.error) : ''}</span>`
+    } else if (data.updateAvailable) {
+      box.innerHTML = `<span style="color:var(--warning-text,#f0b429)"><i class="ph ph-arrow-circle-up"></i> ${t('maint_updateAvailable')} <strong>${escHtml(data.latestVersion)}</strong> (${t('maint_currentVersion')}: ${escHtml(data.currentVersion)}) — <a href="${escHtml(data.releaseUrl)}" target="_blank" rel="noopener noreferrer">${t('maint_updateViewRelease')}</a></span>`
+    } else {
+      box.innerHTML = `<span style="color:var(--success,#4ade80)"><i class="ph ph-check-circle"></i> ${t('maint_updateUpToDate')} (${escHtml(data.currentVersion)})</span>`
+    }
+  } catch (e) {
+    box.innerHTML = `<span style="color:var(--danger-text,#f87171)"><i class="ph ph-warning-circle"></i> ${t('maint_updateCheckFailed')}: ${escHtml(e.message)}</span>`
+  }
+  if (btn) { btn.disabled = false; btn.innerHTML = `<i class="ph ph-magnifying-glass"></i> ${t('maint_updateCheckButton')}` }
 }
 
 async function runCleanup() {
@@ -14642,6 +14682,44 @@ function supStatusBadge(v) {
   return `<span style="display:inline-block;padding:2px 7px;border-radius:3px;font-size:.75rem;font-weight:600;color:${cls[v]||'var(--text-subtle)'};">${SUP_STATUS_LABELS[v] || v}</span>`
 }
 
+// ── Lieferanten-Schnelltriage (#63) ──
+const SUP_TRIAGE_LEVEL_LABELS = {
+  get low()        { return t('supl_triageLevelLow') },
+  get medium()     { return t('supl_triageLevelMedium') },
+  get high()       { return t('supl_triageLevelHigh') },
+  get unassessed() { return t('supl_triageLevelUnassessed') },
+}
+const SUP_TRIAGE_PII_LABELS = {
+  get none()     { return t('supl_triagePiiNone') },
+  get personal() { return t('supl_triagePiiPersonal') },
+  get special()  { return t('supl_triagePiiSpecial') },
+}
+const SUP_TRIAGE_SOC2_LABELS = {
+  get in_place()     { return t('supl_triageSoc2InPlace') },
+  get na()           { return t('supl_triageSoc2Na') },
+  get partial()      { return t('supl_triageSoc2Partial') },
+  get not_available(){ return t('supl_triageSoc2NotAvail') },
+}
+const SUP_TRIAGE_ISO_LABELS = {
+  get in_place() { return t('supl_triageIsoInPlace') },
+  get partial()  { return t('supl_triageIsoPartial') },
+  get none()     { return t('supl_triageIsoNone') },
+}
+
+function _supplierTriageColor(level) {
+  const map = { high: 'var(--color-R400,#de350b)', medium: 'var(--color-Y400,#f0b429)', low: 'var(--color-G400,#4ade80)', unassessed: 'var(--text-subtle)' }
+  return map[level] || 'var(--text-subtle)'
+}
+function supTriageBadge(triageResult) {
+  const level = triageResult?.level || 'unassessed'
+  const color = _supplierTriageColor(level)
+  return `<span style="display:inline-block;padding:2px 7px;border-radius:3px;font-size:.75rem;font-weight:700;background:${color}22;color:${color};border:1px solid ${color}44">${SUP_TRIAGE_LEVEL_LABELS[level] || level}</span>`
+}
+function _triageSelectOptions(labels, current) {
+  return `<option value="">${t('supl_triageNotAnswered')}</option>` +
+    Object.entries(labels).map(([v, l]) => `<option value="${v}"${current === v ? ' selected' : ''}>${l}</option>`).join('')
+}
+
 async function renderSuppliers() {
   const existing = document.getElementById('suppliersContainer')
   if (existing) existing.remove()
@@ -14728,19 +14806,21 @@ async function switchSuppliersTab(tab) {
   if (tab === 'critical')   filtered = list.filter(s => s.criticality === 'critical' || s.criticality === 'high')
   if (tab === 'dataaccess') filtered = list.filter(s => s.dataAccess)
 
-  let filterType = '', filterCrit = '', filterStatus = ''
+  let filterType = '', filterCrit = '', filterStatus = '', filterTriage = ''
 
   function renderTable() {
     let rows = filtered.filter(s => {
       if (filterType   && s.type        !== filterType)   return false
       if (filterCrit   && s.criticality !== filterCrit)   return false
       if (filterStatus && s.status      !== filterStatus) return false
+      if (filterTriage && (s.triageResult?.level || 'unassessed') !== filterTriage) return false
       return true
     })
     return `
       <table class="bcm-table">
         <thead><tr>
           <th>Name</th><th>Type</th><th>Criticality</th><th>Status</th>
+          <th>${t('supl_triage')}</th>
           <th>Country</th><th>Next Audit</th><th>Audit Result</th><th>Actions</th>
         </tr></thead>
         <tbody>
@@ -14754,6 +14834,7 @@ async function switchSuppliersTab(tab) {
               <td>${escHtml(SUP_TYPE_LABELS[s.type] || s.type)}</td>
               <td>${supCritBadge(s.criticality)}</td>
               <td>${supStatusBadge(s.status)}</td>
+              <td>${supTriageBadge(s.triageResult)}</td>
               <td>${escHtml(s.country || '—')}</td>
               <td class="${overdue ? 'bcm-overdue' : ''}">${s.nextAuditDate || '—'}${overdue ? ' <i class="ph ph-warning-circle" title="Overdue!"></i>' : ''}</td>
               <td>${escHtml(SUP_AUDIT_LABELS[s.auditResult] || s.auditResult || '—')}</td>
@@ -14763,7 +14844,7 @@ async function switchSuppliersTab(tab) {
                 ${isAdmin ? `<button class="btn btn-danger btn-xs" onclick="deleteSupplier('${s.id}')"><i class="ph ph-trash"></i></button>` : ''}
               </td>
             </tr>`
-          }).join('') : `<tr><td colspan="8" class="dash-empty">No suppliers found</td></tr>`}
+          }).join('') : `<tr><td colspan="9" class="dash-empty">No suppliers found</td></tr>`}
         </tbody>
       </table>
     `
@@ -14784,6 +14865,10 @@ async function switchSuppliersTab(tab) {
         <option value="">${t('filter_allStatuses')}</option>
         ${Object.entries(SUP_STATUS_LABELS).map(([v, l]) => `<option value="${v}">${l}</option>`).join('')}
       </select>
+      <select id="supFilterTriage" class="select" style="max-width:180px">
+        <option value="">${t('supl_triageAllLevels')}</option>
+        ${Object.entries(SUP_TRIAGE_LEVEL_LABELS).map(([v, l]) => `<option value="${v}">${l}</option>`).join('')}
+      </select>
     </div>
     <div id="suppliersTable">${renderTable()}</div>
   `
@@ -14798,6 +14883,10 @@ async function switchSuppliersTab(tab) {
   })
   el.querySelector('#supFilterStatus')?.addEventListener('change', e => {
     filterStatus = e.target.value
+    el.querySelector('#suppliersTable').innerHTML = renderTable()
+  })
+  el.querySelector('#supFilterTriage')?.addEventListener('change', e => {
+    filterTriage = e.target.value
     el.querySelector('#suppliersTable').innerHTML = renderTable()
   })
 }
@@ -14949,6 +15038,29 @@ async function openSupplierForm(id = null) {
           ${renderLinksBlock('sup', item?.linkedControls || [], item?.linkedPolicies || [])}
         </div>
 
+        <div class="training-form-section">
+          <h4 class="training-form-section-title"><i class="ph ph-gauge"></i> ${t('supl_triageSection')} ${supTriageBadge(item?.triageResult)}</h4>
+          <p style="font-size:.82rem;color:var(--text-subtle);margin:0 0 12px">${t('supl_triageDesc')}</p>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">${t('supl_triagePii')}</label>
+              <select id="supTriagePii" class="select">${_triageSelectOptions(SUP_TRIAGE_PII_LABELS, item?.triage?.pii?.processes || '')}</select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">${t('supl_triageSoc2')}</label>
+              <select id="supTriageSoc2" class="select">${_triageSelectOptions(SUP_TRIAGE_SOC2_LABELS, item?.triage?.soc2?.status || '')}</select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">${t('supl_triageIso27001')}</label>
+              <select id="supTriageIso" class="select">${_triageSelectOptions(SUP_TRIAGE_ISO_LABELS, item?.triage?.iso27001?.status || '')}</select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">${t('supl_triageNotes')}</label>
+            <textarea id="supTriageNotes" class="form-input" rows="2">${escHtml(item?.triage?.notes || '')}</textarea>
+          </div>
+        </div>
+
       </div>
       <div class="training-form-footer">
         <button class="btn btn-secondary" onclick="switchSuppliersTab('${_suppliersTab}')">${t('ui_cancel')}</button>
@@ -14987,6 +15099,14 @@ async function saveSupplier(id) {
     notes:                dom('supNotes')?.value                 || '',
     linkedControls:       getLinkedValues('sup', 'ctrl'),
     linkedPolicies:       getLinkedValues('sup', 'pol'),
+    triage: {
+      pii:      { processes: dom('supTriagePii')?.value || '' },
+      soc2:     { status: dom('supTriageSoc2')?.value || '' },
+      iso27001: { status: dom('supTriageIso')?.value || '' },
+      notes:      dom('supTriageNotes')?.value || '',
+      assessedAt: new Date().toISOString(),
+      assessedBy: getCurrentUser(),
+    },
   }
   if (!payload.name) { alert('Name is required'); return }
   const url    = id ? `/suppliers/${id}` : '/suppliers'

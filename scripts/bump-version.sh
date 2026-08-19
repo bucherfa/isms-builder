@@ -61,14 +61,23 @@ done < <(find server ui -type f \( -name "*.js" -o -name "*.html" -o -name "*.cs
 ok "${COUNT} Quelldateien aktualisiert"
 
 # 3. README.md
+# NUR Zeile 1 (die Copyright-Kopfzeile) anfassen, nicht die ganze Datei —
+# README.md enthaelt in der Roadmap-Tabelle historische Versionsangaben
+# (z.B. "V 1.37.2.0" bei laengst abgeschlossenen Punkten, oder zufaellig genau
+# die Vorversion bei einem gerade fertiggestellten Punkt). Ein fuzzy-Muster wie
+# "V 1\.[0-9][0-9]*" traf frueher sogar "V 1.37" und haengte den Rest doppelt
+# an; selbst ein exaktes Match auf OLD_FULL traf faelschlich die Roadmap-Zeile
+# des zuletzt abgeschlossenen Punkts, weil deren Versionsangabe zufaellig
+# gleich der alten Gesamtversion war. Nur Zeile 1 ist wirklich "die aktuelle
+# Version", alles andere ist Historie und bleibt unangetastet.
 info "README.md..."
-sed -i "s/V 1\.[0-9][0-9]*/V ${NEW_VERSION}/g" README.md
-sed -i "s/version-[0-9][0-9]*\.[0-9][0-9]*/version-${NEW_VERSION}/g" README.md
-ok "README.md → V ${NEW_VERSION}"
+sed -i "1s/V ${OLD_FULL}\b/V ${NEW_VERSION}/" README.md
+sed -i "1s/version-${OLD_FULL}\b/version-${NEW_VERSION}/" README.md
+ok "README.md (Zeile 1) → V ${NEW_VERSION}"
 
 # 4. CLAUDE.md (Projektdoku)
-if grep -q "V 1\." CLAUDE.md 2>/dev/null; then
-  sed -i "s/V 1\.[0-9][0-9]*/V ${NEW_VERSION}/g" CLAUDE.md
+if grep -q "V ${OLD_FULL}\b" CLAUDE.md 2>/dev/null; then
+  sed -i "s/V ${OLD_FULL}\b/V ${NEW_VERSION}/g" CLAUDE.md
   ok "CLAUDE.md aktualisiert"
 fi
 

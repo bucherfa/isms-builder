@@ -104,6 +104,11 @@ app.get('/', (req, res) => {
   res.redirect('/ui/login.html')
 })
 
+// ── Versionsauskunft (kein Auth erforderlich, auch auf der Login-Seite sichtbar) ──
+app.get('/api/version', (req, res) => {
+  res.json({ version: require('../package.json').version })
+})
+
 // ── Health Check (kein Auth erforderlich) ──
 // Prüft: Express läuft, SQLite erreichbar, JSON-Datei lesbar
 // Für Monitoring / Demo-Server-Cron aktivieren

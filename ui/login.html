@@ -393,6 +393,7 @@
     ISMS Builder · ISO 27001 · BSI · NIS2 · EUCS · EU AI Act
   </div>
   <div class="license-notice">
+    <span id="loginVersion"></span>
     <span data-i18n="licenseNotice">© Claude Hecker · Open Source (AGPL-3.0)</span>
     · <a href="https://github.com/coolstartnow/isms-builder" target="_blank" rel="noopener" data-i18n="licenseSourceLink">Quellcode auf GitHub</a>
   </div>
@@ -558,6 +559,10 @@
     document.addEventListener('DOMContentLoaded', () => {
       applyLoginLang()
       applyLanguageConfig()
+      fetch('/api/version').then(r => r.ok ? r.json() : null).then(d => {
+        const el = document.getElementById('loginVersion')
+        if (el && d?.version) el.textContent = `V ${d.version} · `
+      }).catch(() => {})
     })
 
     async function openIncModal() {

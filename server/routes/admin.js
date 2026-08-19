@@ -302,6 +302,12 @@ router.get('/admin/email/status', requireAuth, authorize('admin'), (req, res) =>
   })
 })
 
+// ── Update-Check (nur Hinweis, kein automatisches Anwenden) ──
+router.get('/admin/update-check', requireAuth, authorize('admin'), async (req, res) => {
+  const result = await require('../updateCheck').checkForUpdate(req.query.force === 'true')
+  res.json(result)
+})
+
 // ── WebDAV-Verbindungstest (Nextcloud/ownCloud-Publish, #66) ──
 router.post('/admin/webdav/test', requireAuth, authorize('admin'), async (req, res) => {
   const webdav = require('../webdav')

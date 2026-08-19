@@ -16,6 +16,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      - name: Verify tag matches package.json version
+        # Verhindert die Drift, die zu v1.37.5.1 gefuehrt hat: der Tag wurde
+        # gepusht, ohne vorher scripts/bump-version.sh laufen zu lassen, und
+        # package.json blieb auf der Vorversion stehen — die App zeigte danach
+        # (siehe /api/version) die falsche Version an, bis das manuell auffiel.
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          PKG_VERSION="$(node -p "require('./package.json').version")"
+          if [ "$TAG_VERSION" != "$PKG_VERSION" ]; then
+            echo "::error::Tag ${GITHUB_REF_NAME} passt nicht zu package.json (${PKG_VERSION}). Vor dem Taggen 'bash scripts/bump-version.sh ${TAG_VERSION}' ausfuehren und committen."
+            exit 1
+          fi
+          echo "OK: Tag ${GITHUB_REF_NAME} passt zu package.json (${PKG_VERSION})"
+
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
