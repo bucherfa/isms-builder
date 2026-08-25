@@ -84,6 +84,7 @@ tmp/
 .DS_Store
 Thumbs.db
 claude.md
+.idea/
 
 # Puppeteer cache
 .local-chromium/
